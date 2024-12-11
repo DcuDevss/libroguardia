@@ -28,7 +28,7 @@ class CustomLoginView(LoginView):
         return reverse_lazy('no_permission')
 
 
-    #def get_success_url(self):
+    #def get_success_url(self):cambios
     #    if self.request.user.groups.filter(name='comisariaprimera').exists():
      #       return reverse_lazy('comisaria_primera_list')
       #  elif self.request.user.groups.filter(name='comisariasegunda').exists():
