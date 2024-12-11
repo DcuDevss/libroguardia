@@ -6,7 +6,7 @@ from .models import (
     ComisariaCuartaRG, ComisariaQuintaRG
 )
 
-# Acción para activar registros
+# Acción para activar registrosss
 def make_active(modeladmin, request, queryset):
     queryset.update(activo=True)
 make_active.short_description = "Activar seleccionados"
