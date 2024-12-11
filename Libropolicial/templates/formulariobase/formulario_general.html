@@ -28,15 +28,122 @@
     .django-ckeditor-widget{
         width: 100%;
     }
+    .contenedor{
+        width: 75%;
+    }
+    /* MEDIA QUERY IMG "SOMOS" */  
+    @media (max-width: 1707px){
+        .contenedor{
+            width: 75%
+        }
+        .dep-adicionales{
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+    }
+    @media (max-width: 1440px){
+        .contenedor{
+            width: 88%;
+        }
+        h1{
+            /* color: red; */
+        }
+        .dep-adicionales{
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+    }
+    @media (max-width: 1024px){
+        .contenedor{
+            width: 100%;
+            padding-left: 0;
+            padding-right: 0;
+        }
+        h1{
+            /* color: blue; */
+        }
+        .dep-adicionales{
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+    }
+    @media (max-width: 880px){
+        .contenedor{
+            width: 85%;
+        }
+        .formulario-mapa{
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+        h1{
+            /* color: green; */
+        }
+        .dep-adicionales{
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+    @media (max-width: 640px){
+        h1{
+            /* color: yellow; */
+        }
+        .botones-top{
+            display: grid;
+            width: fit-content;
+            row-gap: 10px;
+            margin: 0 auto;
+            grid-template-columns: 1;
+        }
+        .contenedor{
+            width: 90%;
+        }
+        .codigos-secundarios{
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+        .coordenadas{
+            display: grid;
+            grid-template-columns: 1fr;
+            row-gap: 10px;
+        }
+        .dep-adicionales{
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+        .guardar{
+            margin: auto;
+            padding-top: 30px;
+        }
+    }
+    @media (max-width: 440px){
+        .contenedor{
+            width: 90%;
+        }
+        .bloques{
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+        .codigos-secundarios{
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+        h1{
+            /* color: purple; */
+        }
+        .dep-adicionales{
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
-<div style="width: 75%;" class=" mx-auto mt-4 p-4 dark:text-white">
+<div class="contenedor mx-auto mt-4 p-4 dark:text-white">
     <!-- TITULO -->
     <h1 class="text-2xl font-bold mb-4 text-center">Registrar en comisarias</h1>
-    <form method="post" class="dark:text-gray-300" autocomplete="off">
+    <form method="post" id="comisaria-form" class="dark:text-gray-300" autocomplete="off">
         {% csrf_token %}
         <!-- TOP -->
         <!-- BOTONES -->
-        <div class="flex w-full justify-between pb-1">
+        <div class="botones-top flex w-full justify-between pb-1">
             <!-- GUARDAR -->
             <div class="">
                 <button type="submit" 
@@ -50,11 +157,12 @@
                 {% endblock %}
             </div>
         </div>
-        <div class="grid grid-cols-2 gap-x-4">
+        <div class="formulario-mapa grid grid-cols-2 gap-x-4">
             <!-- FORMULARIO -->
             <div class="">
                 <!-- BLOQUE 1 -->
-                <div class="flex gap-x-4 pb-2 pt-1">
+                <!-- <div class="flex gap-x-4 pb-2 pt-1"> -->
+                <div class="bloques grid grid-cols-2 gap-x-4 pb-2 pt-1">
                     <!-- FECHA Y HORA -->
                     <div class="w-full">
                         <label for="fecha_hora" class="py-1 block text-gray-700 dark:text-gray-300">Fecha y hora</label>
@@ -71,7 +179,7 @@
                     </div>
                 </div>
                 <!-- "BLOQUE 2" -->
-                <div class="flex gap-x-4 pb-2 pt-1">
+                <div class="bloques flex gap-x-4 pb-2 pt-1">
                     <!-- CODIGO -->
                     <div class="w-full">                          
                         <div class="w-full">
@@ -86,7 +194,7 @@
                     </div>
                 </div>
                 <!-- BLOQUE 3 -->
-                <div class="flex gap-x-4 pb-2 pt-1">
+                <div class="bloques flex gap-x-4 pb-2 pt-1">
                     <!-- MOVIL/PATRULLA -->
                     <div class="w-full">
                         <label for="{{ form.movil_patrulla.id_for_label }}" class="py-1 block text-gray-700 dark:text-gray-300">{{ form.movil_patrulla.label }}</label>
@@ -99,7 +207,7 @@
                     </div>
                 </div>
                 <!-- BLOQUE 4 -->
-                <div class="flex gap-x-4 pb-2 pt-1">
+                <div class="bloques flex gap-x-4 pb-2 pt-1">
                     <!-- A CARGO -->
                     <div class="w-full">
                         <label for="{{ form.a_cargo.id_for_label }}" class="py-1 block text-gray-700 dark:text-gray-300">{{ form.a_cargo.label }}</label>
@@ -112,26 +220,26 @@
                     </div>
                 </div>
                 <!-- BLOQUE 5 -->
-                <div class="grid grid-cols-2 gap-x-4 pb-2 pt-1">
-                       <!-- COD. SECUNDARIOS -->
-                <div class="w-full relative" x-data="{ showDropdown: false }">
-                    <label for="codigos_secundarios"
-                        class="block text-gray-700 dark:text-gray-300 text-nowrap">{{ form.codigos_secundarios.label }}</label>
-                    <div @click="showDropdown = !showDropdown" 
-                        class="flex justify-between w-full p-3 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 cursor-pointer
-                        dark:bg-gray-800 bg-gray-50 border
-                        dark:text-gray-200 text-gray-900
-                        dark:border-gray-600 border-gray-300">
-                        <span>Seleccionar</span>
-                        <span :class="showDropdown ? 'rotate-180' : 'rotate-0'" class="ml-2 transition-transform duration-200">
-                            ▼
-                        </span>
-                    </div>
+                <div class="bloques grid grid-cols-2 gap-x-4 pb-2 pt-1">
+                    <!-- COD. SECUNDARIOS -->
+                    <div class="w-full relative" x-data="{ showDropdown: false }">
+                        <label for="codigos_secundarios"
+                            class="block text-gray-700 dark:text-gray-300 text-nowrap">{{ form.codigos_secundarios.label }}</label>
+                        <div @click="showDropdown = !showDropdown" 
+                            class="flex justify-between w-full p-3 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 cursor-pointer
+                            dark:bg-gray-800 bg-gray-50 border
+                            dark:text-gray-200 text-gray-900
+                            dark:border-gray-600 border-gray-300">
+                            <span>Seleccionar</span>
+                            <span :class="showDropdown ? 'rotate-180' : 'rotate-0'" class="ml-2 transition-transform duration-200">
+                                ▼
+                            </span>
+                        </div>
                     <div x-show="showDropdown" @click.away="showDropdown = false" 
-                        class="absolute w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-10 p-1" 
-                        style="display: none;">
+                        class="absolute w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-50 p-1" 
+                        style="display: none; z-index: 1000;">
                         <div style="height: 210px;" 
-                            class="grid grid-cols-4 gap-1 overflow-y-scroll">
+                            class="codigos-secundarios grid grid-cols-4 gap-1 overflow-y-scroll">
                             {% for codigo in form.codigos_secundarios.field.queryset %}
                             <label class="cursor-pointer rounded-lg w-fit pl-1 pr-2 flex items-center hover:bg-gray-100 dark:hover:bg-gray-600">
                                 <input type="checkbox" name="codigos_secundarios" value="{{ codigo.id }}" 
@@ -153,12 +261,12 @@
                     </div>
                 </div>
             </div>
-            <!-- MAPA -->
+            <!-- MAPA cmbios en el mapa-->
             <div class="mt-4">
                 <!-- MAP -->
-                <div id="map" style="height: 343px;" class="rounded-lg"></div>
+                <div id="map" style="height: 343px; z-index: 1;" class="rounded-lg"></div>
                 <!-- COORDENADAS -->
-                <div class="flex gap-x-4 py-2">
+                <div class="coordenadas flex gap-x-4 py-2">
                     <!-- LATITUD -->
                     <div class="w-full">
                         <label for="id_latitude" class="block text-gray-700 dark:text-gray-300">Latitud</label>
@@ -187,10 +295,10 @@
         <!-- BOTTOM -->
         <div class="mt-4">
             <!-- DEP ADICIONALES -->
-            <div class="flex gap-x-4">
+            <div class="dep-adicionales flex gap-x-4 items-end">
                 <!-- BOMBEROS -->
                 <div class="w-full relative" x-data="{ showDropdown: false, selectedServices: {{ detalle_servicios_emergencia }} }">
-                    <label for="servicios_emergencia" class="block text-gray-700 dark:text-gray-300 text-nowrap">
+                    <label for="servicios_emergencia" class="block text-gray-700 dark:text-gray-300 pb-2">
                         {{ form.servicios_emergencia.label }}
                     </label>
                     <div @click="showDropdown = !showDropdown" 
@@ -242,7 +350,7 @@
                 <!-- HRU -->
                 <div class="w-full relative" x-data="{ showDropdown: false, selectedInstituciones: {{ detalle_instituciones_hospitalarias }} }">
                     <label for="instituciones_hospitalarias" 
-                        class="block text-gray-700 dark:text-gray-300">{{ form.instituciones_hospitalarias.label }}</label>
+                        class="block text-gray-700 dark:text-gray-300 pb-2">{{ form.instituciones_hospitalarias.label }}</label>
                     <div @click="showDropdown = !showDropdown" 
                         class="flex justify-between bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 w-full p-3 cursor-pointer">
                         <span>Seleccionar</span>
@@ -281,7 +389,7 @@
                 </div>
                 <!-- MUNIPAS -->
                 <div class="w-full relative" x-data="{ showDropdown: false, selectedDependenciasMunicipales: {{ detalle_dependencias_municipales }} }">
-                    <label for="dependencias_municipales" class="block text-gray-700 dark:text-gray-300">{{ form.dependencias_municipales.label }}</label>
+                    <label for="dependencias_municipales" class="block text-gray-700 dark:text-gray-300 pb-2">{{ form.dependencias_municipales.label }}</label>
                     <div @click="showDropdown = !showDropdown" class="flex justify-between bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 cursor-pointer">
                         <span>Seleccionar</span>
                         <span :class="showDropdown ? 'rotate-180' : 'rotate-0'" class="ml-2 transition-transform duration-200">
@@ -317,7 +425,7 @@
                 </div>
                 <!-- PROVINCIALES -->
                 <div class="w-full relative" x-data="{ showDropdown: false, selectedDependenciasProvinciales: {{ detalle_dependencias_provinciales }} }">
-                    <label for="dependencias_provinciales" class="block text-gray-700 dark:text-gray-300">{{ form.dependencias_provinciales.label }}</label>
+                    <label for="dependencias_provinciales" class="block text-gray-700 dark:text-gray-300 pb-2">{{ form.dependencias_provinciales.label }}</label>
                     <div @click="showDropdown = !showDropdown" class="flex justify-between bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 cursor-pointer">
                         <span>Seleccionar</span>
                         <span :class="showDropdown ? 'rotate-180' : 'rotate-0'" class="ml-2 transition-transform duration-200">
@@ -352,99 +460,122 @@
                         </template>
                     </div>
                 </div>
-
                 <!-- INSTITUCIONES FEDERALES -->
-<div class="w-full relative" x-data="{ showDropdown: false, selectedInstitucionesFederales: {{ detalle_instituciones_federales }} }">
-    <label for="instituciones_federales" class="block text-gray-700 dark:text-gray-300">{{ form.instituciones_federales.label }}</label>
-    <div @click="showDropdown = !showDropdown" class="flex justify-between bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 cursor-pointer">
-        <span>Seleccionar</span>
-        <span :class="showDropdown ? 'rotate-180' : 'rotate-0'" class="ml-2 transition-transform duration-200">▼</span>
-    </div>
-    <div x-show="showDropdown" @click.away="showDropdown = false" 
-        class="absolute w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-10 p-2" 
-        style="display: none;">
-        <div class="grid grid-cols-1 gap-1 h-[150px] overflow-y-scroll">
-            {% for institucion in form.instituciones_federales.field.queryset %}
-            <label class="cursor-pointer flex items-center rounded-lg py-1 hover:bg-gray-100 dark:hover:bg-gray-600">
-                <input type="checkbox" name="instituciones_federales" value="{{ institucion.id }}" 
-                    class="form-checkbox px-1 ml-2 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" 
-                    @change="if ($event.target.checked) { if (!selectedInstitucionesFederales.some(i => i.institucion_federal_id == {{ institucion.id }})) { selectedInstitucionesFederales.push({id: null, institucion_federal_id: {{ institucion.id }}, numero_movil_federal: '', nombre_a_cargo_federal: ''}); } } else { selectedInstitucionesFederales = selectedInstitucionesFederales.filter(i => i.institucion_federal_id != {{ institucion.id }}); }"
-                    :checked="selectedInstitucionesFederales.some(i => i.institucion_federal_id == {{ institucion.id }})">
-                <span class="ml-2 dark:text-gray-300">{{ institucion }}</span>
-            </label>
-            {% endfor %}
-        </div>
-    </div>
-    <!-- Campos visibles para detalles de instituciones federales -->
-    <div class="sm:col-span-3 mt-6">
-        <template x-for="institucion in selectedInstitucionesFederales" :key="institucion.institucion_federal_id">
-            <div>
-                <label :for="'numero_movil_federal_' + institucion.institucion_federal_id" class="block text-gray-700 dark:text-gray-300">Movil Institucion Federal <span x-text="institucion.nombre"></span></label>
-                <input type="text" :name="'numero_movil_federal_' + institucion.institucion_federal_id" :id="'numero_movil_federal_' + institucion.institucion_federal_id" class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 mb-2" x-model="institucion.numero_movil_federal">
+                <div class="w-full relative" x-data="{ showDropdown: false, selectedInstitucionesFederales: {{ detalle_instituciones_federales }} }">
+                    <label for="instituciones_federales" class="block text-gray-700 dark:text-gray-300 pb-2">{{ form.instituciones_federales.label }}</label>
+                    <div @click="showDropdown = !showDropdown" class="flex justify-between bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 cursor-pointer">
+                        <span>Seleccionar</span>
+                        <span :class="showDropdown ? 'rotate-180' : 'rotate-0'" class="ml-2 transition-transform duration-200">▼</span>
+                    </div>
+                    <div x-show="showDropdown" @click.away="showDropdown = false" 
+                        class="absolute w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-10 p-2" 
+                        style="display: none;">
+                        <div class="grid grid-cols-1 gap-1 h-[150px] overflow-y-scroll">
+                            {% for institucion in form.instituciones_federales.field.queryset %}
+                            <label class="cursor-pointer flex items-center rounded-lg py-1 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                <input type="checkbox" name="instituciones_federales" value="{{ institucion.id }}" 
+                                    class="form-checkbox px-1 ml-2 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" 
+                                    @change="if ($event.target.checked) { if (!selectedInstitucionesFederales.some(i => i.institucion_federal_id == {{ institucion.id }})) { selectedInstitucionesFederales.push({id: null, institucion_federal_id: {{ institucion.id }}, numero_movil_federal: '', nombre_a_cargo_federal: ''}); } } else { selectedInstitucionesFederales = selectedInstitucionesFederales.filter(i => i.institucion_federal_id != {{ institucion.id }}); }"
+                                    :checked="selectedInstitucionesFederales.some(i => i.institucion_federal_id == {{ institucion.id }})">
+                                <span class="ml-2 dark:text-gray-300">{{ institucion }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <!-- Campos visibles para detalles de instituciones federales -->
+                    <div class="sm:col-span-3 mt-6">
+                        <template x-for="institucion in selectedInstitucionesFederales" :key="institucion.institucion_federal_id">
+                            <div>
+                                <label :for="'numero_movil_federal_' + institucion.institucion_federal_id" class="block text-gray-700 dark:text-gray-300">Movil Institucion Federal <span x-text="institucion.nombre"></span></label>
+                                <input type="text" :name="'numero_movil_federal_' + institucion.institucion_federal_id" :id="'numero_movil_federal_' + institucion.institucion_federal_id" class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 mb-2" x-model="institucion.numero_movil_federal">
 
-                <label :for="'nombre_a_cargo_federal_' + institucion.institucion_federal_id" class="block text-gray-700 dark:text-gray-300">Personal a Cargo<span x-text="institucion.nombre"></span></label>
-                <input type="text" :name="'nombre_a_cargo_federal_' + institucion.institucion_federal_id" :id="'nombre_a_cargo_federal_' + institucion.institucion_federal_id" class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 mb-2" x-model="institucion.nombre_a_cargo_federal">
+                                <label :for="'nombre_a_cargo_federal_' + institucion.institucion_federal_id" class="block text-gray-700 dark:text-gray-300">Personal a Cargo<span x-text="institucion.nombre"></span></label>
+                                <input type="text" :name="'nombre_a_cargo_federal_' + institucion.institucion_federal_id" :id="'nombre_a_cargo_federal_' + institucion.institucion_federal_id" class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 mb-2" x-model="institucion.nombre_a_cargo_federal">
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                <!-- DEPENDENCIAS SECUNDARIAS -->
+                <div class="w-full relative" x-data="{ showDropdown: false, selectedDependenciasSecundarias: {{ detalle_dependencias_secundarias }} }">
+                    <label for="dependencias_secundarias" class="block text-gray-700 dark:text-gray-300 pb-2">{{ form.dependencias_secundarias.label }}</label>
+                    <div @click="showDropdown = !showDropdown" class="flex justify-between bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 cursor-pointer">
+                        <span>Seleccionar</span>
+                        <span :class="showDropdown ? 'rotate-180' : 'rotate-0'" class="ml-2 transition-transform duration-200">▼</span>
+                    </div>
+                    <div x-show="showDropdown" @click.away="showDropdown = false" 
+                        class="absolute w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-10 p-2" 
+                        style="display: none;">
+                        <div class="grid grid-cols-1 gap-1 h-[150px] overflow-y-scroll">
+                            {% for dependencia in form.dependencias_secundarias.field.queryset %}
+                            <label class="cursor-pointer flex items-center rounded-lg py-1 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                <input type="checkbox" name="dependencias_secundarias" value="{{ dependencia.id }}" 
+                                    class="form-checkbox px-1 ml-2 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" 
+                                    @change="if ($event.target.checked) { if (!selectedDependenciasSecundarias.some(d => d.dependencia_secundaria_id == {{ dependencia.id }})) { selectedDependenciasSecundarias.push({id: null, dependencia_secundaria_id: {{ dependencia.id }}, numero_movil_secundaria: '', nombre_a_cargo_secundaria: ''}); } } else { selectedDependenciasSecundarias = selectedDependenciasSecundarias.filter(d => d.dependencia_secundaria_id != {{ dependencia.id }}); }"
+                                    :checked="selectedDependenciasSecundarias.some(d => d.dependencia_secundaria_id == {{ dependencia.id }})">
+                                <span class="ml-2 dark:text-gray-300">{{ dependencia }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <!-- Campos visibles para detalles de dependencias secundarias -->
+                    <div class="sm:col-span-3 mt-6">
+                        <template x-for="dependencia in selectedDependenciasSecundarias" :key="dependencia.dependencia_secundaria_id">
+                            <div>
+                                <label :for="'numero_movil_secundaria_' + dependencia.dependencia_secundaria_id" class="block text-gray-700 dark:text-gray-300">Móvil dependencia Policial <span x-text="dependencia.nombre"></span></label>
+                                <input type="text" :name="'numero_movil_secundaria_' + dependencia.dependencia_secundaria_id" :id="'numero_movil_secundaria_' + dependencia.dependencia_secundaria_id" class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 mb-2" x-model="dependencia.numero_movil_secundaria">
+
+                                <label :for="'nombre_a_cargo_secundaria_' + dependencia.dependencia_secundaria_id" class="block text-gray-700 dark:text-gray-300">Personal a Cargo <span x-text="dependencia.nombre"></span></label>
+                                <input type="text" :name="'nombre_a_cargo_secundaria_' + dependencia.dependencia_secundaria_id" :id="'nombre_a_cargo_secundaria_' + dependencia.dependencia_secundaria_id" class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 mb-2" x-model="dependencia.nombre_a_cargo_secundaria">
+                            </div>
+                        </template>
+                    </div>
+                </div>
             </div>
-        </template>
-    </div>
-</div>
-
-<!-- DEPENDENCIAS SECUNDARIAS -->
-<div class="w-full relative" x-data="{ showDropdown: false, selectedDependenciasSecundarias: {{ detalle_dependencias_secundarias }} }">
-    <label for="dependencias_secundarias" class="block text-gray-700 dark:text-gray-300">{{ form.dependencias_secundarias.label }}</label>
-    <div @click="showDropdown = !showDropdown" class="flex justify-between bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 cursor-pointer">
-        <span>Seleccionar</span>
-        <span :class="showDropdown ? 'rotate-180' : 'rotate-0'" class="ml-2 transition-transform duration-200">▼</span>
-    </div>
-    <div x-show="showDropdown" @click.away="showDropdown = false" 
-        class="absolute w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-10 p-2" 
-        style="display: none;">
-        <div class="grid grid-cols-1 gap-1 h-[150px] overflow-y-scroll">
-            {% for dependencia in form.dependencias_secundarias.field.queryset %}
-            <label class="cursor-pointer flex items-center rounded-lg py-1 hover:bg-gray-100 dark:hover:bg-gray-600">
-                <input type="checkbox" name="dependencias_secundarias" value="{{ dependencia.id }}" 
-                    class="form-checkbox px-1 ml-2 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" 
-                    @change="if ($event.target.checked) { if (!selectedDependenciasSecundarias.some(d => d.dependencia_secundaria_id == {{ dependencia.id }})) { selectedDependenciasSecundarias.push({id: null, dependencia_secundaria_id: {{ dependencia.id }}, numero_movil_secundaria: '', nombre_a_cargo_secundaria: ''}); } } else { selectedDependenciasSecundarias = selectedDependenciasSecundarias.filter(d => d.dependencia_secundaria_id != {{ dependencia.id }}); }"
-                    :checked="selectedDependenciasSecundarias.some(d => d.dependencia_secundaria_id == {{ dependencia.id }})">
-                <span class="ml-2 dark:text-gray-300">{{ dependencia }}</span>
-            </label>
-            {% endfor %}
-        </div>
-    </div>
-    <!-- Campos visibles para detalles de dependencias secundarias -->
-    <div class="sm:col-span-3 mt-6">
-        <template x-for="dependencia in selectedDependenciasSecundarias" :key="dependencia.dependencia_secundaria_id">
-            <div>
-                <label :for="'numero_movil_secundaria_' + dependencia.dependencia_secundaria_id" class="block text-gray-700 dark:text-gray-300">Móvil dependencia Policial <span x-text="dependencia.nombre"></span></label>
-                <input type="text" :name="'numero_movil_secundaria_' + dependencia.dependencia_secundaria_id" :id="'numero_movil_secundaria_' + dependencia.dependencia_secundaria_id" class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 mb-2" x-model="dependencia.numero_movil_secundaria">
-
-                <label :for="'nombre_a_cargo_secundaria_' + dependencia.dependencia_secundaria_id" class="block text-gray-700 dark:text-gray-300">Personal a Cargo <span x-text="dependencia.nombre"></span></label>
-                <input type="text" :name="'nombre_a_cargo_secundaria_' + dependencia.dependencia_secundaria_id" :id="'nombre_a_cargo_secundaria_' + dependencia.dependencia_secundaria_id" class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 mb-2" x-model="dependencia.nombre_a_cargo_secundaria">
-            </div>
-        </template>
-    </div>
-</div>
-
-
-
-
-             
-            </div>
-            
             <!-- TAREAS JUDICIALES -->
             <div class="">
                 <label for="{{ form.tareas_judiciales.id_for_label }}" class="block text-gray-700 dark:text-gray-300">{{ form.tareas_judiciales.label }}</label>
                 <textarea name="{{ form.tareas_judiciales.name }}" id="{{ form.tareas_judiciales.id_for_label }}" class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3">{{ form.tareas_judiciales.value|default_if_none:'' }}</textarea>
             </div>
         </div>
-
-
-        <div class="w-fit mt-4">
-            <button type="submit" 
-                class="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-700 w-full">
+        <!-- GUARDAR -->
+        <div class="guardar w-fit mt-4">
+            <button type="submit" id="submit-button" class="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-700 w-full">
                 Guardar
             </button>
-        </div>
+        <!-- Campop oculto para el guardado -->  
+            <input type="hidden" name="is_confirmed" id="is_confirmed" value="false">
+        </div>        
     </form>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('comisaria-form');  // El formulario
+            const submitButton = document.getElementById('submit-button');  // El botón de guardar
+            const isConfirmedInput = document.getElementById('is_confirmed');  // El campo oculto para la confirmación
+    
+            // Evitar que el formulario se envíe inmediatamente
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();  // Evita el envío inmediato del formulario
+    
+                // Muestra el SweetAlert de confirmación
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: '¿Deseas guardar este código?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, guardar',
+                    cancelButtonText: 'No, cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Si el usuario confirma, marca como 'true' y envía el formulario
+                        isConfirmedInput.value = 'true';  // Establece el valor de 'is_confirmed' a 'true'
+                        form.submit();  // Envía el formulario
+                    } else {
+                        // Si el usuario cancela, muestra un mensaje informando que la acción fue cancelada
+                        Swal.fire('Cancelado', 'No se guardó el código.', 'info');
+                    }
+                });
+            });
+        });
+    </script>
 </div>
 {% endblock %}

@@ -1,5 +1,4 @@
 # Archivos de entorno
-.env
 
 # Python
 *.pyc
@@ -23,6 +22,8 @@ var/
 *.egg
 MANIFEST
 /static/css/
+#/Libropolicial/Libropolicial/settings.py
+
 
 # Django
 *.log
@@ -34,3 +35,4 @@ media/
 
 # Entorno virtual
 .venv/
+#se elimino el .env del gitigniore

@@ -3,244 +3,178 @@
 {% block title %}Registros Completos de Comisarías{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.dataTables.css" />
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdn.datatables.net/2.1.3/js/dataTables.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
-<!-- estilos varios -->
-<style>
-    /* ::-webkit-scrollbar {
-        display: none;
-    } */
-    h1{
-        font-family: 'Roboto Slab', serif;
-    }
-    .dt-layout-row{
-        font-size: 13px;
-    }
-    #dt-search-0{
-        border-radius: 6px;
-        min-width: 300px;
-    }
-    #dt-length-0{
-        border-radius: 6px;
-    }
-    /* cambio de posicion buscador y selector de registros */
-    .dt-layout-row {
-        display: flex;
-    }
-    div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {
-        order: 1;
-        justify-content: flex-start;
-        margin-left: 0;
-    }
-    div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-start {
-        order: 2;
-        justify-content: flex-end;
-        margin-right: 0;
-    }
-    /* Estilos para el modo oscuro */
-    .dark .dataTables_wrapper {
-        background-color: #2d2d2d;
-        color: #e0e0e0;
-    }
+<div class="w-full max-w-6xl mx-auto px-4 pb-4 pt-2">
+    <h1 class="text-2xl font-bold text-center mb-4 text-gray-400 dark:text-gray-100">
+        Registros Completos de Comisarías
+    </h1>
+    
 
-    .dark .dataTables_wrapper .dataTables_paginate .paginate_button {
-        background-color: #444;
-        color: #e0e0e0;
-    }
+    <!-- Formulario de búsqueda y selección de elementos por página -->
+    <div class="mb-4 flex justify-between items-center">
+        <!-- Formulario de búsqueda -->
+        <form method="get" class="flex items-center">
+            <input type="text" name="q" value="{{ query }}" placeholder="Buscar..." class="border rounded px-4 py-2 w-full max-w-xs">
+            <button type="submit" class="ml-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                Buscar
+            </button>
+            <button type="button" onclick="clearSearch()" class="ml-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-2.707-5.707a1 1 0 010-1.414L8.586 10 7.293 8.707a1 1 0 011.414-1.414L10 8.586l1.293-1.293a1 1 0 011.414 1.414L11.414 10l1.293 1.293a1 1 0 01-1.414 1.414L10 11.414l-1.293 1.293a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </form>
 
-    .dark .dataTables_wrapper .dataTables_filter input {
-        background-color: #333;
-        color: #e0e0e0;
-        border: 1px solid #555;
-    }
-
-    .dark .dataTables_wrapper .dataTables_info {
-        color: #e0e0e0;
-    }
-
-    .dark .dataTables_wrapper .dataTables_header {
-        background-color: #333;
-        color: #e0e0e0;
-    }
-
-    .dark .dataTables_wrapper .dataTables_body {
-        background-color: #2d2d2d;
-    }
-    #myTable tbody tr:hover {
-        background-color: transparent; /* Elimina el color de fondo en hover */
-    }
-    /*  */
-    .carajo {
-        border: 1px solid #555 !important;
-    }
-    /*  */
-    .dark .dataTables_wrapper tbody tr:hover {
-        background-color: #3b82f6; /* Equivalente a blue-500 */
-    }
-</style>
-
-<div class="w-full mx-auto px-4 pb-4 pt-2 rounded-lg dark:text-white"
-     x-data="{ showModal: false, descripcion: '' }">
-    <h1 class="text-2xl font-bold text-center">Registros Completos de Comisarías</h1>
-    <div class="overflow-x-auto rounded-lg">
-        <table id="myTable" class="display carajo w-full  text-[13px] rounded-lg">
-            <thead class="bg-[#111] text-white text-[16px] rounded-lg">
-                <tr class="">
-                    <th class="px-4 py-4 rounded-tl-lg">Comisaria</th>
-                    <th class="px-4 py-4">Guardia</th>
-                    <th class="px-4 py-4"style="white-space: nowrap;">Fecha y Hora</th>
-                    <th class="px-4 py-4">Código</th>
-                    <th class="px-4 py-4" style="white-space: nowrap;">Móvil-Patrulla</th>
-                    <th class="px-4 py-4">A Cargo</th>
-                    <th class="px-4 py-4">Secundante</th>
-                    <th class="px-4 py-4">QTH</th>
-                    <th class="px-4 py-4">Descrip.</th>
-                    <th class="px-4 py-4">Instituciones Intervinientes</th>
-                    <th class="px-4 py-4">Tareas Judiciales</th>
-                    <th class="px-4 py-4 rounded-tr-lg">Fecha de Registro</th>
-                </tr>
-            </thead>
-            <tbody class="">
-                {% for comisaria in comisarias %}
-                <tr class="border-b cursor-pointer">
-                    <td class="py-1 px-2 font-bold ">{{ comisaria.comisaria_nombre }}</td>
-                    <td class="py-1 px-2 text-center">{{ comisaria.cuarto.cuarto }}</td>
-                    <td class="py-1 px-2">{{ comisaria.fecha_hora|date:"Y-m-d H:i" }}</td>
-                    <td class="py-1 px-2"><p class="text-center">{{ comisaria.codigo.codigo }}</p></td>
-                    <td class="py-1 px-2"><p class="text-center">{{ comisaria.movil_patrulla|default_if_none:'' }}</p></td>
-                    <td class="py-1 px-2">{{ comisaria.a_cargo|default_if_none:'' }}</td>
-                    <td class="py-1 px-2">{{ comisaria.secundante|default_if_none:'' }}</td>
-                    <td class="py-1 px-2">{{ comisaria.lugar_codigo|default_if_none:'' }}</td>
-                    <td class="py-1 px-2">
-                        <button @click="descripcion = '{{ comisaria.descripcion|escapejs }}'; showModal = true" class="bg-[#00b3b3] text-white px-4 py-2 rounded hover:bg-gray-700">Ver</button>
-                    </td>
-                    <td class="py-1 px-2"><p class="overflow-x-auto max-w-[300px]">{{ comisaria.instituciones_intervinientes }}</p></td>
-                    <td class="py-1 px-2">
-                        <p class="overflow-auto max-w-[300px]" style="max-height: 60px; line-height: 18px;">
-                            {{ comisaria.tareas_judiciales }}
-                        </p>
-                    </td>
-                    <td class="py-1 px-2">{{ comisaria.created_at }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <!-- Formulario para selección de elementos por página -->
+        <form method="get">
+            <select name="items_per_page" onchange="this.form.submit()" class="border rounded px-4 py-2">
+                <option value="10" {% if items_per_page == 10 %}selected{% endif %}>10</option>
+                <option value="20" {% if items_per_page == 20 %}selected{% endif %}>20</option>
+                <option value="30" {% if items_per_page == 30 %}selected{% endif %}>30</option>
+                <option value="40" {% if items_per_page == 40 %}selected{% endif %}>40</option>
+            </select>
+            <input type="hidden" name="q" value="{{ query }}">
+        </form>
     </div>
-    <!-- MODAL -->
-    <div x-show="showModal" class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div x-show="showModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div x-show="showModal" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                Descripción
-                            </h3>
-                            <div class="mt-2">
-                                <p class="text-sm text-gray-500" x-html="descripcion"></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button @click="showModal = false" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                        Cerrar
+
+    <!-- Tabla -->
+    <!-- Contenedor de la tabla -->
+<div class="overflow-x-auto rounded-lg">
+    <table class="table-auto w-full text-sm border-collapse border border-gray-200 dark:border-gray-700">
+        <thead class="bg-gray-800 dark:bg-gray-900 text-gray-300 dark:text-gray-200">
+            <tr class="hover:bg-gray-300 dark:hover:bg-gray-700">
+                <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Comisaria</th>
+                
+                <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Fecha y Hora Código</th>
+                <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Código</th>
+                <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Móvil-Patrulla</th>
+              
+                <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Lugar Código</th>
+                <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Tareas Judiciales</th>
+                <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Descripción</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-300">
+            {% for comisaria in page_obj %}
+            <tr class="hover:bg-gray-100 dark:hover:bg-gray-700">
+                <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ comisaria.comisaria_nombre|default_if_none:'' }}</td>
+               
+                <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ comisaria.fecha_hora|date:"Y-m-d H:i:s" }}</td>
+                <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ comisaria.codigo|default_if_none:''}}</td>
+                <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ comisaria.movil_patrulla|default_if_none:'' }}</td>
+                
+                <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ comisaria.lugar_codigo|default_if_none:'' }}</td> 
+                <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ comisaria.tareas_judiciales|default_if_none:'' }}</td>
+                <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">
+                    
+                    <button type="button" onclick="showModal('{{ comisaria.descripcion|escapejs|safe }}')" 
+                            class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+                             Ver
                     </button>
-                </div>
-            </div>
+
+                    
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+     
+
+
+<div class="flex flex-col md:flex-row justify-between items-center mt-6 space-y-4 md:space-y-0">
+    <!-- Información sobre registros -->
+    <span class="text-gray-600 dark:text-gray-300">
+        Mostrando registros del 
+        {{ page_obj.start_index }} al {{ page_obj.end_index }} 
+        de un total de {{ page_obj.paginator.count }} registros.
+    </span>
+
+    <!-- Paginación -->
+    <div class="flex items-center space-x-4"> <!-- Espaciado ajustado a 'space-x-4' -->
+        {% if page_obj.has_previous %}
+        <a href="?page=1&items_per_page={{ items_per_page }}&q={{ query }}" 
+           class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded shadow">
+            &laquo; Primero
+        </a>
+        <a href="?page={{ page_obj.previous_page_number }}&items_per_page={{ items_per_page }}&q={{ query }}" 
+           class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded shadow">
+            Anterior
+        </a>
+        {% endif %}
+
+        <!-- Números de página -->
+        {% for page_num in page_range %}
+            {% if page_obj.number == page_num %}
+                <span class="px-4 py-2 rounded bg-blue-500 text-white shadow">{{ page_num }}</span>
+            {% else %}
+                <a href="?page={{ page_num }}&items_per_page={{ items_per_page }}&q={{ query }}" 
+                   class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded shadow">
+                    {{ page_num }}
+                </a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&items_per_page={{ items_per_page }}&q={{ query }}" 
+           class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded shadow">
+            Siguiente
+        </a>
+        <a href="?page={{ page_obj.paginator.num_pages }}&items_per_page={{ items_per_page }}&q={{ query }}" 
+           class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded shadow">
+            Último &raquo;
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+
+  <!-- VOLVER -->
+  <a href="/" class="inline-block text-[13px] bg-[#00b3b3] hover:bg-gray-700 text-white px-4 py-2 rounded text-center">Volver</a>
+</div>
+
+    
+
+</div>
+
+<!-- Modal -->
+<div id="modal" class="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75 hidden">
+    <div class="bg-white rounded-lg shadow-xl transform transition-all sm:max-w-lg sm:w-full p-6">
+        <!-- Título del Modal -->
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Descripción</h3>
+        
+        <!-- Contenido HTML del Modal -->
+        <div id="modal-content" class="text-sm text-gray-700 overflow-y-auto max-h-80"></div>
+        
+        <!-- Botón de Cerrar -->
+        <div class="mt-4 flex justify-end">
+            <button onclick="closeModal()" 
+                class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+                Cerrar
+            </button>
         </div>
     </div>
-    <!-- VOLVER -->
-    <a href="/" class="inline-block text-[13px] bg-[#00b3b3] hover:bg-gray-700 text-white px-4 py-2 rounded text-center">Volver</a>
-    
 </div>
-<!-- DATATABLE CONFIG -->
+
+
 <script>
-    $(document).ready(function() {
-        $('#myTable').DataTable({
-            language: {
-                "sProcessing": "Procesando...",
-                "sLengthMenu": "Mostrar _MENU_ registros",
-                "sZeroRecords": "No se encontraron resultados",
-                "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-                "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
-                "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
-                "sInfoPostFix": "",
-                "sSearch": "Buscar:",
-                "sUrl": "",
-                "sInfoThousands": ",",
-                "sLoadingRecords": "Cargando...",
-                "oPaginate": {
-                    "sFirst": "Primero",
-                    "sLast": "Último",
-                    "sNext": "Siguiente",
-                    "sPrevious": "Anterior"
-                },
-                "oAria": {
-                    "sSortAscending": ": activar para ordenar la columna de manera ascendente",
-                    "sSortDescending": ": activar para ordenar la columna de manera descendente"
-                }
-            },
-            /* pageLength: -1, */
-            ordering: false,
-            fixedHeader: true
-        });
-        // Maneja la selección y deselección de filas
-        $('#myTable tbody').on('click', 'tr', function() {
-        // Verifica si la fila clickeada ya está seleccionada
-            if ($(this).hasClass('selected')) {
-                // Deselecciona la fila si ya estaba seleccionada
-                $(this).removeClass('selected');
-            } else {
-                // Deselecciona cualquier otra fila previamente seleccionada
-                $('#myTable tbody tr.selected').removeClass('selected');
-                
-                // Marca la fila clickeada como seleccionada
-                $(this).addClass('selected');
-            }
-        });
-        /* ESC */
-        $(document).on('keydown', function(e) {
-            if (e.key === 'Escape') {
-                $('#myTable tbody tr.selected').removeClass('selected');
-            }
-        });
-        // Navegar entre filas usando las flechas del teclado sin mover la pantalla
-        $(document).on('keydown', function(e) {
-            const selectedRow = $('#myTable tbody tr.selected');
+    function showModal(content) {
+        document.getElementById('modal-content').innerHTML = content; // Renderiza el contenido HTML
+        document.getElementById('modal').classList.remove('hidden');
+    }
 
-            if (selectedRow.length) {
-                if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-                    e.preventDefault(); // Evita que la pantalla se mueva
+    function closeModal() {
+        document.getElementById('modal').classList.add('hidden');
+    }
 
-                    if (e.key === 'ArrowUp') {
-                        // Mover a la fila anterior
-                        const prevRow = selectedRow.prev('tr');
-                        if (prevRow.length) {
-                            selectedRow.removeClass('selected');
-                            prevRow.addClass('selected');
-                        }
-                    } else if (e.key === 'ArrowDown') {
-                        // Mover a la fila siguiente
-                        const nextRow = selectedRow.next('tr');
-                        if (nextRow.length) {
-                            selectedRow.removeClass('selected');
-                            nextRow.addClass('selected');
-                        }
-                    }
-                }
-            }
-        });
-        /*  */
-        // Aplica estilos de modo oscuro si está activo
-        const isDarkMode = document.documentElement.classList.contains('dark');
-            if (isDarkMode) {
-                $('.dataTables_wrapper').addClass('dark');
-            }
-    });
+    function clearSearch() {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('q');
+        url.searchParams.set('items_per_page', '{{ items_per_page }}');
+        window.location.href = url.toString();
+    }
 </script>
+
+
 {% endblock %}

@@ -1,5 +1,3 @@
-#compartido/middleware.py
-
 # Importa MiddlewareMixin para crear middlewares compatibles con versiones anteriores de Django
 from django.utils.deprecation import MiddlewareMixin
 # Importa redirect para redirigir a los usuarios a una URL específica
@@ -8,7 +6,6 @@ from django.shortcuts import redirect
 from django.utils import timezone
 # Importa timedelta para trabajar con diferencias de tiempo
 from datetime import timedelta
-
 
 
 class NoCacheMiddleware(MiddlewareMixin):
@@ -20,17 +17,33 @@ class NoCacheMiddleware(MiddlewareMixin):
         return response
 
 
-
 # Middleware que redirige a los usuarios autenticados a sus vistas específicas según su grupo
 class RedirectAuthenticatedUserMiddleware(MiddlewareMixin):
     def process_request(self, request):
         # Define las URLs restringidas donde no deben estar los usuarios autenticados
         restricted_urls = ['/', '/login/', '/no-permission/']
         if request.user.is_authenticated and request.path in restricted_urls:
+            # Redirige a los usuarios basados en su grupo
             if request.user.groups.filter(name='comisariaprimera').exists():
                 return redirect('comisaria_primera_list')
             elif request.user.groups.filter(name='comisariasegunda').exists():
                 return redirect('comisaria_segunda_list')
+            elif request.user.groups.filter(name='comisariatercera').exists():
+                return redirect('comisaria_tercera_list')
+            elif request.user.groups.filter(name='comisariacuarta').exists():
+                return redirect('comisaria_cuarta_list')
+            elif request.user.groups.filter(name='comisariaquinta').exists():
+                return redirect('comisaria_quinta_list')
+            elif request.user.groups.filter(name='comisariaprimeraRG').exists():
+                return redirect('comisaria_primeraRG_list')
+            elif request.user.groups.filter(name='comisariasegundaRG').exists():
+                return redirect('comisaria_segundaRG_list')
+            elif request.user.groups.filter(name='comisariaterceraRG').exists():
+                return redirect('comisaria_terceraRG_list')
+            elif request.user.groups.filter(name='comisariacuartaRG').exists():
+                return redirect('comisaria_cuartaRG_list') 
+            elif request.user.groups.filter(name='comisariaquintaRG').exists():
+                return redirect('comisaria_quintaRG_list')
             elif request.user.groups.filter(name='divisioncomunicaciones').exists():
                 return redirect('divisioncomunicaciones_list')
             elif request.user.groups.filter(name='estadisticas').exists():

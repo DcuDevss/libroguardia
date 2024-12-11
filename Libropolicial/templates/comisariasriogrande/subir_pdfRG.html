@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Subir PDF{% endblock %}
+
+{% block content %}
+<style>
+    .joberFirma{
+        border: 1px solid rgb(210, 208, 208);
+    }
+    .joberFirma:hover{
+        background-color: #e6e6e6;
+        color: black;
+    }
+    .fuente{
+        font-family: 'Roboto Slab', serif;
+    }
+</style>
+    <!-- Dropzone -->
+    <div class="w-fit mx-auto mt-10 p-4 bg-gray-100 dark:text-gray-700 rounded-lg shadow-lg">
+        <h1 class="fuente text-2xl font-bold text-center">Subir PDFRG</h1>
+        <div class="max-w-3xl mx-auto p-4 mb-2 bg-gray-100 rounded-lg shadow-lg">
+            <div class="flex gap-x-1">
+                <i class="fa-solid fa-circle-exclamation" style="color: #ff000d; margin-top: 4px; margin-right: 2px;"></i>
+                <div class="">
+                    <p class="font-semibold text-[#ff000d] pb-[2px] leading-[25px]">
+                        Envíar con este formato: libro-guardia-Comisaria-"Comisaria"-"Ciudad"-"dia-mes-año"
+                    </p>
+                    <p class="font-semibold text-[#ff000d] pb-[8px] text-center">
+                        Ejemplo: "libro-guardia-Comisaria-Primera-Rio-Grande"
+                    </p>
+                </div>
+            </div>
+            <div class="flex justify-center text-center">
+                <a class="joberFirma  w-full p-2 rounded-lg font-semibold  border-2 border-black flex items-center justify-center shadow-md" target="_blank"
+                    href="https://firmar.gob.ar/firmador/#/"
+                    style="width: 60%;">
+                    <span class="mr-2">Firma Digital:</span>
+                    <img class="" style="width: 200px;" src="https://firmar.gob.ar/firmador/resources/imgs/argentinagob.svg" alt="">
+                </a>
+            </div>
+        </div>
+        <form class="flex flex-col items-center" 
+            id="upload-form" action="{% url 'subir_pdfRG' %}" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="flex items-center justify-center w-full mb-4">
+                <label for="pdf" id="dropzone" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                    <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                        <svg class="w-8 h-8 mb-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
+                        </svg>
+                        <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Haga clic para subir</span> o arrastre y suelte</p>
+                        <p class="text-xs text-gray-500">PDF (MAX. 10MB)</p>
+                    </div>
+                    <input id="pdf" name="pdf" type="file" class="hidden" accept="application/pdf" />
+                </label>
+            </div>
+            <div class="flex w-full justify-center items-center gap-x-4">
+                <button type="submit" 
+                    class="bg-blue-500 px-4 py-1 text-white rounded hover:bg-blue-700">Enviar</button>
+                <div class="">
+                    <a href="/" class="inline-block  bg-gray-500 hover:bg-gray-600 text-white px-4 py-1 rounded text-center">Volver</a>
+                </div>
+            </div>
+            
+        </form>
+        <!-- Aquí se mostrará el mensaje de éxito o error -->
+        <div id="message-container"></div>
+    </div>
+{% endblock %}

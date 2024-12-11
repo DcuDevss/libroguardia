@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}Lista de PDFs{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.dataTables.css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/2.1.3/js/dataTables.js"></script>
+
+<style>
+    h1{
+        font-family: 'Roboto Slab', serif;
+    }
+    .dt-layout-row{
+        font-size: 13px;
+    }
+    #dt-search-0{
+        border-radius: 6px;
+        min-width: 300px;
+    }
+    #dt-length-0{
+        border-radius: 6px;
+    }
+    /* cambio de posicion buscador y selector de registros */
+    .dt-layout-row {
+        display: flex;
+    }
+    div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {
+        order: 1;
+        justify-content: flex-start;
+        margin-left: 0;
+    }
+    div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-start {
+        order: 2;
+        justify-content: flex-end;
+        margin-right: 0;
+    }
+
+    /* Estilos para el modo oscuro */
+    .dark .dataTables_wrapper {
+        background-color: #2d2d2d;
+        color: #e0e0e0;
+    }
+
+    .dark .dataTables_wrapper .dataTables_paginate .paginate_button {
+        background-color: #444;
+        color: #e0e0e0;
+    }
+
+    .dark .dataTables_wrapper .dataTables_filter input {
+        background-color: #333;
+        color: #e0e0e0;
+        border: 1px solid #555;
+    }
+
+    .dark .dataTables_wrapper .dataTables_info {
+        color: #e0e0e0;
+    }
+
+    .dark .dataTables_wrapper .dataTables_header {
+        background-color: #333;
+        color: #e0e0e0;
+    }
+
+    .dark .dataTables_wrapper .dataTables_body {
+        background-color: #2d2d2d;
+    }
+
+    .dark #myTablePDF thead th {
+        background-color: #111 !important;
+        color: white !important;
+    }
+
+    .dark #myTablePDF tbody td {
+        background-color: #333 !important;
+        color: #e0e0e0 !important;
+    }
+
+    #myTablePDF tbody tr:hover {
+        background-color: transparent; /* Elimina el color de fondo en hover */
+    }
+
+    /* Bordes de la tabla en modo oscuro */
+    .carajo {
+        border: 1px solid #555 !important;
+    }
+
+    /* Efecto hover en modo oscuro */
+    .dark .dataTables_wrapper tbody tr:hover {
+        background-color: #3b82f6; /* Equivalente a blue-500 */
+    }
+</style>
+
+<div class="max-w-7xl mx-auto px-4 pb-4 pt-2 rounded-lg dark:text-white">
+    <h1 class="text-2xl font-bold mb-4 text-center">Lista de PDFs Subidos en Rio Grande</h1>
+    <div class="overflow-x-auto">
+        <table id="myTablePDF" class="display carajo w-full text-[13px] rounded-lg">
+            <thead class="bg-[#111] text-white text-[16px] rounded-lg">
+                <tr>
+                    <th class="px-4 py-4 rounded-tl-lg">Nombre del Archivo</th>
+                    <th class="px-4 py-4">Subido por</th>
+                    <th class="px-4 py-4">Fecha de Subida</th>
+                    <th class="px-4 py-4 rounded-tr-lg">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pdf in pdfs %}
+                <tr>
+                    <td class="px-4 py-2">{{ pdf.file.name|cut:"partespdf/" }}</td>
+                    <td class="px-4 py-2">{{ pdf.uploaded_by.get_full_name }}</td>
+                    <td class="px-4 py-2">{{ pdf.uploaded_at|date:"d/m/Y H:i:s" }}</td>
+                    <td class="px-4 py-2">
+                        <a href="{% url 'mostrar_pdfRG' pdf.id %}" target="_blank" class="bg-[#00b3b3] text-white px-2 py-1 rounded hover:bg-gray-700">Ver</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="mt-6">
+        <a href="/" class="inline-block bg-gray-500 hover:bg-gray-600 text-white px-4 py-1 rounded text-center">Volver</a>
+    </div>
+</div>
+
+<!-- DATATABLE CONFIG -->
+<script>
+    $(document).ready(function() {
+        // Añadimos un parser personalizado para la fecha en formato d/m/Y H:i:s
+        $.fn.dataTable.ext.type.order['date-eu-pre'] = function (date) {
+            if (!date) {
+                return 0;
+            }
+            // Extraemos día, mes, año, hora, minuto y segundo del formato d/m/Y H:i:s
+            const parts = date.split(/[\s/:]/);
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1; // Mes en JavaScript es 0-based
+            const year = parseInt(parts[2], 10);
+            const hour = parseInt(parts[3], 10);
+            const minute = parseInt(parts[4], 10);
+            const second = parseInt(parts[5], 10);
+            return new Date(year, month, day, hour, minute, second).getTime();
+        };
+
+        $('#myTablePDF').DataTable({
+            language: {
+                "sProcessing": "Procesando...",
+                "sLengthMenu": "Mostrar _MENU_ registros",
+                "sZeroRecords": "No se encontraron resultados",
+                "sInfo": "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty": "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered": "(filtrado de un total de _MAX_ registros)",
+                "sSearch": "Buscar:",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst": "Primero",
+                    "sLast": "Último",
+                    "sNext": "Siguiente",
+                    "sPrevious": "Anterior"
+                }
+            },
+            order: [[2, 'desc']], // Orden descendente por la columna "Fecha de Subida"
+            columnDefs: [
+                { 
+                    type: 'date-eu', 
+                    targets: 2  // Aplica el parser de fecha personalizado a la tercera columna (Fecha de Subida)
+                }
+            ],
+            fixedHeader: true
+        });
+
+        // Maneja la selección y deselección de filas
+        $('#myTablePDF tbody').on('click', 'tr', function() {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            } else {
+                $('#myTablePDF tbody tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+
+        // Aplica estilos de modo oscuro si está activo
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        if (isDarkMode) {
+            $('.dataTables_wrapper').addClass('dark');
+        }
+    });
+</script>
+{% endblock %}
