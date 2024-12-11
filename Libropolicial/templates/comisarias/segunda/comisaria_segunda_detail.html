@@ -59,19 +59,6 @@
     </div>
     <!-- DEPENDENCIAS Y CODIGOS SEC., ESTADO -->
     <div class="grid grid-cols-3 gap-x-4 py-4 my-2 bg-gray-200 rounded-md px-2">
-        <!-- Detalles de relaciones ManyToMany -->
-        <div class="">
-            <h2 class="text-lg font-semibold">Dependencias Secundarias:</h2>
-            {% if record.dependencias_secundarias.all %}
-                <ul>
-                    {% for dependencia in record.dependencias_secundarias.all %}
-                    <li>{{ dependencia.dependencia|default:"S/N" }}</li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p>S/N</p>
-            {% endif %}
-        </div>
 
         <div class="">
             <h2 class="text-lg font-semibold">Codigos Secundarios:</h2>
@@ -98,15 +85,6 @@
         {{ record.descripcion|safe|default:"S/N" }}
     </p>
 </div>
-
-
-    <!-- TAREAS JUDICIALES, INSTITUCIONES INT.  -->
-    <div class="py-4 my-2 bg-gray-200 rounded-md px-2 text-center">
-        <div class="col-span-2">
-            <h2 class="text-lg font-semibold">Tareas Judiciales:</h2>
-            <p style="max-height: 80px; line-height: 20px;" class="overflow-auto leading-10">{{ record.tareas_judiciales|default:"S/N" }}</p>
-        </div>
-    </div>
     <!--  -->
     <div class="grid grid-cols-2 gap-x-4 py-4 my-2 bg-gray-200 rounded-md px-2">
         <div class="">
@@ -214,6 +192,69 @@
             {% endif %}
         </div>
     </div>
+     <!-- Dependencias Secundarias e Instituciones Federales -->
+     <div class="cont grid grid-cols-2 gap-x-4 py-4 my-2 bg-gray-200 rounded-md px-2">
+        <!-- Detalles de dependencias secundarias -->
+        <div class="">
+            <h2 class="text-lg font-semibold">Dependencias secundarias que intervienen:</h2>
+            {% if record.detalles_dependencia_secundaria.all %}
+                <ul>
+                    <div class="flex flex-col gap-y-2">
+                        {% for detalle in record.detalles_dependencia_secundaria.all %}
+                        <div class="">
+                            <li>
+                                <span class="font-semibold">Dependencia: </span>{{ detalle.dependencia_secundaria.dependencia|default:"S/N" }}
+                            </li>
+                            <li>
+                                <span class="font-semibold">Móvil: </span>{{ detalle.numero_movil_secundaria|default:"S/N" }}
+                            </li>
+                            <li>
+                                <span class="font-semibold">A Cargo: </span>{{ detalle.nombre_a_cargo_secundaria|default:"S/N" }}
+                            </li>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </ul>
+            {% else %}
+                <p>S/N</p>
+            {% endif %}
+        </div>
+        
+        <!-- Detalles de instituciones federales -->
+        <div class="">
+            <h2 class="text-lg font-semibold">Instituciones federales que intervienen:</h2>
+            {% if record.detalles_institucion_federal.all %}
+                <ul>
+                    <div class="flex flex-col gap-y-2">
+                        {% for detalle in record.detalles_institucion_federal.all %}
+                        <div class="">
+                            <li>
+                                <span class="font-semibold">Institución: </span>{{ detalle.institucion_federal.nombre|default:"S/N" }}
+                            </li>
+                            <li>
+                                <span class="font-semibold">Móvil: </span>{{ detalle.numero_movil_federal|default:"S/N" }}
+                            </li>
+                            <li>
+                                <span class="font-semibold">A Cargo: </span>{{ detalle.nombre_a_cargo_federal|default:"S/N" }}
+                            </li>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </ul>
+            {% else %}
+                <p>S/N</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- TAREAS JUDICIALES, INSTITUCIONES INT.  -->
+    <div class="py-4 my-2 bg-gray-200 rounded-md px-2 text-center">
+        <div class="col-span-2">
+            <h2 class="text-lg font-semibold">Tareas Judiciales:</h2>
+            <p style="max-height: 80px; line-height: 20px;" class="overflow-auto leading-10">{{ record.tareas_judiciales|default:"S/N" }}</p>
+        </div>
+    </div>
+
     <div class="py-4 my-2 bg-gray-200 rounded-md px-2">
         <div class="flex gap-x-2">
             <h2 class="text-lg font-semibold pb-1 break-words" style="line-height: 20px;">Fecha de Creación del Primer registro:</h2>

@@ -1,0 +1,614 @@
+{% extends "base.html" %}
+
+{% block title %}Formulario general Rio Grande{% endblock %}
+
+{% block extrahead %}
+    {{ form.media }}
+{% endblock %}
+
+{% block content %}
+<style>
+    ::-webkit-scrollbar {
+    display: none;
+    }
+    /* Para Firefox */
+    * {
+        scrollbar-width: none; /* Oculta la scrollbar */
+    }
+
+    /* Para otros navegadores (por si acaso) */
+    * {
+        -ms-overflow-style: none; /* Para Internet Explorer y Edge */
+        overflow: -moz-scrollbars-none; /* Para versiones antiguas de Firefox */
+    }
+    #cuartoSelect:hover {
+        background-color: red;
+    }
+    /* cehckeditor ancho */
+    .django-ckeditor-widget {
+        width: 100%;
+    }
+    .contenedor {
+        width: 75%;
+    }
+    /* MEDIA QUERY IMG "SOMOS" */  
+    @media (max-width: 1707px) {
+        .contenedor {
+            width: 75%;
+        }
+        .dep-adicionales {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+    }
+    @media (max-width: 1440px) {
+        .contenedor {
+            width: 88%;
+        }
+        h1 {
+            /* color: red; */
+        }
+        .dep-adicionales {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+    }
+    @media (max-width: 1024px) {
+        .contenedor {
+            width: 100%;
+            padding-left: 0;
+            padding-right: 0;
+        }
+        h1 {
+            /* color: blue; */
+        }
+        .dep-adicionales {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+    }
+    @media (max-width: 880px) {
+        .contenedor {
+            width: 85%;
+        }
+        .formulario-mapa {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+        h1 {
+            /* color: green; */
+        }
+        .dep-adicionales {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+    @media (max-width: 640px) {
+        h1 {
+            /* color: yellow; */
+        }
+        .botones-top {
+            display: grid;
+            width: fit-content;
+            row-gap: 10px;
+            margin: 0 auto;
+            grid-template-columns: 1;
+        }
+        .contenedor {
+            width: 90%;
+        }
+        .codigos-secundarios {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+        .coordenadas {
+            display: grid;
+            grid-template-columns: 1fr;
+            row-gap: 10px;
+        }
+        .dep-adicionales {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+        .guardar {
+            margin: auto;
+            padding-top: 30px;
+        }
+    }
+    @media (max-width: 440px) {
+        .contenedor {
+            width: 90%;
+        }
+        .bloques {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+        .codigos-secundarios {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+        h1 {
+            /* color: purple; */
+        }
+        .dep-adicionales {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+<div class="contenedor mx-auto mt-4 p-4 dark:text-white">
+    <!-- TITULO -->
+    <h1 class="text-2xl font-bold mb-4 text-center">Registrar en comisarias</h1>
+    <form method="post" id="comisaria-form" class="dark:text-gray-300" autocomplete="off">
+        {% csrf_token %}
+        <!-- TOP -->
+        <!-- BOTONES -->
+        <div class="botones-top flex w-full justify-between pb-1">
+            <!-- GUARDAR -->
+            <div>
+                <button type="submit" 
+                    class="bg-blue-500 text-white px-6 py-1 rounded hover:bg-blue-700 w-full">
+                    Guardar
+                </button>
+            </div>
+            <!-- VOLVER -->
+            <div class="flex">
+                {% block back_button %}
+                {% endblock %}
+            </div>
+        </div>
+        <div class="formulario-mapa grid grid-cols-2 gap-x-4">
+            <!-- FORMULARIO -->
+            <div>
+                <!-- BLOQUE 1 -->
+                <div class="bloques grid grid-cols-2 gap-x-4 pb-2 pt-1">
+                    <!-- FECHA Y HORA -->
+                    <div class="w-full">
+                        <label for="fecha_hora" class="py-1 block text-gray-700 dark:text-gray-300">Fecha y hora</label>
+                        <input type="datetime-local" id="fecha_hora" 
+                            class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3" 
+                            required value="{{ form.instance.fecha_hora|date:'Y-m-d\\TH:i' }}" disabled>
+                        <input type="hidden" name="fecha_hora" value="{{ form.instance.fecha_hora|date:'Y-m-d\\TH:i' }}">
+                    </div>
+                    <!-- CUARTO -->
+                    <div class="w-full relative">
+                        <label for="{{ form.cuartoRG.id_for_label }}" class="py-1 block text-gray-700 dark:text-gray-300">{{ form.cuartoRG.label }}</label>
+                        {{ form.cuartoRG }}
+                    </div>
+                </div>
+                <!-- BLOQUE 2 -->
+                <div class="bloques flex gap-x-4 pb-2 pt-1">
+                    <!-- CODIGO -->
+                    <div class="w-full">
+                        <label for="{{ form.codigoRG.id_for_label }}" class="py-1 block text-gray-700 dark:text-gray-300">{{ form.codigoRG.label }}</label>
+                        {{ form.codigoRG }}
+                    </div>
+                    <!-- SOLICITANTE -->
+                    <div class="w-full">
+                        <label for="{{ form.solicitante_codigoRG.id_for_label }}" class="py-1 block text-gray-700 dark:text-gray-300">{{ form.solicitante_codigoRG.label }}</label>
+                        {{ form.solicitante_codigoRG }}
+                    </div>
+                </div>
+                <!-- BLOQUE 3 -->
+                <div class="bloques flex gap-x-4 pb-2 pt-1">
+                    <!-- MOVIL/PATRULLA -->
+                    <div class="w-full">
+                        <label for="{{ form.movil_patrulla.id_for_label }}" class="py-1 block text-gray-700 dark:text-gray-300">{{ form.movil_patrulla.label }}</label>
+                        <input type="text" name="{{ form.movil_patrulla.name }}" id="{{ form.movil_patrulla.id_for_label }}" class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3" value="{{ form.movil_patrulla.value|default_if_none:'' }}">
+                    </div>
+                    <!-- LUGAR -->
+                    <div class="w-full">
+                        <label for="{{ form.lugar_codigo.id_for_label }}" class="py-1 block text-gray-700 dark:text-gray-300">{{ form.lugar_codigo.label }}</label>
+                        <input type="text" name="{{ form.lugar_codigo.name }}" id="{{ form.lugar_codigo.id_for_label }}" class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3" value="{{ form.lugar_codigo.value|default_if_none:'' }}">
+                    </div>
+                </div>
+                <!-- BLOQUE 4 -->
+                <div class="bloques flex gap-x-4 pb-2 pt-1">
+                    <!-- A CARGO -->
+                    <div class="w-full">
+                        <label for="{{ form.a_cargo.id_for_label }}" class="py-1 block text-gray-700 dark:text-gray-300">{{ form.a_cargo.label }}</label>
+                        <input type="text" name="{{ form.a_cargo.name }}" id="{{ form.a_cargo.id_for_label }}" class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3" value="{{ form.a_cargo.value|default_if_none:'' }}">
+                    </div>
+                    <!-- SECUNDANTE -->
+                    <div class="w-full">
+                        <label for="{{ form.secundante.id_for_label }}" class="py-1 block text-gray-700 dark:text-gray-300">{{ form.secundante.label }}</label>
+                        <input type="text" name="{{ form.secundante.name }}" id="{{ form.secundante.id_for_label }}" class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3" value="{{ form.secundante.value|default_if_none:'' }}">
+                    </div>
+                </div>
+                <!-- BLOQUE 5 -->
+                <div class="bloques grid grid-cols-2 gap-x-4 pb-2 pt-1">
+                    <!-- COD. SECUNDARIOS -->
+                    <div class="w-full relative" x-data="{ showDropdown: false }">
+                        <label for="codigos_secundariosRG" class="block text-gray-700 dark:text-gray-300 text-nowrap">{{ form.codigos_secundariosRG.label }}</label>
+                        <div @click="showDropdown = !showDropdown" class="flex justify-between w-full p-3 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 cursor-pointer dark:bg-gray-800 bg-gray-50 border dark:text-gray-200 text-gray-900 dark:border-gray-600 border-gray-300">
+                            <span>Seleccionar</span>
+                            <span :class="showDropdown ? 'rotate-180' : 'rotate-0'" class="ml-2 transition-transform duration-200">▼</span>
+                        </div>
+                        <div x-show="showDropdown" @click.away="showDropdown = false" class="absolute w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-50 p-1" style="display: none; z-index: 1000;">
+                            <div style="height: 210px;" class="codigos-secundarios grid grid-cols-4 gap-1 overflow-y-scroll">
+                                {% for codigo in form.codigos_secundariosRG.field.queryset %}
+                                <label class="cursor-pointer rounded-lg w-fit pl-1 pr-2 flex items-center hover:bg-gray-100 dark:hover:bg-gray-600">
+                                    <input type="checkbox" name="codigos_secundariosRG" value="{{ codigo.id }}" class="form-checkbox dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" {% if codigo in form.instance.codigos_secundariosRG.all %}checked{% endif %}>
+                                    <span class="ml-2 dark:text-gray-300">{{ codigo }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ESTADO -->
+                    <div class="w-fit">
+                        <label for="{{ form.estado.id_for_label }}" class="block mb-3 text-gray-700 dark:text-gray-300">Estado del código</label>
+                        <label class="relative flex items-center cursor-pointer w-fit">
+                            {{ form.estado }}
+                            <div class="w-14 h-7 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white dark:after:bg-gray-800 after:border-gray-300 dark:after:border-gray-700 after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-indigo-600 hover:peer-checked:bg-indigo-700"></div>
+                            <span id="estado-text" class="ml-3 text-sm font-medium text-gray-600 dark:text-gray-300">Activo</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <!-- MAPA y coordenadas -->
+            <div class="mt-4">
+                <div id="map" style="height: 343px; z-index: 1;" class="rounded-lg"></div>
+                <div class="coordenadas flex gap-x-4 py-2">
+                    <!-- LATITUD -->
+                    <div class="w-full">
+                        <label for="id_latitude" class="block text-gray-700 dark:text-gray-300">Latitud</label>
+                        <input type="text" name="latitude" id="id_latitude" class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3" value="{{ form.instance.latitude|default_if_none:'' }}">
+                    </div>
+                    <!-- LONGITUD -->
+                    <div class="w-full">
+                        <label for="id_longitude" class="block text-gray-700 dark:text-gray-300">Longitud</label>
+                        <input type="text" name="longitude" id="id_longitude" class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3" value="{{ form.instance.longitude|default_if_none:'' }}">
+                    </div>
+                    <!-- LIMPIAR -->
+                    <div class="w-full flex items-end">
+                        <button type="button" id="clear-coordinates" class="bg-red-600 text-white w-full py-3 rounded hover:bg-red-700">
+                            Limpiar coordenadas
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Descripción -->
+        <div class="w-full">
+            <label for="{{ form.descripcion.id_for_label }}" class="block py-1 text-gray-700 dark:text-white">{{ form.descripcion.label }}:</label>
+            {{ form.descripcion }}
+        </div>
+        <!-- BOTTOM RG ---->
+        <div class="mt-4">
+            <!-- DEP ADICIONALES RG -->  
+            <div class="dep-adicionales flex gap-x-4 items-end">
+                <!-- Sección de Servicios de Emergencia -->
+                <!-- BOMBEROS RG ---->
+                <div class="sm:col-span-1 relative" x-data="{ showDropdown: false, selectedServices: {{ detalle_servicios_emergenciaRG }} }">
+                        <label for="servicios_emergenciaRG" class="block text-gray-700 dark:text-gray-300">{{ form.servicios_emergenciaRG.label }}</label>
+                        <div @click="showDropdown = !showDropdown" 
+                            class="flex justify-between bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 w-full p-3 cursor-pointer">
+                            <span>Seleccionar</span>
+                            <span :class="showDropdown ? 'rotate-180' : 'rotate-0'" class="ml-2 transition-transform duration-200">▼</span>
+                        </div>
+                        <div x-show="showDropdown" @click.away="showDropdown = false" class="absolute mt-2 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-10 p-4" style="display: none;">
+                            <div class="grid grid-cols-1 gap-1 h-[150px] overflow-y-scroll">
+                                {% for servicio in form.servicios_emergenciaRG.field.queryset %}
+                                <label class="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                    <input type="checkbox" name="servicios_emergenciaRG" value="{{ servicio.id }}" class="form-checkbox dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" 
+                                        @change="if ($event.target.checked) { if (!selectedServices.some(s => s.servicio_emergenciaRG_id == {{ servicio.id }})) { selectedServices.push({id: null, servicio_emergenciaRG_id: {{ servicio.id }}, numero_movil_bomberosRG: '', nombre_a_cargo_bomberosRG: ''}); } } else { selectedServices = selectedServices.filter(s => s.servicio_emergenciaRG_id != {{ servicio.id }}); }"
+                                        :checked="selectedServices.some(s => s.servicio_emergenciaRG_id == {{ servicio.id }})">
+                                    <span class="ml-2 dark:text-gray-300">{{ servicio }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Campos visibles para detalles de servicios de emergencia -->
+                        <div class="sm:col-span-3 mt-6">
+                            <template x-for="service in selectedServices" :key="service.servicio_emergenciaRG_id">
+                                <div>
+                                    <label :for="'numero_movil_bomberos_' + service.servicio_emergenciaRG_id" class="block text-gray-700 dark:text-gray-300">Número móvil Bomberil<span x-text="service.nombre"></span></label>
+                                    <input type="text" :name="'numero_movil_bomberos_' + service.servicio_emergenciaRG_id" :id="'numero_movil_bomberos_' + service.servicio_emergenciaRG_id" class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 mb-2" x-model="service.numero_movil_bomberosRG">
+
+                                    <label :for="'nombre_a_cargo_bomberos_' + service.servicio_emergenciaRG_id" class="block text-gray-700 dark:text-gray-300">Nombre a cargo Bomberil <span x-text="service.nombre"></span></label>
+                                    <input type="text" :name="'nombre_a_cargo_bomberos_' + service.servicio_emergenciaRG_id" :id="'nombre_a_cargo_bomberos_' + service.servicio_emergenciaRG_id" class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 mb-2" x-model="service.nombre_a_cargo_bomberosRG">
+                                </div>
+                            </template>
+                        </div>
+                </div>
+                <!-- HRU RG -->
+                <div class="sm:col-span-1 relative" x-data="{ showDropdown: false, selectedInstitucionesRG: {{ detalle_instituciones_hospitalariasRG }} }">
+                        <label for="instituciones_hospitalariasRG" class="block text-gray-700 dark:text-gray-300 pb-2">
+                            {{ form.instituciones_hospitalariasRG.label }}
+                        </label>
+                        <div @click="showDropdown = !showDropdown" 
+                            class="flex justify-between bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 w-full p-3 cursor-pointer">
+                            <span>Seleccionar</span>
+                            <span :class="showDropdown ? 'rotate-180' : 'rotate-0'" class="ml-2 transition-transform duration-200">▼</span>
+                        </div>
+                        <div x-show="showDropdown" @click.away="showDropdown = false"  class="absolute mt-2 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-10 p-4" style="display: none;">
+                            <div class="grid grid-cols-1 gap-1 h-[150px] overflow-y-scroll">
+                                {% for institucion in form.instituciones_hospitalariasRG.field.queryset %}
+                                <label class="flex items-center cursor-pointer py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
+                                    <input type="checkbox" name="instituciones_hospitalariasRG" value="{{ institucion.id }}" 
+                                        class="form-checkbox px-1 ml-2 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" 
+                                        @change="if ($event.target.checked) { if (!selectedInstitucionesRG.some(i => i.institucion_hospitalariaRG_id == {{ institucion.id }})) { selectedInstitucionesRG.push({id: null, institucion_hospitalariaRG_id: {{ institucion.id }}, numero_movil_hospitalRG: '', nombre_a_cargo_hospitalRG: ''});}} else { selectedInstitucionesRG = selectedInstitucionesRG.filter(i => i.institucion_hospitalariaRG_id != {{ institucion.id }});}"
+                                        :checked="selectedInstitucionesRG.some(i => i.institucion_hospitalariaRG_id == {{ institucion.id }})">
+                                    <span class="ml-2 dark:text-gray-300">{{ institucion }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                    <!-- Campos visibles para detalles de instituciones hospitalarias RG -->
+                    <div class="sm:col-span-3 mt-6">
+                        <template x-for="institucion in selectedInstitucionesRG" :key="institucion.institucion_hospitalariaRG_id">
+                            <div>
+                                <label :for="'numero_movil_hospital_' + institucion.institucion_hospitalariaRG_id" class="block text-gray-700 dark:text-gray-300">
+                                    Móvil Ambulancia <span x-text="institucion.nombre"></span>
+                                </label>
+                                <input type="text" :name="'numero_movil_hospital_' + institucion.institucion_hospitalariaRG_id" :id="'numero_movil_hospital_' + institucion.institucion_hospitalariaRG_id" 
+                                    class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 mb-2" 
+                                    x-model="institucion.numero_movil_hospitalRG">
+                    
+                                <label :for="'nombre_a_cargo_hospital_' + institucion.institucion_hospitalariaRG_id" class="block text-gray-700 dark:text-gray-300">
+                                    Personal a Cargo <span x-text="institucion.nombre"></span>
+                                </label>
+                                <input type="text" :name="'nombre_a_cargo_hospital_' + institucion.institucion_hospitalariaRG_id" :id="'nombre_a_cargo_hospital_' + institucion.institucion_hospitalariaRG_id" 
+                                    class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 mb-2" 
+                                    x-model="institucion.nombre_a_cargo_hospitalRG">
+                            </div>
+                        </template>
+                    </div>            
+                </div>
+                <!-- MUNIPAS RG -->
+                <div class="sm:col-span-1 relative" x-data="{ showDropdown: false, selectedDependenciasMunicipalesRG: {{ detalle_dependencias_municipalesRG }} }">
+                        <label for="dependencias_municipalesRG" class="block text-gray-700 dark:text-gray-300 pb-2">
+                            {{ form.dependencias_municipalesRG.label }}
+                        </label>
+                        <div @click="showDropdown = !showDropdown" class="flex justify-between bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 cursor-pointer">
+                            <span>Seleccionar</span>
+                            <span :class="showDropdown ? 'rotate-180' : 'rotate-0'" class="ml-2 transition-transform duration-200">▼</span>
+                        </div>
+                        <div x-show="showDropdown" @click.away="showDropdown = false" 
+                            class="absolute w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-10 p-2" style="display: none;">
+                            <div class="grid grid-cols-1 gap-1 h-[150px] overflow-y-scroll">
+                                {% for dependencia in form.dependencias_municipalesRG.field.queryset %}
+                                <label class="flex items-center cursor-pointer py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
+                                    <input type="checkbox" name="dependencias_municipalesRG" value="{{ dependencia.id }}" 
+                                        class="form-checkbox px-1 ml-2 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" 
+                                        @change="if ($event.target.checked) { 
+                                            if (!selectedDependenciasMunicipalesRG.some(d => d.dependencia_municipalRG_id == {{ dependencia.id }})) { 
+                                                selectedDependenciasMunicipalesRG.push({id: null, dependencia_municipalRG_id: {{ dependencia.id }}, numero_movil_municipalRG: '', nombre_a_cargo_municipalRG: ''}); 
+                                            } 
+                                        } else { 
+                                            selectedDependenciasMunicipalesRG = selectedDependenciasMunicipalesRG.filter(d => d.dependencia_municipalRG_id != {{ dependencia.id }}); 
+                                        }"
+                                        :checked="selectedDependenciasMunicipalesRG.some(d => d.dependencia_municipalRG_id == {{ dependencia.id }})">
+                                    <span class="ml-2 dark:text-gray-300">{{ dependencia }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <!-- Campos visibles para detalles de dependencias municipales RG -->
+                        <div class="sm:col-span-3 mt-6">
+                            <template x-for="dependencia in selectedDependenciasMunicipalesRG" :key="dependencia.dependencia_municipalRG_id">
+                                <div>
+                                    <label :for="'numero_movil_municipal_' + dependencia.dependencia_municipalRG_id" class="block text-gray-700 dark:text-gray-300">
+                                        Número móvil Municipal <span x-text="dependencia.nombre"></span>
+                                    </label>
+                                    <input type="text" :name="'numero_movil_municipal_' + dependencia.dependencia_municipalRG_id" :id="'numero_movil_municipal_' + dependencia.dependencia_municipalRG_id" 
+                                        class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 mb-2" 
+                                        x-model="dependencia.numero_movil_municipalRG">
+
+                                    <label :for="'nombre_a_cargo_municipal_' + dependencia.dependencia_municipalRG_id" class="block text-gray-700 dark:text-gray-300">
+                                        Personal a Cargo <span x-text="dependencia.nombre"></span>
+                                    </label>
+                                    <input type="text" :name="'nombre_a_cargo_municipal_' + dependencia.dependencia_municipalRG_id" :id="'nombre_a_cargo_municipal_' + dependencia.dependencia_municipalRG_id" 
+                                        class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 mb-2" 
+                                        x-model="dependencia.nombre_a_cargo_municipalRG">
+                                </div>
+                            </template>
+                        </div>
+                </div>
+                <!-- PROVINCIALES RG -->
+                <div class="sm:col-span-1 relative" x-data="{ showDropdown: false, selectedDependenciasProvincialesRG: {{ detalle_dependencias_provincialesRG }} }">
+                        <label for="dependencias_provincialesRG" class="block text-gray-700 dark:text-gray-300 pb-2">
+                            {{ form.dependencias_provincialesRG.label }}
+                        </label>
+                        <div @click="showDropdown = !showDropdown" class="flex justify-between bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 cursor-pointer">
+                            <span>Seleccionar</span>
+                            <span :class="showDropdown ? 'rotate-180' : 'rotate-0'" class="ml-2 transition-transform duration-200">▼</span>
+                        </div>
+                        <div x-show="showDropdown" @click.away="showDropdown = false" 
+                            class="absolute w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-10 p-2" style="display: none;">
+                            <div class="grid grid-cols-1 gap-1 h-[150px] overflow-y-scroll">
+                                {% for dependencia in form.dependencias_provincialesRG.field.queryset %}
+                                <label class="cursor-pointer flex items-center rounded-lg py-1 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                    <input type="checkbox" name="dependencias_provincialesRG" value="{{ dependencia.id }}" 
+                                        class="form-checkbox px-1 ml-2 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" 
+                                        @change="if ($event.target.checked) { 
+                                            if (!selectedDependenciasProvincialesRG.some(d => d.dependencia_provincialRG_id == {{ dependencia.id }})) { 
+                                                selectedDependenciasProvincialesRG.push({id: null, dependencia_provincialRG_id: {{ dependencia.id }}, numero_movil_provincialRG: '', nombre_a_cargo_provincialRG: ''}); 
+                                            } 
+                                        } else { 
+                                            selectedDependenciasProvincialesRG = selectedDependenciasProvincialesRG.filter(d => d.dependencia_provincialRG_id != {{ dependencia.id }}); 
+                                        }"
+                                        :checked="selectedDependenciasProvincialesRG.some(d => d.dependencia_provincialRG_id == {{ dependencia.id }})">
+                                    <span class="ml-2 dark:text-gray-300">{{ dependencia }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    
+                        <!-- Campos visibles para detalles de dependencias provinciales RG -->
+                        <div class="sm:col-span-3 mt-6">
+                            <template x-for="dependencia in selectedDependenciasProvincialesRG" :key="dependencia.dependencia_provincialRG_id">
+                                <div>
+                                    <label :for="'numero_movil_provincial_' + dependencia.dependencia_provincialRG_id" class="block text-gray-700 dark:text-gray-300">
+                                        Movil dependencia Provincial <span x-text="dependencia.nombre"></span>
+                                    </label>
+                                    <input type="text" :name="'numero_movil_provincial_' + dependencia.dependencia_provincialRG_id" :id="'numero_movil_provincial_' + dependencia.dependencia_provincialRG_id" 
+                                        class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 mb-2" 
+                                        x-model="dependencia.numero_movil_provincialRG">
+                    
+                                    <label :for="'nombre_a_cargo_provincial_' + dependencia.dependencia_provincialRG_id" class="block text-gray-700 dark:text-gray-300">
+                                        Personal a Cargo <span x-text="dependencia.nombre"></span>
+                                    </label>
+                                    <input type="text" :name="'nombre_a_cargo_provincial_' + dependencia.dependencia_provincialRG_id" :id="'nombre_a_cargo_provincial_' + dependencia.dependencia_provincialRG_id" 
+                                        class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 mb-2" 
+                                        x-model="dependencia.nombre_a_cargo_provincialRG">
+                                </div>
+                            </template>
+                        </div>
+                </div>
+                <!-- INSTITUCIONES FEDERALES RG -->
+                <div class="sm:col-span-1 relative" x-data="{ showDropdown: false, selectedInstitucionesFederales: {{ detalle_instituciones_federales }} }">
+                        <label for="instituciones_federales" class="block text-gray-700 dark:text-gray-300 pb-2">
+                            {{ form.instituciones_federales.label }}
+                        </label>
+                        <div @click="showDropdown = !showDropdown" class="flex justify-between bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 cursor-pointer">
+                            <span>Seleccionar</span>
+                            <span :class="showDropdown ? 'rotate-180' : 'rotate-0'" class="ml-2 transition-transform duration-200">▼</span>
+                        </div>
+                        <div x-show="showDropdown" @click.away="showDropdown = false" 
+                            class="absolute w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-10 p-2" style="display: none;">
+                            <div class="grid grid-cols-1 gap-1 h-[150px] overflow-y-scroll">
+                                {% for institucion in form.instituciones_federales.field.queryset %}
+                                <label class="cursor-pointer flex items-center rounded-lg py-1 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                    <input type="checkbox" name="instituciones_federales" value="{{ institucion.id }}" 
+                                        class="form-checkbox px-1 ml-2 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" 
+                                        @change="if ($event.target.checked) { 
+                                            if (!selectedInstitucionesFederales.some(i => i.institucion_federal_id == {{ institucion.id }})) { 
+                                                selectedInstitucionesFederales.push({id: null, institucion_federal_id: {{ institucion.id }}, numero_movil_federal: '', nombre_a_cargo_federal: ''}); 
+                                            } 
+                                        } else { 
+                                            selectedInstitucionesFederales = selectedInstitucionesFederales.filter(i => i.institucion_federal_id != {{ institucion.id }}); 
+                                        }"
+                                        :checked="selectedInstitucionesFederales.some(i => i.institucion_federal_id == {{ institucion.id }})">
+                                    <span class="ml-2 dark:text-gray-300">{{ institucion }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    
+                        <!-- Campos visibles para detalles de instituciones federales -->
+                        <div class="sm:col-span-3 mt-6">
+                            <template x-for="institucion in selectedInstitucionesFederales" :key="institucion.institucion_federal_id">
+                                <div>
+                                    <label :for="'numero_movil_federal_' + institucion.institucion_federal_id" class="block text-gray-700 dark:text-gray-300">
+                                        Movil Institucion Federal <span x-text="institucion.nombre"></span>
+                                    </label>
+                                    <input type="text" :name="'numero_movil_federal_' + institucion.institucion_federal_id" :id="'numero_movil_federal_' + institucion.institucion_federal_id" 
+                                        class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 mb-2" 
+                                        x-model="institucion.numero_movil_federal">
+                    
+                                    <label :for="'nombre_a_cargo_federal_' + institucion.institucion_federal_id" class="block text-gray-700 dark:text-gray-300">
+                                        Personal a Cargo <span x-text="institucion.nombre"></span>
+                                    </label>
+                                    <input type="text" :name="'nombre_a_cargo_federal_' + institucion.institucion_federal_id" :id="'nombre_a_cargo_federal_' + institucion.institucion_federal_id" 
+                                        class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 mb-2" 
+                                        x-model="institucion.nombre_a_cargo_federal">
+                                </div>
+                            </template>
+                        </div>
+                </div>
+                <!-- DEPENDENCIAS SECUNDARIAS RG -->
+                <div class="sm:col-span-1 relative" x-data="{ showDropdown: false, selectedDependenciasSecundariasRG: {{ detalle_dependencias_secundariasRG }} }">
+                        <label for="dependencias_secundariasRG" class="block text-gray-700 dark:text-gray-300 pb-2">
+                            {{ form.dependencias_secundariasRG.label }}
+                        </label>
+                        <div @click="showDropdown = !showDropdown" class="flex justify-between bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 cursor-pointer">
+                            <span>Seleccionar</span>
+                            <span :class="showDropdown ? 'rotate-180' : 'rotate-0'" class="ml-2 transition-transform duration-200">▼</span>
+                        </div>
+                        <div x-show="showDropdown" @click.away="showDropdown = false" 
+                            class="absolute w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-10 p-2" style="display: none;">
+                            <div class="grid grid-cols-1 gap-1 h-[150px] overflow-y-scroll">
+                                {% for dependencia in form.dependencias_secundariasRG.field.queryset %}
+                                <label class="cursor-pointer flex items-center rounded-lg py-1 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                    <input type="checkbox" name="dependencias_secundariasRG" value="{{ dependencia.id }}" 
+                                        class="form-checkbox px-1 ml-2 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" 
+                                        @change="if ($event.target.checked) { 
+                                            if (!selectedDependenciasSecundariasRG.some(d => d.dependencia_secundariaRG_id == {{ dependencia.id }})) { 
+                                                selectedDependenciasSecundariasRG.push({id: null, dependencia_secundariaRG_id: {{ dependencia.id }}, numero_movil_secundariaRG: '', nombre_a_cargo_secundariaRG: ''}); 
+                                            } 
+                                        } else { 
+                                            selectedDependenciasSecundariasRG = selectedDependenciasSecundariasRG.filter(d => d.dependencia_secundariaRG_id != {{ dependencia.id }}); 
+                                        }"
+                                        :checked="selectedDependenciasSecundariasRG.some(d => d.dependencia_secundariaRG_id == {{ dependencia.id }})">
+                                    <span class="ml-2 dark:text-gray-300">{{ dependencia }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    
+                        <!-- Campos visibles para detalles de dependencias secundarias RG -->
+                        <div class="sm:col-span-3 mt-6">
+                            <template x-for="dependencia in selectedDependenciasSecundariasRG" :key="dependencia.dependencia_secundariaRG_id">
+                                <div>
+                                    <label :for="'numero_movil_secundaria_' + dependencia.dependencia_secundariaRG_id" class="block text-gray-700 dark:text-gray-300">
+                                        Móvil dependencia Policial <span x-text="dependencia.nombre"></span>
+                                    </label>
+                                    <input type="text" :name="'numero_movil_secundaria_' + dependencia.dependencia_secundariaRG_id" :id="'numero_movil_secundaria_' + dependencia.dependencia_secundariaRG_id" 
+                                        class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 mb-2" 
+                                        x-model="dependencia.numero_movil_secundariaRG">
+                    
+                                    <label :for="'nombre_a_cargo_secundaria_' + dependencia.dependencia_secundariaRG_id" class="block text-gray-700 dark:text-gray-300">
+                                        Personal a Cargo <span x-text="dependencia.nombre"></span>
+                                    </label>
+                                    <input type="text" :name="'nombre_a_cargo_secundaria_' + dependencia.dependencia_secundariaRG_id" :id="'nombre_a_cargo_secundaria_' + dependencia.dependencia_secundariaRG_id" 
+                                        class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 mb-2" 
+                                        x-model="dependencia.nombre_a_cargo_secundariaRG">
+                                </div>
+                            </template>
+                        </div>
+                </div>
+            </div>
+            <!-- TAREAS JUDICIALES RG -->
+            <div class="">
+                        <label for="{{ form.tareas_judiciales.id_for_label }}" class="block text-gray-700 dark:text-gray-300">{{ form.tareas_judiciales.label }}</label>
+                        <textarea name="{{ form.tareas_judiciales.name }}" id="{{ form.tareas_judiciales.id_for_label }}" class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3">{{ form.tareas_judiciales.value|default_if_none:'' }}</textarea>
+            </div>
+        </div>
+        <!-- GUARDAR RG -->
+        <div class="guardar w-fit mt-4">
+            <button type="submit" id="submit-button" class="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-700 w-full">
+                Guardar
+            </button>
+        <!-- Campop oculto para el guardado -->  
+            <input type="hidden" name="is_confirmed" id="is_confirmed" value="false">
+        </div>        
+    </form>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('comisaria-form');  // El formulario
+            const submitButton = document.getElementById('submit-button');  // El botón de guardar
+            const isConfirmedInput = document.getElementById('is_confirmed');  // El campo oculto para la confirmación
+    
+            // Evitar que el formulario se envíe inmediatamente
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();  // Evita el envío inmediato del formulario
+    
+                // Muestra el SweetAlert de confirmación
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: '¿Deseas guardar este código?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, guardar',
+                    cancelButtonText: 'No, cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Si el usuario confirma, marca como 'true' y envía el formulario
+                        isConfirmedInput.value = 'true';  // Establece el valor de 'is_confirmed' a 'true'
+                        form.submit();  // Envía el formulario
+                    } else {
+                        // Si el usuario cancela, muestra un mensaje informando que la acción fue cancelada
+                        Swal.fire('Cancelado', 'No se guardó el código.', 'info');
+                    }
+                });
+            });
+        });
+    </script>
+</div>
+{% endblock %}
+

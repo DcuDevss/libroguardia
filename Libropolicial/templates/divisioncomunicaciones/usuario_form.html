@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}{{ view.action }} Usuario - División Comunicaciones{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">{{ view.action }} Usuario</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700">{{ view.action }}</button>
+    <a href="{% url 'division_usuarios_list' %}" class="ml-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700">Cancelar</a>
+</form>
+{% endblock %}

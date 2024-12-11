@@ -6,6 +6,8 @@
 <style>
     .joberFirma{
         border: 1px solid rgb(210, 208, 208);
+        width: fit-content;
+        display: flex;
     }
     .joberFirma:hover{
         background-color: #e6e6e6;
@@ -14,15 +16,38 @@
     .fuente{
         font-family: 'Roboto Slab', serif;
     }
+    .cont-msg div p{
+        font-size: 14px;
+        text-align: center;
+    }
+    @media (max-width: 440px){
+        .cont-msg{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .cont-msg i{
+            margin-top: 0;
+        }
+        .joberFirma{
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .cont-msg div p{
+            font-size: 12px;
+            text-align: center;
+        }
+    }
 </style>
     <!-- Dropzone -->
-    <div class="w-fit mx-auto mt-10 p-4 bg-gray-100 dark:text-gray-700 rounded-lg shadow-lg">
-        <h1 class="fuente text-2xl font-bold text-center">Subir PDF</h1>
+    <div class="w-fit mx-auto  p-4 bg-gray-300 dark:text-gray-700 rounded-lg shadow-lg">
+        <h1 class="fuente sm:text-2xl text-lg font-bold text-center">Subir PDF</h1>
         <div class="max-w-3xl mx-auto p-4 mb-2 bg-gray-100 rounded-lg shadow-lg">
-            <div class="flex gap-x-1">
-                <i class="fa-solid fa-circle-exclamation" style="color: #ff000d; margin-top: 4px; margin-right: 2px;"></i>
-                <div class="">
-                    <p class="font-semibold text-[#ff000d] pb-[2px] leading-[25px]">
+            <div class="cont-msg flex gap-x-1">
+                <i class="fa-solid fa-circle-exclamation" style="color: #ff000d; margin-top: 1px; margin-right: 2px;"></i>
+                <div class="sm:text-base text-xs">
+                    <p class="font-semibold text-[#ff000d] pb-[2px] sm:leading-[25px] leading-[15px]">
                         Envíar con este formato: libro-guardia-Comisaria-"Comisaria"-"Ciudad"-"dia-mes-año"
                     </p>
                     <p class="font-semibold text-[#ff000d] pb-[8px] text-center">
@@ -30,16 +55,15 @@
                     </p>
                 </div>
             </div>
-            <div class="flex justify-center text-center">
+            <div class="jober-cont flex justify-center text-center">
                 <a class="joberFirma  w-full p-2 rounded-lg font-semibold  border-2 border-black flex items-center justify-center shadow-md" target="_blank"
-                    href="https://firmar.gob.ar/firmador/#/"
-                    style="width: 60%;">
+                    href="https://firmar.gob.ar/firmador/#/">
                     <span class="mr-2">Firma Digital:</span>
                     <img class="" style="width: 200px;" src="https://firmar.gob.ar/firmador/resources/imgs/argentinagob.svg" alt="">
                 </a>
             </div>
         </div>
-        <form class="flex flex-col items-center" 
+        <form class="flex flex-col items-center"
             id="upload-form" action="{% url 'subir_pdf' %}" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="flex items-center justify-center w-full mb-4">
@@ -61,7 +85,6 @@
                     <a href="/" class="inline-block  bg-gray-500 hover:bg-gray-600 text-white px-4 py-1 rounded text-center">Volver</a>
                 </div>
             </div>
-            
         </form>
         <!-- Aquí se mostrará el mensaje de éxito o error -->
         <div id="message-container"></div>

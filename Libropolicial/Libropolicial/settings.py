@@ -9,7 +9,7 @@ import os
 # Construye rutas dentro del proyecto como BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Configuraciones rápidas para el desarrollo - no adecuadas para producción
+# Configuraciones rápidas para el desarrollo - no adecuadas para producción//
 # Ver https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 
@@ -20,12 +20,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'your-default-secret-key')
 
 # Ruta absoluta a la imagen
-#IMAGE_PATH = os.path.join(BASE_DIR, 'comisarias', 'static', 'comisarias', 'images', 'ESCUDO POLICIA.jpeg')
-
+#IMAGE_PATH = os.path.join(BASE_DIR, 'comisarias', 'static', 'comisarias', 'images', 'ESCUDO POLICIA.jpeg')//
 # ADVERTENCIA DE SEGURIDAD: no ejecutes con debug activado en producción.
 DEBUG = True
 
+
 ALLOWED_HOSTS = []
+#el setting esta para desarrollo nuevos cambios
+# ALLOWED_HOSTS = ['192.168.1.114', 'localhost', '127.0.0.1']
 
 # Definición de la aplicación
 
@@ -61,8 +63,15 @@ MIDDLEWARE = [
     # 'comisarias.middleware.RedirectAuthenticatedUserMiddleware',  # Añadir este middleware si es necesario
     # 'comisarias.middleware.InactivityLogoutMiddleware',  # Añadir este middleware si es necesario
    
-
 ]
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
+
 
 ROOT_URLCONF = 'Libropolicial.urls'
 
@@ -77,13 +86,35 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'compartido.context_processors.global_user_permissions',# agreege este nuevo para permisos globales dcu101
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'Libropolicial.wsgi.application'
+
+
+#WSGI_APPLICATION = 'Libropolicial.wsgi.application'
 #ASGI_APPLICATION = 'Libropolicial.asgi.application'
+
+# Configuración para canales
+# settings.py
+
+ASGI_APPLICATION = 'Libropolicial.asgi.application'
+
+
+# En desarrollo, si no quieres usar Redis todavía
+# Puedes usar esto:
+# CHANNEL_LAYERS = {
+#    'default': {
+#        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+#    },
+# }
+
+# settings.py
+
+
+
 
 # Base de datos
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -91,7 +122,7 @@ WSGI_APPLICATION = 'Libropolicial.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # Utiliza el backend MySQL
-        'NAME': 'librodiario',  # Nombre de la base de datos
+        'NAME': 'libro',  # Nombre de la base de datos
         'USER': 'root',  # Usuario de la base de datos
         'PASSWORD': '',  # Contraseña de la base de datos
         'HOST': 'localhost',  # Host de la base de datos
@@ -157,7 +188,7 @@ LOGIN_URL = 'login'  # URL de inicio de sesión
 # Configuración del motor de sesiones
 SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
 
-# Configuración de canales (WebSockets)
+# Configuración de canales (WebSockets) 'JustifyRight', 'JustifyBlock',
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
@@ -170,7 +201,7 @@ CKEDITOR_CONFIGS = {
             {'name': 'clipboard', 'items': ['Cut', 'Copy', 'Paste', 'Undo', 'Redo']},
             {'name': 'editing', 'items': ['Find', 'Replace', 'SelectAll', 'Scayt']},
             {'name': 'basicstyles', 'items': ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', 'RemoveFormat']},
-            {'name': 'paragraph', 'items': ['NumberedList', 'BulletedList', 'Outdent', 'Indent', 'Blockquote', 'CreateDiv', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'BidiLtr', 'BidiRtl', 'Language']},
+            {'name': 'paragraph', 'items': ['NumberedList', 'BulletedList', 'Outdent', 'Indent', 'Blockquote', 'CreateDiv', 'JustifyLeft','JustifyCenter',  'BidiLtr', 'BidiRtl', 'Language']},
             {'name': 'links', 'items': ['Link', 'Unlink', 'Anchor']},
             {'name': 'insert', 'items': ['Table', 'HorizontalRule', 'SpecialChar']},
             {'name': 'styles', 'items': ['Styles', 'Format', 'Font', 'FontSize']},
@@ -180,5 +211,6 @@ CKEDITOR_CONFIGS = {
         ],
         'height': 250,
         'width': 'auto',
+        'font_names': 'Arial/Arial, Helvetica, sans-serif; Times New Roman/Times New Roman, Times, serif; Verdana/Verdana, Geneva, sans-serif; Courier New/Courier New, Courier, monospace',
     },
 }

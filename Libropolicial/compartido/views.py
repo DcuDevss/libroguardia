@@ -1,4 +1,3 @@
-
 #compartidos/views
 from django.shortcuts import render, redirect
 from django.contrib.auth.views import LoginView
@@ -20,6 +19,11 @@ class CustomLoginView(LoginView):
         user_group_redirects = {
             'comisariaprimera': 'comisaria_primera_list',
             'comisariasegunda': 'comisaria_segunda_list',
+            'comisaria_primeraRG': 'comisariaprimeraRG_list',
+            'comisaria_segundaRG': 'comisariasegundaRG_list',
+            'comisaria_terceraRG': 'comisariaterceraRG_list',
+            'comisaria_cuartaRG': 'comisariacuartaRG_list',
+            'comisaria_quintaRG': 'comisariaquintaRG_list',
             'divisioncomunicaciones': 'divisioncomunicaciones_list'
         }
         for group, url in user_group_redirects.items():
@@ -28,7 +32,7 @@ class CustomLoginView(LoginView):
         return reverse_lazy('no_permission')
 
 
-    #def get_success_url(self):
+    #def get_success_url(self):cambios
     #    if self.request.user.groups.filter(name='comisariaprimera').exists():
      #       return reverse_lazy('comisaria_primera_list')
       #  elif self.request.user.groups.filter(name='comisariasegunda').exists():
@@ -38,4 +42,4 @@ class CustomLoginView(LoginView):
         #else:
          #   return reverse_lazy('no_permission')
 
-    
+

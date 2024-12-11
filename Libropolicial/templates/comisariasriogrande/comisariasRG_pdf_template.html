@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: 'Helvetica', sans-serif;
+            font-size: 12px;
+        }
+        .header {
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .header p {
+            font-size: 8px;
+            margin: 0;
+            padding: 0;
+        }
+        .registro {
+            margin-bottom: 4px;
+        }
+        .line-separator {
+            border-top: 2px solid #000;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        .signature {
+            font-style: italic;
+            color: #777;
+            margin-top: 10px;
+        }
+        .footer {
+            font-size: 10px;
+            text-align: center;
+            margin-top: 50px;
+            color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        th, td {
+            padding: 5px;
+            text-align: left;
+            border: 1px solid #000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <img src="data:image/jpeg;base64,{{ escudo_base64 }}" alt="Escudo Policial" style="width: 100px; height: auto;">
+        <p>“2024 - 30° Aniversario de la Disposición Transitoria Primera de la Constitución Nacional de 1994”</p>
+        <br>
+        Libro de Guardia {{ comisaria_name }}
+    </div>
+
+    {% for registro in registros %}
+    <div class="registro">
+        <table>
+            
+                <div colspan="3" style="text-align: center; font-size: 16px; font-weight: bold;">
+                    <span style="color: blue;">CÓDIGO:</span>
+                    {% if registro.codigoRG %}
+                        <span style="color: red;">{{ registro.codigoRG.codigoRG }} - {{ registro.codigoRG.nombre_codigo|default:"S/N" }}</span>
+                    {% else %}
+                        <span style="color: red;">S/N</span>
+                    {% endif %}
+                </div>
+            
+            <tr>
+                <td><strong>Estado del Código:</strong> {{ registro.estado|yesno:"Activo,Finalizado" }}</td>
+                <td><strong>Fecha y hora del Código:</strong> {{ registro.fecha_hora|date:"d/m/Y H:i:s" }}</td>
+                <td><strong>Última actualización del Código:</strong> {{ registro.updated_at|date:"d/m/Y H:i:s" }}</td>
+            </tr>
+            <tr>
+                <td><strong>Códigos Secundarios:</strong> 
+                    {% if registro.codigos_secundariosRG.all %}
+                        {% for codigoRG in registro.codigos_secundariosRG.all %}
+                            {{ codigoRG.codigoRG }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        S/N
+                    {% endif %}
+                <td><strong>Cuarto de Guardia:</strong> {% if registro.cuartoRG %}{{ registro.cuartoRG.cuartoRG }}{% else %}N/A{% endif %}</td>
+                <td><strong>Móvil Patrulla:</strong> {% if registro.movil_patrulla %}{{ registro.movil_patrulla }}{% else %}N/A{% endif %}</td>
+            </tr>
+            <tr>
+                <td><strong>A Cargo:</strong> {% if registro.a_cargo %}{{ registro.a_cargo }}{% else %}N/A{% endif %}</td>
+                <td><strong>Secundante:</strong> {% if registro.secundante %}{{ registro.secundante }}{% else %}N/A{% endif %}</td>
+                <td><strong>Lugar del Código:</strong> {% if registro.lugar_codigo %}{{ registro.lugar_codigo }}{% else %}N/A{% endif %}</td>
+            </tr>
+        </table>
+        <div><strong>Descripción del Codigo:</strong> {{ registro.descripcion|safe }}</div>
+        
+        <!-- Servicios de Emergencia -->
+<table>
+    <tr>
+        <td><strong>Emergencia Bomberil:</strong></td>
+        {% if registro.detalles_servicio_emergenciaRG.all %}
+            <td colspan="2">
+                <table>
+                    {% for detalle in registro.detalles_servicio_emergenciaRG.all %}
+                    <tr>
+                        <td><strong>Servicio:</strong> {{ detalle.servicio_emergenciaRG.nombre|default:"S/N" }}</td>
+                        <td><strong>Móvil:</strong> {{ detalle.numero_movil_bomberosRG|default:"S/N" }}</td>
+                        <td><strong>A Cargo:</strong> {{ detalle.nombre_a_cargo_bomberosRG|default:"S/N" }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        {% else %}
+            <td colspan="2">S/N</td>
+        {% endif %}
+    </tr>
+</table>
+
+<!-- Instituciones Hospitalarias -->
+<table>
+    <tr>
+        <td><strong>Instituciones Hospitalarias:</strong></td>
+        {% if registro.detalles_institucion_hospitalariaRG.all %}
+            <td colspan="2">
+                <table>
+                    {% for detalle in registro.detalles_institucion_hospitalariaRG.all %}
+                    <tr>
+                        <td><strong>Institución:</strong> {{ detalle.institucion_hospitalariaRG.nombre|default:"S/N" }}</td>
+                        <td><strong>Móvil:</strong> {{ detalle.numero_movil_hospitalRG|default:"S/N" }}</td>
+                        <td><strong>A Cargo:</strong> {{ detalle.nombre_a_cargo_hospitalRG|default:"S/N" }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        {% else %}
+            <td colspan="2">S/N</td>
+        {% endif %}
+    </tr>
+</table>
+
+<!-- Dependencias Municipales -->
+<table>
+    <tr>
+        <td><strong>Instituciones Municipales:</strong></td>
+        {% if registro.detalles_dependencia_municipalRG.all %}
+            <td colspan="2">
+                <table>
+                    {% for detalle in registro.detalles_dependencia_municipalRG.all %}
+                    <tr>
+                        <td><strong>Institucion:</strong> {{ detalle.dependencia_municipalRG.nombre|default:"S/N" }}</td>
+                        <td><strong>Móvil:</strong> {{ detalle.numero_movil_municipalRG|default:"S/N" }}</td>
+                        <td><strong>A Cargo:</strong> {{ detalle.nombre_a_cargo_municipalRG|default:"S/N" }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        {% else %}
+            <td colspan="2">S/N</td>
+        {% endif %}
+    </tr>
+</table>
+
+<!-- Dependencias Provinciales -->
+<table>
+    <tr>
+        <td><strong>Instituciones Provinciales:</strong></td>
+        {% if registro.detalles_dependencia_provincialRG.all %}
+            <td colspan="2">
+                <table>
+                    {% for detalle in registro.detalles_dependencia_provincialRG.all %}
+                    <tr>
+                        <td><strong>Institucion:</strong> {{ detalle.dependencia_provincialRG.nombre|default:"S/N" }}</td>
+                        <td><strong>Móvil:</strong> {{ detalle.numero_movil_provincialRG|default:"S/N" }}</td>
+                        <td><strong>A Cargo:</strong> {{ detalle.nombre_a_cargo_provincialRG|default:"S/N" }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        {% else %}
+            <td colspan="2">S/N</td>
+        {% endif %}
+    </tr>
+</table>
+
+
+
+<!-- Instituciones Federales -->
+<table>
+    <tr>
+        <td><strong>Instituciones Federales:</strong></td>
+        {% if registro.detalles_institucion_federal.all %}
+            <td colspan="2">
+                <table>
+                    {% for detalle in registro.detalles_institucion_federal.all %}
+                    <tr>
+                        <td><strong>Institución:</strong> {{ detalle.institucion_federal.nombre|default:"S/N" }}</td>
+                        <td><strong>Móvil:</strong> {{ detalle.numero_movil_federal|default:"S/N" }}</td>
+                        <td><strong>A Cargo:</strong> {{ detalle.nombre_a_cargo_federal|default:"S/N" }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        {% else %}
+            <td colspan="2">S/N</td>
+        {% endif %}
+    </tr>
+</table>
+
+<!-- Dependencias Secundarias -->
+<table>
+    <tr>
+        <td><strong>Dependencias Secundarias:</strong></td>
+        {% if registro.detalles_dependencia_secundariaRG.all %}
+            <td colspan="2">
+                <table>
+                    {% for detalle in registro.detalles_dependencia_secundariaRG.all %}
+                    <tr>
+                        <td><strong>Dependencia:</strong> {{ detalle.dependencia_secundariaRG.nombre|default:"S/N" }}</td>
+                        <td><strong>Móvil:</strong> {{ detalle.numero_movil_secundariaRG|default:"S/N" }}</td>
+                        <td><strong>A Cargo:</strong> {{ detalle.nombre_a_cargo_secundariaRG|default:"S/N" }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        {% else %}
+            <td colspan="2">S/N</td>
+        {% endif %}
+    </tr>
+</table>
+
+
+
+        <!-- Fecha de creación, creado y editado por 
+        <div>
+            <h2 class="text-xl font-semibold">Fecha de Creación:</h2>
+            <p>{{ registro.created_at|date:"d/m/Y H:i:s"|default:"S/N" }}</p>
+        </div>
+        <div>
+            <h2 class="text-xl font-semibold">Creado por:</h2>
+            <p>{{ registro.created_by.get_full_name|default:"S/N" }}</p>
+        </div>
+        <div>
+            <h2 class="text-xl font-semibold">Editado por:</h2>
+            <p>{{ registro.updated_by.get_full_name|default:"S/N" }}</p>
+        </div>-->
+        
+        {% if registro.firmas %}
+        <div class="signature">Firmado por: {{ registro.firmas }}</div>
+        {% endif %}
+        <div class="line-separator">-</div>
+    </div>
+    {% endfor %}
+
+    <!-- Información de pie de página -->
+    <div class="footer">
+        {{ comisaria_name }}. Descargado por: {{ username }}. Fecha y hora: {{ now|date:"d/m/Y H:i:s" }}
+    </div>
+
+</body>
+</html>

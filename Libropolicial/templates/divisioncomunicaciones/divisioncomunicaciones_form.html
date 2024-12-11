@@ -1,84 +1,200 @@
 {% extends "base.html" %}
 
-{% block title %}Nueva Comunicación{% endblock %}
+{% block title %}Iniciar Guardia en Comisaría Primera{% endblock %}
 
 {% block content %}
-<div class="flex justify-center items-center min-h-screen bg-gray-100" x-data="{ showModal: false, showDropdown: false }">
-    <div class="bg-white shadow-md rounded-lg p-6 w-full max-w-5xl mx-auto">
-        <h1 class="text-2xl font-bold mb-4 text-center">Nueva Comunicación</h1>
-        <form method="post">
-            {% csrf_token %}
-            <div class="grid gap-4 sm:grid-cols-3">
-                <div class="sm:col-span-2">
-                    <label for="inicio_guardia" class="block text-gray-700">Inicio Guardia:</label>
-                    <input type="datetime-local" id="inicio_guardia" name="inicio_guardia" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3" required>
-                </div>
-                <div class="sm:col-span-2">
-                    <label for="finalizacion_guardia" class="block text-gray-700">Finalización Guardia:</label>
-                    <input type="datetime-local" id="finalizacion_guardia" name="finalizacion_guardia" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3" required>
-                </div>
-                <div class="sm:col-span-1 relative">
-                    <label for="encargado_guardia" class="block text-gray-700">Encargado Guardia:</label>
-                    <select id="encargado_guardia" name="encargado_guardia" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3" required>
-                        {% for encargado in encargados %}
-                        <option value="{{ encargado.id }}">{{ encargado.nombre_apellido }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="sm:col-span-1 relative">
-                    <label for="personal_guardia" class="block text-gray-700">Personal Guardia:</label>
-                    <div @click="showDropdown = !showDropdown" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 cursor-pointer">
-                        Seleccionar personal
-                    </div>
-                    <div x-show="showDropdown" @click.away="showDropdown = false" class="absolute mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10 p-4" style="display: none;">
-                        <div class="grid grid-cols-3 gap-2">
-                            {% for personal in personales %}
-                            <label class="flex items-center p-2 hover:bg-gray-100">
-                                <input type="checkbox" name="personal_guardia" value="{{ personal.id }}" class="form-checkbox" {% if personal.id in form.personal_guardia.value %}checked{% endif %}>
-                                <span class="ml-2">{{ personal.nombre_apellido }}</span>
-                            </label>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-                <div class="sm:col-span-1">
-                    <label for="solicitante" class="block text-gray-700">Solicitante:</label>
-                    <input type="text" id="solicitante" name="solicitante" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3" required>
-                </div>
-                <div class="sm:col-span-1">
-                    <label for="nombre_apellido" class="block text-gray-700">Nombre y Apellido:</label>
-                    <input type="text" id="nombre_apellido" name="nombre_apellido" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3" required>
-                </div>
-                <div class="sm:col-span-1">
-                    <label for="dni" class="block text-gray-700">DNI:</label>
-                    <input type="text" id="dni" name="dni" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3" required>
-                </div>
-                <div class="sm:col-span-1">
-                    <label for="telefono" class="block text-gray-700">Teléfono:</label>
-                    <input type="text" id="telefono" name="telefono" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3" required>
-                </div>
-                <div class="sm:col-span-1">
-                    <label for="movil_patrulla" class="block text-gray-700">Móvil Patrulla:</label>
-                    <input type="text" id="movil_patrulla" name="movil_patrulla" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3" required>
-                </div>
-                <div class="sm:col-span-1">
-                    <label for="personal_cargo" class="block text-gray-700">Personal a Cargo:</label>
-                    <input type="text" id="personal_cargo" name="personal_cargo" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3" required>
-                </div>
-                <div class="sm:col-span-3">
-                    <label for="descripcion" class="block text-gray-700">Descripción:</label>
-                    <textarea id="descripcion" name="descripcion" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3" rows="4" required></textarea>
-                </div>
-                <div class="sm:col-span-1">
-                    <label for="intervencion_comisaria" class="block text-gray-700">Intervención Comisaria:</label>
-                    <input type="text" id="intervencion_comisaria" name="intervencion_comisaria" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3" required>
-                </div>
-                <div class="sm:col-span-3">
-                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 w-full">Guardar</button>
+<div class="container mx-auto mt-4">
+    <h1 class="text-2xl font-bold mb-4">Iniciar Guardia en Comisaría Primera</h1>
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Renderización manual de los campos del formulario principal -->
+        <div class="mb-4">
+            <label for="{{ guardia_form.inicio_guardia.id_for_label }}">Inicio de la Guardia</label><br>
+            <input type="datetime-local" name="inicio_guardia" value="{{ guardia_form.inicio_guardia.value }}" id="{{ guardia_form.inicio_guardia.id_for_label }}">
+        </div>
+
+        <div class="sm:col-span-1">
+            <label for="{{ form.cuarto.id_for_label }}" class="block text-gray-700 dark:text-gray-300">{{ form.cuarto.label }}</label>
+            {{ form.cuarto }}
+        </div>
+
+        <div class="sm:col-span-1">
+            <label for="{{ form.encargado_guardia.id_for_label }}" class="block text-gray-700 dark:text-gray-300">{{ form.encargado_guardia.label }}</label>
+            {{ form.encargado_guardia }}
+        </div>
+         <!-- Sección de Dependencias Secundarias -->
+         <div class="sm:col-span-1 relative" x-data="{ showDropdown: false }">
+            <label for="personal_guardia" class="block text-gray-700 dark:text-gray-300">{{ form.personal_guardia.label }}</label>
+            <div @click="showDropdown = !showDropdown" class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 cursor-pointer">
+                Personal 
+            </div>
+            <div x-show="showDropdown" @click.away="showDropdown = false" class="absolute mt-2 w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-10 p-4" style="display: none;">
+                <div class="grid grid-cols-4 gap-2">
+                    {% for personal in form.personal_guardia.field.queryset %}
+                    <label class="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-600">
+                        <input type="checkbox" name="personal_guardia" value="{{ personal.id }}" class="form-checkbox dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200" {% if personal in form.instance.personal_guardia.all %}checked{% endif %}>
+                        <span class="ml-2 dark:text-gray-300">{{ personal }}</span>
+                    </label>
+                    {% endfor %}
                 </div>
             </div>
-        </form>
-        <a href="{% url 'divisioncomunicaciones_list' %}" class="mt-4 inline-block bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-700 w-full text-center">Volver a la lista</a>
-    </div>
+        </div>
+
+        <div class="mb-4">
+            <label for="{{ guardia_form.oficial_servicio.id_for_label }}">Oficial de Servicio</label><br>
+            <input type="text" name="oficial_servicio" value="{{ guardia_form.oficial_servicio.value }}" id="{{ guardia_form.oficial_servicio.id_for_label }}">
+        </div>
+
+        <div class="mb-4">
+            <label for="{{ guardia_form.distribucion_personal_moviles.id_for_label }}">Distribución Personal y Móviles</label><br>
+            <textarea name="distribucion_personal_moviles" id="{{ guardia_form.distribucion_personal_moviles.id_for_label }}">{{ guardia_form.distribucion_personal_moviles.value }}</textarea>
+        </div>
+
+        <div class="mb-4">
+            <label for="{{ guardia_form.novedades.id_for_label }}">Novedades</label><br>
+            <textarea name="novedades" id="{{ guardia_form.novedades.id_for_label }}">{{ guardia_form.novedades.value }}</textarea>
+        </div>
+
+        <!-- Campo oculto necesario para el manejo de formularios de eventos -->
+        {{ eventos_formset.management_form }}
+        {{ eventos_bis_formset.management_form }}
+        {{ eventos_bis_uno_formset.management_form }}
+
+        <!-- Sección para los eventos de tipo "Guardia Bis" -->
+        <h3 class="text-lg font-bold">Eventos - Guardia Bis</h3>
+        <div id="eventos-bis">
+            {% for form in eventos_bis_formset %}
+                <div class="border p-4 mb-2 evento-bis-formulario">
+                    {{ form.tipo_eventobis.label_tag }} {{ form.tipo_eventobis }}
+                    {{ form.nombre_jerarquia.label_tag }} {{ form.nombre_jerarquia}}
+                   
+                    <button type="button" class="remove-bis bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700">Eliminar</button>
+                </div>
+            {% endfor %}
+        </div>
+        <button type="button" id="add-evento-bis" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 mt-4">Agregar Evento - Guardia Bis</button>
+
+        <!-- Sección para los eventos de tipo "Guardia Bis Uno" -->
+        <h3 class="text-lg font-bold">Eventos - Guardia Bis Uno</h3>
+        <div id="eventos-bis-uno">
+            {% for form in eventos_bis_uno_formset %}
+                <div class="border p-4 mb-2 evento-bis-uno-formulario">
+                    {{ form.tipo_eventobisuno.label_tag }} {{ form.tipo_eventobisuno }}
+                    {{ form.movil_patrulla.label_tag }} {{ form.movil_patrulla }}
+                    {{ form.nombre_jerarquia_movil_patrulla.label_tag }} {{ form.nombre_jerarquia_movil_patrulla }}
+                    <button type="button" class="remove-bis-uno bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700">Eliminar</button>
+                </div>
+            {% endfor %}
+        </div>
+        <button type="button" id="add-evento-bis-uno" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 mt-4">Agregar Evento - Guardia Bis Uno</button>
+
+        <!-- Sección para los eventos originales -->
+        <h3 class="text-lg font-bold">Eventos Originales</h3>
+        <div id="eventos">
+            {% for form in eventos_formset %}
+                <div class="border p-4 mb-2 evento-formulario">
+                    {{ form.tipo_evento.label_tag }} {{ form.tipo_evento }}
+                    {{ form.hora_evento.label_tag }} {{ form.hora_evento }}
+                    {{ form.descripcion.label_tag }} {{ form.descripcion }}
+                    <button type="button" class="remove-form bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700">Eliminar</button>
+                </div>
+            {% endfor %}
+        </div>
+        <button type="button" id="add-evento" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 mt-4">Agregar Evento Original</button>
+
+        <div class="mb-4">
+            <label for="{{ guardia_form.finalizacion_guardia.id_for_label }}">Finalización de la Guardia</label><br>
+            <input type="datetime-local" name="finalizacion_guardia" value="{{ guardia_form.finalizacion_guardia.value }}" id="{{ guardia_form.finalizacion_guardia.id_for_label }}">
+        </div>
+
+        <!-- Botón para enviar el formulario -->
+        <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 mt-4">Guardar</button>
+    </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const eventosContainer = document.querySelector('#eventos');
+        const eventosBisContainer = document.querySelector('#eventos-bis');
+        const eventosBisUnoContainer = document.querySelector('#eventos-bis-uno');
+
+        const totalFormsInput = document.querySelector('input[name$="-TOTAL_FORMS"]');
+        const totalFormsBisInput = document.querySelector('input[name$="-TOTAL_FORMS"]');
+        const totalFormsBisUnoInput = document.querySelector('input[name$="-TOTAL_FORMS"]');
+
+        const addEventoButton = document.querySelector('#add-evento');
+        const addEventoBisButton = document.querySelector('#add-evento-bis');
+        const addEventoBisUnoButton = document.querySelector('#add-evento-bis-uno');
+
+        let formCount = parseInt(totalFormsInput.value);
+        let formCountBis = parseInt(totalFormsBisInput.value);
+        let formCountBisUno = parseInt(totalFormsBisUnoInput.value);
+
+        // Agregar nuevo evento original
+        addEventoButton.addEventListener('click', function() {
+            if (eventosContainer.firstElementChild) {
+                const newForm = eventosContainer.firstElementChild.cloneNode(true);
+                newForm.innerHTML = newForm.innerHTML.replace(/-\d+-/g, `-${formCount}-`).replace(/_\d+_/g, `_${formCount}_`);
+                newForm.querySelectorAll('input, textarea, select').forEach(function(input) {
+                    input.value = '';
+                });
+                eventosContainer.appendChild(newForm);
+                formCount++;
+                totalFormsInput.value = formCount;
+            } else {
+                console.error('No hay formularios iniciales en el formset.');
+            }
+        });
+
+        // Agregar nuevo evento bis
+        addEventoBisButton.addEventListener('click', function() {
+            if (eventosBisContainer.firstElementChild) {
+                const newForm = eventosBisContainer.firstElementChild.cloneNode(true);
+                newForm.innerHTML = newForm.innerHTML.replace(/-\d+-/g, `-${formCountBis}-`).replace(/_\d+_/g, `_${formCountBis}_`);
+                newForm.querySelectorAll('input, textarea, select').forEach(function(input) {
+                    input.value = '';
+                });
+                eventosBisContainer.appendChild(newForm);
+                formCountBis++;
+                totalFormsBisInput.value = formCountBis;
+            } else {
+                console.error('No hay formularios iniciales en el formset.');
+            }
+        });
+
+        // Agregar nuevo evento bis uno
+        addEventoBisUnoButton.addEventListener('click', function() {
+            if (eventosBisUnoContainer.firstElementChild) {
+                const newForm = eventosBisUnoContainer.firstElementChild.cloneNode(true);
+                newForm.innerHTML = newForm.innerHTML.replace(/-\d+-/g, `-${formCountBisUno}-`).replace(/_\d+_/g, `_${formCountBisUno}_`);
+                newForm.querySelectorAll('input, textarea, select').forEach(function(input) {
+                    input.value = '';
+                });
+                eventosBisUnoContainer.appendChild(newForm);
+                formCountBisUno++;
+                totalFormsBisUnoInput.value = formCountBisUno;
+            } else {
+                console.error('No hay formularios iniciales en el formset.');
+            }
+        });
+
+        // Eliminar evento
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-form')) {
+                e.target.closest('.evento-formulario').remove();
+                formCount--;
+                totalFormsInput.value = formCount;
+            } else if (e.target.classList.contains('remove-bis')) {
+                e.target.closest('.evento-bis-formulario').remove();
+                formCountBis--;
+                totalFormsBisInput.value = formCountBis;
+            } else if (e.target.classList.contains('remove-bis-uno')) {
+                e.target.closest('.evento-bis-uno-formulario').remove();
+                formCountBisUno--;
+                totalFormsBisUnoInput.value = formCountBisUno;
+            }
+        });
+    });
+</script>
 {% endblock %}

@@ -1,0 +1,18 @@
+<!-- libropolicial/templates/comisarias/primera/comisaria_primera_form.html -->
+{% extends "formulariobase/formulario_generalRG.html" %}
+{% block back_button %}
+<!-- <a href="{% url 'comisaria_primera_list' %}" class="mt-4 inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700  text-center">Volver</a> -->
+<a href="{% url 'comisaria_terceraRG_list' %}" 
+    class="inline-block bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded text-center">
+    Volver a la lista de Codigos
+</a>
+{% endblock %}
+
+{% block title %}Registrar en Comisaría Tercera Rio Grande{% endblock %}
+
+{% block green_button %}
+<a href="{% url 'comisaria_terceraRG_list' %}" 
+    class="mt-4 inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full text-center">
+    Volver a la listado de Codigos ok
+</a>
+{% endblock %}

@@ -1,0 +1,316 @@
+<!-- comisarias/primera/comisaria_primera_list.html -->
+{% extends "base.html" %}
+
+{% block title %}Lista de Codigos en Comisaría Primera{% endblock %}
+
+{% block content %}
+<style>
+    /* Modo oscuro para los elementos de DataTables */
+    /* .dark .dataTables_length label,
+    .dark .dataTables_filter label,
+    .dark .dataTables_info,
+    .dark .dataTables_paginate span a {
+        color: white !important;
+    }
+    .dark .paginate_button.current,
+    .dark .paginate_button:hover {
+        background-color: #4B5563 !important;  /* Color gris oscuro */
+        color: white !important;
+    }
+    .dark .paginate_button {
+        color: white !important;
+    } */
+    @media (max-width: 600px){
+        .me-nu{
+            display: flex;
+            flex-direction: column;
+            width: fit-content;
+            margin: auto;
+            text-align: center;
+            row-gap: 8px;
+        }
+    }
+    /* ::-webkit-scrollbar {
+        display: none;
+    } */
+    h1{
+        font-family: 'Roboto Slab', serif;
+    }
+    .dt-layout-row{
+        font-size: 13px;
+    }
+    #dt-search-0{
+        border-radius: 6px;
+        min-width: 300px;
+    }
+    #dt-length-0{
+        border-radius: 6px;
+    }
+    /* cambio de posicion buscador y selector de registros */
+    .dt-layout-row {
+        display: flex;
+    }
+    div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {
+        order: 1;
+        justify-content: flex-start;
+        margin-left: 0;
+    }
+    div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-start {
+        order: 2;
+        justify-content: flex-end;
+        margin-right: 0;
+    }
+    /* Estilos para el modo oscuro */
+    .dark .dataTables_wrapper {
+        background-color: #2d2d2d;
+        color: #e0e0e0;
+    }
+
+    .dark .dataTables_wrapper .dataTables_paginate .paginate_button {
+        background-color: #444;
+        color: #e0e0e0;
+    }
+
+    .dark .dataTables_wrapper .dataTables_filter input {
+        background-color: #333;
+        color: #e0e0e0;
+        border: 1px solid #555;
+    }
+
+    .dark .dataTables_wrapper .dataTables_info {
+        color: #e0e0e0;
+    }
+
+    .dark .dataTables_wrapper .dataTables_header {
+        background-color: #333;
+        color: #e0e0e0;
+    }
+
+    .dark .dataTables_wrapper .dataTables_body {
+        background-color: #2d2d2d;
+    }
+    #myTable tbody tr:hover {
+        background-color: transparent; /* Elimina el color de fondo en hover */
+    }
+    /*  */
+    .carajo {
+        border: 1px solid #555 !important;
+    }
+    /*  */
+    .dark .dataTables_wrapper tbody tr:hover {
+        background-color: #3b82f6; /* Equivalente a blue-500 */
+    }
+</style>
+<div class="w-full max-w-7xl mx-auto px-4 pb-4 pt-2 rounded-lg dark:text-white" x-data="{ 
+        showModal: false, 
+        descripcion: '', 
+        showResolveModal: false, 
+        resolveId: null, 
+        resolveData: {},
+        showConfirmModal: false, 
+        recordIdToSign: null, 
+        confirmSign() {
+            if (this.recordIdToSign !== null) {
+                window.location.href = '/comisarias/primera/firmar/' + this.recordIdToSign;
+            }
+            } 
+        }">
+    <h1 class="text-2xl font-bold mb-4 text-center">Lista de Codigos en Comisaría Primera</h1>
+
+    <div class="me-nu flex flex-wrap justify-center gap-4 mb-4">
+        <a href="{% url 'comisaria_primera_create' %}" class="btn bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Iniciar Codigo</a>
+    
+        <!-- Botón para 'jefessuperiores' -->
+        {% if is_jefessuperiores %}
+        <a href="{% url 'comisarias_completa_list' %}" class="btn bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-700">Libro general codigos</a>
+        {% endif %}
+    
+        <!-- Botón para 'oficialesservicios' y 'jefessuperiores' -->
+        {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias %}
+        <a href="{% url 'generate_comisaria_primera_pdf_download' %}?signature=true" target="_blank" class="btn bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-700">Ver y Descargar PDF</a>
+        {% endif %}
+    
+        {% if user.is_authenticated and user.is_superuser %}
+        <a href="{% url 'generate_comisaria_primera_pdf_download_previous_day' %}" target="_blank" class="btn bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700">Descargar PDF del Día Anterior</a>
+        {% endif %}
+    
+        <!-- Botón para subir y ver PDFs -->
+        {% if is_oficialesservicios or is_jefessuperiores %}
+        <a href="{% url 'subir_pdf' %}" class="btn bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700">Subir PDF</a>
+        {% endif %}
+    
+        {% if user.is_authenticated and user.is_superuser %}
+        <a href="{% url 'ver_pdfs' %}" class="btn bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-700">Ver PDF Libro</a>
+        {% endif %}
+    
+    
+    </div>
+
+    <div class="overflow-x-auto rounded-lg">
+        <table id="comisarias-table" class="display carajo w-full text-[13px] rounded-lg">
+            <thead class="bg-[#111] text-white text-[16px] rounded-lg">
+                <tr>
+                    <th class="px-4 py-4 text-center rounded-tl-lg">Cuarto</th>
+                    <th class="px-4 py-4 text-center">Fecha y hora</th>
+                    <th class="px-4 py-4 text-center">Código</th>
+                    <th class="px-4 py-4 text-center">Lugar</th>
+                    <th class="px-4 py-4 text-center">Descripción</th>
+                    <th class="px-4 py-4 text-center">Estado</th>
+                    <th class="px-4 py-4 text-center">Creado por</th>
+                    <th class="px-4 py-4 text-center">1er Registro</th>
+                    <th class="px-4 py-4 text-center">Editado por</th>
+                    <th class="px-4 py-4 text-center">Ultima Actualización</th>
+                    <th class="px-4 py-4 text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr class="border-b cursor-pointer">
+                    <td class="py-1 px-2 font-bold text-center">{{ record.cuarto.cuarto }}</td>
+                    <td class="py-1 px-2 text-center">{{ record.fecha_hora|date:"d/m/Y H:i:s" }}</td>
+                    <td class="py-1 px-2 text-center">{{ record.codigo|default_if_none:'' }}</td>
+                    <td class="py-1 px-2 text-center">{{ record.lugar_codigo|default_if_none:'' }}</td>
+                    <td class="py-1 px-2 text-center">
+                        <button @click="descripcion = '{{ record.descripcion|escapejs }}'; showModal = true" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Ver</button>
+                    </td>
+                    <td class="py-1 px-2 text-center">
+                        {{ record.estado|yesno:"Activo,Finalizado" }}
+                    </td>
+                    <td class="py-1 px-2 text-center">{{ record.created_by.get_full_name|default_if_none:'' }}</td>
+                    <td class="py-1 px-2 text-center">{{ record.created_at|date:"d/m/Y H:i:s" }}</td>
+                    <td class="py-1 px-2 text-center">
+                        {% if record.updated_by %}
+                            {{ record.updated_by.get_full_name|default:record.updated_by.username }}
+                        {% endif %}
+                    </td>
+                    <td class="py-1 px-2 text-center">
+                        {% if record.updated_at and record.updated_at|date:"d/m/Y H:i:s" != record.created_at|date:"d/m/Y H:i:s" %}
+                            {{ record.updated_at|date:"d/m/Y H:i:s" }}
+                        {% endif %}
+                    </td>
+                    <td style="row-gap: 8px;" 
+                        class="text-center flex flex-col">
+                        <a href="{% url 'comisaria_primera_detail' record.pk %}" style="font-size: 10px; font-weight: 600;"
+                            class="bg-blue-600 text-white py-1 px-4 w-full rounded hover:bg-blue-700 block text-center">
+                            FULL
+                        </a>
+
+                        {% if not request.user.get_full_name in record.firmas %}
+                            <button @click.prevent="recordIdToSign = {{ record.pk }}; showConfirmModal = true" style="font-size: 10px; font-weight: 600;"
+                                class="bg-teal-500 text-black py-1 px-4 w-full rounded hover:bg-teal-700 block text-center">
+                                FIRMAR
+                            </button>
+                        {% endif %}
+
+                        {% if record.estado or record.fecha_hora.date == today %}
+                            <a href="{% url 'comisaria_primera_edit' record.pk %}" style="font-size: 10px; font-weight: 600;"
+                                class="bg-yellow-500 text-black py-1 px-4 w-full rounded hover:bg-yellow-600 block  text-center">
+                                EDITAR
+                            </a>
+                        {% endif %}
+                        
+
+                        {% if is_jefessuperiores or user.is_superuser %}
+                         <!-- Botón Eliminar (Soft Delete) con confirmación -->
+                             <button @click.prevent="if (confirm('¿Estás seguro/a de que deseas eliminar este registro?')) { window.location.href = '{% url 'comisaria_primera_eliminar' record.pk %}' }" style="font-size: 10px; font-weight: 600;"
+                             class="bg-red-600 text-white py-1 px-4 w-full rounded hover:bg-red-700 block text-center">
+                             ELIMINAR
+                             </button>
+                        {% endif %}
+                    </td>
+                    
+                    <!--<td class="bg-gray-300 border border-gray-300 px-2 py-2 dark:bg-gray-700 dark:border-gray-600">
+                         Botón para leer en voz alta 
+                        <button class="bg-pink-500 text-white py-1 px-4 w-full min-w-[120px] rounded hover:bg-pink-700 block text-center mt-2"
+                          onclick="readRecord('{{ record.cuarto.cuarto }}', '{{ record.fecha_hora|date:"d/m/Y H:i:s" }}', 
+                                               '{{ record.codigo.codigo }}', '{{ record.codigo.nombre_codigo }}', 
+                                               '{{ record.lugar_codigo }}', '{{ record.descripcion|escapejs }}',
+                                               '{{ record.estado|yesno:"Activo,Finalizado" }}', 
+                                               '{{ record.created_by.get_full_name }}', '{{ record.updated_by.get_full_name }}')">
+                          Audio
+                        </button>-->
+                      
+                        <!-- Botón para detener el audio 
+                        <button class="bg-red-500 text-white py-1 px-4 w-full min-w-[120px] rounded hover:bg-red-700 block text-center mt-2"
+                          onclick="stopAudio()">
+                          Detener
+                        </button>
+                      </td>-->
+                                          
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+    </div>
+    
+
+   <!-- Modal para Descripción -->
+<div x-show="showModal" x-cloak class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-2 px-4 pb-20 text-center sm:block sm:p-0">
+        <div x-show="showModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div x-show="showModal" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Descripción</h3>
+                        <div class="mt-2">
+                            <!-- Usar x-html para renderizar el HTML en lugar de texto -->
+                            <div class="descripcion-container text-sm text-gray-500" x-html="descripcion"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button @click="showModal = false" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación para firmar -->
+<div x-show="showConfirmModal" x-cloak class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-2 px-4 pb-20 text-center sm:block sm:p-0">
+        <div x-show="showConfirmModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div x-show="showConfirmModal" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Confirmación</h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">¿Está seguro/a de que desea firmar este codigo?</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-300 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button @click="confirmSign()" type="button" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">Sí</button>
+                <button @click="showConfirmModal = false" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:mt-0 sm:w-auto sm:text-sm">No</button>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+</div>
+
+<!-- SweetAlert2 para mostrar el mensaje de éxito -->
+{% if messages %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            {% for message in messages %}
+                Swal.fire({
+                    icon: 'success',  // Cambia el ícono según el tipo de mensaje (success, error, etc.)
+                    title: '¡Éxito!',
+                    text: '{{ message }}',
+                    confirmButtonText: 'OK',
+                    timer: 3000  // La alerta se cierra automáticamente después de 3 segundos
+                });
+            {% endfor %}
+        });
+    </script>
+{% endif %}
+
+{% endblock %}

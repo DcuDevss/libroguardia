@@ -19,6 +19,8 @@
     <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
     <script src="https://unpkg.com/htmx.org@1.4.1"></script>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2" defer></script>
+    <script src="https://unpkg.com/htmx.org@1.4.1"></script>
+
     
     <style>
         .bg-red-500 {
@@ -407,8 +409,47 @@
               }).catch(error => console.error('Error:', error));
         });
     </script>
+
+
+
+
+
+    <style>
+   
+        .animate-blink {
+            animation: blink 1s infinite;  /* Aplica la animación de destello, cada segundo se repetirá */
+            background-color: #f56565; /* bg-red-500 */
+            color: black; /* Texto en color oscuro */
+        }
+    </style>
     
-    
+    <!-- Aquí es donde se mostrará el mensaje -->
+    <div id="alert-box" class="hidden fixed top-0 bg-red-500 text-white p-4 z-50 text-center mx-auto animate-blink" style="max-width: 500px; left: 0; right: 0; border-radius: 20px;">
+        <strong>RECUERDE DESCARGAR EL PDF DE LIBRODIARIO ANTES DE LAS 23:59 HS</strong>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function checkForMessage() {
+                fetch('/check-message/')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.show_message) {
+                            const alertBox = document.getElementById('alert-box');
+                            alertBox.classList.remove('hidden');
+                            setTimeout(() => {
+                                alertBox.classList.add('hidden');
+                            }, 120000); // 2 minutos (120,000 ms)
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        
+            // Ejecuta la función cada 4 minutos
+            setInterval(checkForMessage, 240000);  // 240000 ms = 4 minutos
+            // Ejecuta al cargar la página por primera vez
+            checkForMessage();
+        });
+    </script>
     
     
 </body>

@@ -32,7 +32,9 @@ from xhtml2pdf import pisa
 
 from Libropolicial.settings import MEDIA_ROOT
 from .forms import ComisariaPrimeraForm, ComisariaSegundaForm, ComisariaTerceraForm, ComisariaCuartaForm, ComisariaQuintaForm, CustomLoginForm
-from .models import ComisariaPrimera, ComisariaSegunda, ComisariaTercera, ComisariaCuarta, ComisariaQuinta, DependenciasSecundarias, CodigoPolicialUSH, DetalleDependenciaSecundaria, DetalleInstitucionFederal, DetalleServicioEmergencia, DetalleInstitucionHospitalaria, DetalleDependenciaMunicipal, DetalleDependenciaProvincial, UploadedPDF
+from .models import ComisariaPrimera, ComisariaSegunda, ComisariaTercera, ComisariaCuarta, ComisariaQuinta, DependenciasSecundarias, CodigoPolicialUSH, DetalleDependenciaSecundaria, DetalleInstitucionFederal, DetalleServicioEmergencia, DetalleInstitucionHospitalaria, DetalleDependenciaMunicipal, DetalleDependenciaProvincial 
+from compartido.models import UploadedPDF
+
 from compartido.utils import user_is_in_group
 import base64
 
@@ -144,8 +146,8 @@ class ComisariaPrimeraListView(LoginRequiredMixin, UserPassesTestMixin, ListView
     # Método que personaliza el conjunto de datos que se listará en la vista.
     def get_queryset(self):
         # Obtiene el queryset predeterminado y lo ordena por la fecha y hora en orden descendente.
-        queryset = super().get_queryset().order_by('-fecha_hora')
-        
+        #queryset = super().get_queryset().order_by('-fecha_hora')
+        queryset = super().get_queryset().filter(activo=True).order_by('-fecha_hora')
         # Obtiene el parámetro de búsqueda de la solicitud GET, si existe.
         search_query = self.request.GET.get('q', '')
         
@@ -178,11 +180,16 @@ class ComisariaPrimeraListView(LoginRequiredMixin, UserPassesTestMixin, ListView
           # Verificar la pertenencia a los grupos
           
         
-        context['is_encargados_guardias_primera'] = user.groups.filter(name='encargados_guardias_primera').exists()
+        #context['is_encargados_guardias_primera'] = user.groups.filter(name='encargados_guardias_primera').exists()
+        #context['is_jefessuperiores'] = user.groups.filter(name='jefessuperiores').exists()
+        #context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
+        #context['is_comisariaprimera'] = user.groups.filter(name='comisariaprimera').exists()
+
         context['is_jefessuperiores'] = user.groups.filter(name='jefessuperiores').exists()
+        context['is_libreros'] = user.groups.filter(name='libreros').exists()
+        context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariaprimera'] = user.groups.filter(name='comisariaprimera').exists()
-
         
         # Agrega la fecha actual al contexto.
         context['today'] = timezone.now().date()
@@ -246,120 +253,121 @@ class ComisariaPrimeraCreateView(LoginRequiredMixin, UserPassesTestMixin, Create
 
     # Método que se llama cuando el formulario es válido.
     def form_valid(self, form):
-        # Guarda el objeto pero sin enviarlo aún a la base de datos.
-        self.object = form.save(commit=False)
-        
-        # Asigna al campo 'created_by' el usuario actual.
-        self.object.created_by = self.request.user
-        
-        # Inicializa los campos 'updated_by' y 'updated_at' como None.
-        self.object.updated_by = None
-        self.object.updated_at = None
-
-        # Obtiene la latitud y longitud desde el formulario y convierte las comas en puntos.
-        latitude = self.request.POST.get('latitude').replace(',', '.')
-        longitude = self.request.POST.get('longitude').replace(',', '.')
-
-        # Asigna las coordenadas al objeto si están disponibles.
-        self.object.latitude = float(latitude) if latitude else None
-        self.object.longitude = float(longitude) if longitude else None
-
-        # Guarda el objeto en la base de datos.
-        self.object.save()
-        
-        # Guarda las relaciones many-to-many del formulario.
-        form.save_m2m()
-
-        # Guardar los detalles adicionales para cada servicio de emergencia.
-        for servicio in form.cleaned_data['servicios_emergencia']:
-            # Obtiene los datos específicos para cada servicio de emergencia desde el formulario.
-            numero_movil_bomberos = self.request.POST.get(f'numero_movil_bomberos_{servicio.id}')
-            nombre_a_cargo_bomberos = self.request.POST.get(f'nombre_a_cargo_bomberos_{servicio.id}')
+            # Guarda el objeto pero sin enviarlo aún a la base de datos.
+            self.object = form.save(commit=False)
             
-            # Si se proporcionan datos, crea un registro en DetalleServicioEmergencia.
-            if numero_movil_bomberos or nombre_a_cargo_bomberos:
-                DetalleServicioEmergencia.objects.create(
-                    servicio_emergencia=servicio,
-                    comisaria_primera=self.object,
-                    numero_movil_bomberos=numero_movil_bomberos,
-                    nombre_a_cargo_bomberos=nombre_a_cargo_bomberos
-                )
-
-        # Guardar los detalles adicionales para cada institución hospitalaria.
-        for institucion in form.cleaned_data['instituciones_hospitalarias']:
-            # Obtiene los datos específicos para cada institución hospitalaria desde el formulario.
-            numero_movil_hospital = self.request.POST.get(f'numero_movil_hospital_{institucion.id}')
-            nombre_a_cargo_hospital = self.request.POST.get(f'nombre_a_cargo_hospital_{institucion.id}')
+            # Asigna al campo 'created_by' el usuario actual.
+            self.object.created_by = self.request.user
             
-            # Si se proporcionan datos, crea un registro en DetalleInstitucionHospitalaria.
-            if numero_movil_hospital or nombre_a_cargo_hospital:
-                DetalleInstitucionHospitalaria.objects.create(
-                    institucion_hospitalaria=institucion,
-                    comisaria_primera=self.object,
-                    numero_movil_hospital=numero_movil_hospital,
-                    nombre_a_cargo_hospital=nombre_a_cargo_hospital
-                )
+            # Inicializa los campos 'updated_by' y 'updated_at' como None.
+            self.object.updated_by = None
+            self.object.updated_at = None
 
-        # Guardar los detalles adicionales para cada dependencia municipal.
-        for dependencia_municipal in form.cleaned_data['dependencias_municipales']:
-            # Obtiene los datos específicos para cada dependencia municipal desde el formulario.
-            numero_movil_municipal = self.request.POST.get(f'numero_movil_municipal_{dependencia_municipal.id}')
-            nombre_a_cargo_municipal = self.request.POST.get(f'nombre_a_cargo_municipal_{dependencia_municipal.id}')
+            # Obtiene la latitud y longitud desde el formulario y convierte las comas en puntos.
+            latitude = self.request.POST.get('latitude').replace(',', '.')
+            longitude = self.request.POST.get('longitude').replace(',', '.')
+
+            # Asigna las coordenadas al objeto si están disponibles.
+            self.object.latitude = float(latitude) if latitude else None
+            self.object.longitude = float(longitude) if longitude else None
+
+            # Guarda el objeto en la base de datos.
+            self.object.save()
             
-            # Si se proporcionan datos, crea un registro en DetalleDependenciaMunicipal.
-            if numero_movil_municipal or nombre_a_cargo_municipal:
-                DetalleDependenciaMunicipal.objects.create(
-                    dependencia_municipal=dependencia_municipal,
-                    comisaria_primera=self.object,
-                    numero_movil_municipal=numero_movil_municipal,
-                    nombre_a_cargo_municipal=nombre_a_cargo_municipal
-                )
+            # Guarda las relaciones many-to-many del formulario.
+            form.save_m2m()
 
-        # Guardar los detalles adicionales para cada dependencia provincial.
-        for dependencia_provincial in form.cleaned_data['dependencias_provinciales']:
-            # Obtiene los datos específicos para cada dependencia provincial desde el formulario.
-            numero_movil_provincial = self.request.POST.get(f'numero_movil_provincial_{dependencia_provincial.id}')
-            nombre_a_cargo_provincial = self.request.POST.get(f'nombre_a_cargo_provincial_{dependencia_provincial.id}')
+            # Guardar los detalles adicionales para cada servicio de emergencia.
+            for servicio in form.cleaned_data['servicios_emergencia']:
+                # Obtiene los datos específicos para cada servicio de emergencia desde el formulario.
+                numero_movil_bomberos = self.request.POST.get(f'numero_movil_bomberos_{servicio.id}')
+                nombre_a_cargo_bomberos = self.request.POST.get(f'nombre_a_cargo_bomberos_{servicio.id}')
+                
+                # Si se proporcionan datos, crea un registro en DetalleServicioEmergencia.
+                if numero_movil_bomberos or nombre_a_cargo_bomberos:
+                    DetalleServicioEmergencia.objects.create(
+                        servicio_emergencia=servicio,
+                        comisaria_primera=self.object,
+                        numero_movil_bomberos=numero_movil_bomberos,
+                        nombre_a_cargo_bomberos=nombre_a_cargo_bomberos
+                    )
+
+            # Guardar los detalles adicionales para cada institución hospitalaria.
+            for institucion in form.cleaned_data['instituciones_hospitalarias']:
+                # Obtiene los datos específicos para cada institución hospitalaria desde el formulario.
+                numero_movil_hospital = self.request.POST.get(f'numero_movil_hospital_{institucion.id}')
+                nombre_a_cargo_hospital = self.request.POST.get(f'nombre_a_cargo_hospital_{institucion.id}')
+                
+                # Si se proporcionan datos, crea un registro en DetalleInstitucionHospitalaria.
+                if numero_movil_hospital or nombre_a_cargo_hospital:
+                    DetalleInstitucionHospitalaria.objects.create(
+                        institucion_hospitalaria=institucion,
+                        comisaria_primera=self.object,
+                        numero_movil_hospital=numero_movil_hospital,
+                        nombre_a_cargo_hospital=nombre_a_cargo_hospital
+                    )
+
+            # Guardar los detalles adicionales para cada dependencia municipal.
+            for dependencia_municipal in form.cleaned_data['dependencias_municipales']:
+                # Obtiene los datos específicos para cada dependencia municipal desde el formulario.
+                numero_movil_municipal = self.request.POST.get(f'numero_movil_municipal_{dependencia_municipal.id}')
+                nombre_a_cargo_municipal = self.request.POST.get(f'nombre_a_cargo_municipal_{dependencia_municipal.id}')
+                
+                # Si se proporcionan datos, crea un registro en DetalleDependenciaMunicipal.
+                if numero_movil_municipal or nombre_a_cargo_municipal:
+                    DetalleDependenciaMunicipal.objects.create(
+                        dependencia_municipal=dependencia_municipal,
+                        comisaria_primera=self.object,
+                        numero_movil_municipal=numero_movil_municipal,
+                        nombre_a_cargo_municipal=nombre_a_cargo_municipal
+                    )
+
+            # Guardar los detalles adicionales para cada dependencia provincial.
+            for dependencia_provincial in form.cleaned_data['dependencias_provinciales']:
+                # Obtiene los datos específicos para cada dependencia provincial desde el formulario.
+                numero_movil_provincial = self.request.POST.get(f'numero_movil_provincial_{dependencia_provincial.id}')
+                nombre_a_cargo_provincial = self.request.POST.get(f'nombre_a_cargo_provincial_{dependencia_provincial.id}')
+                
+                # Si se proporcionan datos, crea un registro en DetalleDependenciaProvincial.
+                if numero_movil_provincial or nombre_a_cargo_provincial:
+                    DetalleDependenciaProvincial.objects.create(
+                        dependencia_provincial=dependencia_provincial,
+                        comisaria_primera=self.object,
+                        numero_movil_provincial=numero_movil_provincial,
+                        nombre_a_cargo_provincial=nombre_a_cargo_provincial
+                    )
+
+            # Guardar los detalles adicionales para dependencias secundarias
+            for dependencia_secundaria in form.cleaned_data['dependencias_secundarias']:
+                numero_movil_secundaria = self.request.POST.get(f'numero_movil_secundaria_{dependencia_secundaria.id}')
+                nombre_a_cargo_secundaria = self.request.POST.get(f'nombre_a_cargo_secundaria_{dependencia_secundaria.id}')
+                if numero_movil_secundaria or nombre_a_cargo_secundaria:
+                    DetalleDependenciaSecundaria.objects.create(
+                        dependencia_secundaria=dependencia_secundaria,
+                        comisaria_primera=self.object,
+                        numero_movil_secundaria=numero_movil_secundaria,
+                        nombre_a_cargo_secundaria=nombre_a_cargo_secundaria
+                    )
+
+            # Guardar los detalles adicionales para instituciones federales
+            for institucion_federal in form.cleaned_data['instituciones_federales']:
+                numero_movil_federal = self.request.POST.get(f'numero_movil_federal_{institucion_federal.id}')
+                nombre_a_cargo_federal = self.request.POST.get(f'nombre_a_cargo_federal_{institucion_federal.id}')
+                if numero_movil_federal or nombre_a_cargo_federal:
+                    DetalleInstitucionFederal.objects.create(
+                        institucion_federal=institucion_federal,
+                        comisaria_primera=self.object,
+                        numero_movil_federal=numero_movil_federal,
+                        nombre_a_cargo_federal=nombre_a_cargo_federal
+                    )        
+
+            # Llama al método form_valid de la clase base para completar la operación.
+            # Añadir un mensaje de éxito al sistema de mensajes
+            messages.success(self.request, 'El código ha sido guardado exitosamente.')
             
-            # Si se proporcionan datos, crea un registro en DetalleDependenciaProvincial.
-            if numero_movil_provincial or nombre_a_cargo_provincial:
-                DetalleDependenciaProvincial.objects.create(
-                    dependencia_provincial=dependencia_provincial,
-                    comisaria_primera=self.object,
-                    numero_movil_provincial=numero_movil_provincial,
-                    nombre_a_cargo_provincial=nombre_a_cargo_provincial
-                )
+            return super().form_valid(form)
+       
 
-        # Guardar los detalles adicionales para dependencias secundarias
-        for dependencia_secundaria in form.cleaned_data['dependencias_secundarias']:
-            numero_movil_secundaria = self.request.POST.get(f'numero_movil_secundaria_{dependencia_secundaria.id}')
-            nombre_a_cargo_secundaria = self.request.POST.get(f'nombre_a_cargo_secundaria_{dependencia_secundaria.id}')
-            if numero_movil_secundaria or nombre_a_cargo_secundaria:
-                DetalleDependenciaSecundaria.objects.create(
-                    dependencia_secundaria=dependencia_secundaria,
-                    comisaria_primera=self.object,
-                    numero_movil_secundaria=numero_movil_secundaria,
-                    nombre_a_cargo_secundaria=nombre_a_cargo_secundaria
-                )
-
-        # Guardar los detalles adicionales para instituciones federales
-        for institucion_federal in form.cleaned_data['instituciones_federales']:
-            numero_movil_federal = self.request.POST.get(f'numero_movil_federal_{institucion_federal.id}')
-            nombre_a_cargo_federal = self.request.POST.get(f'nombre_a_cargo_federal_{institucion_federal.id}')
-            if numero_movil_federal or nombre_a_cargo_federal:
-                DetalleInstitucionFederal.objects.create(
-                    institucion_federal=institucion_federal,
-                    comisaria_primera=self.object,
-                    numero_movil_federal=numero_movil_federal,
-                    nombre_a_cargo_federal=nombre_a_cargo_federal
-                )        
-
-        # Llama al método form_valid de la clase base para completar la operación.
-        # Añadir un mensaje de éxito al sistema de mensajes
-        messages.success(self.request, 'El código ha sido guardado exitosamente.')
-        
-        return super().form_valid(form)
-    
  #------------------------clase para el edit updtae------------------------------------------------------
 
 
@@ -571,7 +579,7 @@ class ComisariaPrimeraUpdateView(LoginRequiredMixin, UserPassesTestMixin, Update
         # Llama al método form_valid de la clase base para completar la operación.
         return super().form_valid(form)
 
-#--------------------------viesta para ver todos completo cada regitro--------
+#--------------------------viesta para ver todos completo cada regitro--------------------------------------------------
 
 
 
@@ -579,6 +587,29 @@ class ComisariaPrimeraDetailView(DetailView):
     model = ComisariaPrimera
     template_name = 'comisarias/primera/comisaria_primera_detail.html'
     context_object_name = 'record'
+
+
+
+
+#----------------------------softdelete-------------------------------------------------------------
+
+# En views.py
+
+def eliminar_comisaria_primera(request, pk):
+    # Obtén el registro a eliminar
+    comisaria = get_object_or_404(ComisariaPrimera, pk=pk)
+    
+    # Marca el registro como inactivo
+    comisaria.activo = False
+    comisaria.save()
+    
+    # Envía un mensaje de confirmación
+    messages.success(request, 'El código ha sido eliminado correctamente.')
+    
+    # Redirige de vuelta a la lista
+    return redirect('comisaria_primera_list')
+
+
 
 
 #---------------------------------------------------------------------------------------------------------------------------------------
@@ -600,7 +631,8 @@ class ComisariaSegundaListView(LoginRequiredMixin, UserPassesTestMixin, ListView
     
 
     def get_queryset(self):
-        queryset = super().get_queryset().order_by('-fecha_hora')
+        #queryset = super().get_queryset().order_by('-fecha_hora')
+        queryset = super().get_queryset().filter(activo=True).order_by('-fecha_hora')
         search_query = self.request.GET.get('q', '')
         if search_query:
             queryset = queryset.filter(cuarto__cuarto__icontains=search_query)
@@ -615,8 +647,13 @@ class ComisariaSegundaListView(LoginRequiredMixin, UserPassesTestMixin, ListView
         user = self.request.user
 
         #context['is_jefessuperiores'] = self.request.user.groups.filter(name='jefessuperiores').exists()
-        context['is_encargados_guardias_segunda'] = user.groups.filter(name='encargados_guardias_segunda').exists()
+        #context['is_encargados_guardias_segunda'] = user.groups.filter(name='encargados_guardias_segunda').exists()
         context['is_jefessuperiores'] = user.groups.filter(name='jefessuperiores').exists()
+        context['is_libreros'] = user.groups.filter(name='libreros').exists()
+        context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
+        context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
+        context['is_comisariasegunda'] = user.groups.filter(name='comisariasegunda').exists()
+
 
         context['today'] = timezone.now().date()
         context['resolveId'] = None
@@ -822,12 +859,18 @@ class ComisariaSegundaUpdateView(LoginRequiredMixin, UserPassesTestMixin, Update
         instituciones_hospitalarias_ids = form.cleaned_data['instituciones_hospitalarias'].values_list('id', flat=True)
         dependencias_municipales_ids = form.cleaned_data['dependencias_municipales'].values_list('id', flat=True)
         dependencias_provinciales_ids = form.cleaned_data['dependencias_provinciales'].values_list('id', flat=True)
+        dependencias_secundarias_ids = form.cleaned_data['dependencias_secundarias'].values_list('id', flat=True)
+        instituciones_federales_ids = form.cleaned_data['instituciones_federales'].values_list('id', flat=True)
 
-        # Eliminar los detalles que ya no están seleccionados
+
+
+        # Eliminar los detalles que ya no se arreglo están seleccionados
         DetalleServicioEmergencia.objects.filter(comisaria_segunda=self.object).exclude(servicio_emergencia_id__in=servicios_emergencia_ids).delete()
         DetalleInstitucionHospitalaria.objects.filter(comisaria_segunda=self.object).exclude(institucion_hospitalaria_id__in=instituciones_hospitalarias_ids).delete()
         DetalleDependenciaMunicipal.objects.filter(comisaria_segunda=self.object).exclude(dependencia_municipal_id__in=dependencias_municipales_ids).delete()
         DetalleDependenciaProvincial.objects.filter(comisaria_segunda=self.object).exclude(dependencia_provincial_id__in=dependencias_provinciales_ids).delete()
+        DetalleDependenciaSecundaria.objects.filter(comisaria_segunda=self.object).exclude(dependencia_secundaria_id__in=dependencias_secundarias_ids).delete()
+        DetalleInstitucionFederal.objects.filter(comisaria_segunda=self.object).exclude(institucion_federal_id__in=instituciones_federales_ids).delete()
 
 
         # Guardar los detalles adicionales para cada servicio de emergencia.
@@ -854,9 +897,6 @@ class ComisariaSegundaUpdateView(LoginRequiredMixin, UserPassesTestMixin, Update
                 }
             )
     
-
-
-
 
         # Guardar los detalles adicionales para cada institución hospitalaria
         for institucion in form.cleaned_data['instituciones_hospitalarias']:
@@ -927,8 +967,7 @@ class ComisariaSegundaUpdateView(LoginRequiredMixin, UserPassesTestMixin, Update
         return super().form_valid(form)
     
 
-#--------------------------viesta para ver todos completo cada regitro--------
-
+#--------------------------vista para ver todos completo cada registro------------------------------------------------------
 
 
 class ComisariaSegundaDetailView(DetailView):
@@ -937,148 +976,1228 @@ class ComisariaSegundaDetailView(DetailView):
     context_object_name = 'record'
 
 
-#---------------------------------------------------------------------------------------------------------------------------------------
+#----------------------------softdelete-------------------------------------------------------------
+
+# En views.py
+
+def eliminar_comisaria_segunda(request, pk):
+    # Obtén el registro a eliminar
+    comisaria = get_object_or_404(ComisariaSegunda, pk=pk)
+    
+    # Marca el registro como inactivo
+    comisaria.activo = False
+    comisaria.save()
+    
+    # Envía un mensaje de confirmación
+    messages.success(request, 'El código ha sido eliminado correctamente.')
+    
+    # Redirige de vuelta a la lista
+    return redirect('comisaria_segunda_list')
 
 
 
+#-------------------------VISTA DE COMISARIA TERCERA ---------------------------------------------------------------------------------------------------------
 
-class ComisariaTerceraListView(LoginRequiredMixin, ListView):
+
+class ComisariaTerceraListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = ComisariaTercera
     template_name = 'comisarias/tercera/comisaria_tercera_list.html'
+    context_object_name = 'records'
 
-class ComisariaTerceraCreateView(LoginRequiredMixin, CreateView):
+    def test_func(self):
+        return user_is_in_group(self.request.user, 'comisariatercera')
+
+    def handle_no_permission(self):
+        return redirect('no_permission')
+
+    def get_queryset(self):
+        #queryset = super().get_queryset().order_by('-fecha_hora')
+        queryset = super().get_queryset().filter(activo=True).order_by('-fecha_hora')
+        search_query = self.request.GET.get('q', '')
+        if search_query:
+            queryset = queryset.filter(cuarto__cuarto__icontains=search_query)
+        for comisaria in queryset:
+            if timezone.is_naive(comisaria.fecha_hora):
+                comisaria.fecha_hora = timezone.make_aware(comisaria.fecha_hora, timezone.get_current_timezone())
+            comisaria.fecha_hora = timezone.localtime(comisaria.fecha_hora)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        context['is_jefessuperiores'] = user.groups.filter(name='jefessuperiores').exists()
+        context['is_libreros'] = user.groups.filter(name='libreros').exists()
+        context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
+        context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
+        context['is_comisariatercera'] = user.groups.filter(name='comisariatercera').exists()
+
+        context['today'] = timezone.now().date()
+        context['resolveId'] = None
+        return context
+
+
+#----------------------------CREACION DE COMISARIA TERCERA----------------------------------------
+
+
+class ComisariaTerceraCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = ComisariaTercera
     form_class = ComisariaTerceraForm
     template_name = 'comisarias/tercera/comisaria_tercera_form.html'
     success_url = reverse_lazy('comisaria_tercera_list')
 
-class ComisariaCuartaListView(LoginRequiredMixin, ListView):
+    def test_func(self):
+        return user_is_in_group(self.request.user, 'comisariatercera')
+
+    def handle_no_permission(self):
+        return redirect('no_permission')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['codigos_policiales'] = CodigoPolicialUSH.objects.all()
+
+        # Inicializar detalles como listas vacías en el contexto
+        context['detalle_servicios_emergencia'] = json.dumps([])  # Para vista de creación, siempre es una lista vacía
+        context['detalle_instituciones_hospitalarias'] = json.dumps([])
+        context['detalle_dependencias_municipales'] = json.dumps([])
+        context['detalle_dependencias_provinciales'] = json.dumps([])
+        context['detalle_dependencias_secundarias'] = json.dumps([])
+        context['detalle_instituciones_federales'] = json.dumps([])  # Añadido para federales
+
+        return context
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.created_by = self.request.user
+        self.object.updated_by = None
+        self.object.updated_at = None
+
+        latitude = self.request.POST.get('latitude').replace(',', '.')
+        longitude = self.request.POST.get('longitude').replace(',', '.')
+
+        self.object.latitude = float(latitude) if latitude else None
+        self.object.longitude = float(longitude) if longitude else None
+
+        self.object.save()
+        form.save_m2m()
+
+        # Guardar los detalles adicionales para cada servicio de emergencia
+        for servicio in form.cleaned_data['servicios_emergencia']:
+            numero_movil_bomberos = self.request.POST.get(f'numero_movil_bomberos_{servicio.id}')
+            nombre_a_cargo_bomberos = self.request.POST.get(f'nombre_a_cargo_bomberos_{servicio.id}')
+            if numero_movil_bomberos or nombre_a_cargo_bomberos:
+                DetalleServicioEmergencia.objects.create(
+                    servicio_emergencia=servicio,
+                    comisaria_tercera=self.object,
+                    numero_movil_bomberos=numero_movil_bomberos,
+                    nombre_a_cargo_bomberos=nombre_a_cargo_bomberos
+                )
+
+        # Guardar los detalles adicionales para cada institución hospitalaria
+        for institucion in form.cleaned_data['instituciones_hospitalarias']:
+            numero_movil_hospital = self.request.POST.get(f'numero_movil_hospital_{institucion.id}')
+            nombre_a_cargo_hospital = self.request.POST.get(f'nombre_a_cargo_hospital_{institucion.id}')
+            if numero_movil_hospital or nombre_a_cargo_hospital:
+                DetalleInstitucionHospitalaria.objects.create(
+                    institucion_hospitalaria=institucion,
+                    comisaria_tercera=self.object,
+                    numero_movil_hospital=numero_movil_hospital,
+                    nombre_a_cargo_hospital=nombre_a_cargo_hospital
+                )
+
+        # Guardar los detalles adicionales para cada dependencia municipal
+        for dependencia_municipal in form.cleaned_data['dependencias_municipales']:
+            numero_movil_municipal = self.request.POST.get(f'numero_movil_municipal_{dependencia_municipal.id}')
+            nombre_a_cargo_municipal = self.request.POST.get(f'nombre_a_cargo_municipal_{dependencia_municipal.id}')
+            if numero_movil_municipal or nombre_a_cargo_municipal:
+                DetalleDependenciaMunicipal.objects.create(
+                    dependencia_municipal=dependencia_municipal,
+                    comisaria_tercera=self.object,
+                    numero_movil_municipal=numero_movil_municipal,
+                    nombre_a_cargo_municipal=nombre_a_cargo_municipal
+                )
+
+        # Guardar los detalles adicionales para cada dependencia provincial
+        for dependencia_provincial in form.cleaned_data['dependencias_provinciales']:
+            numero_movil_provincial = self.request.POST.get(f'numero_movil_provincial_{dependencia_provincial.id}')
+            nombre_a_cargo_provincial = self.request.POST.get(f'nombre_a_cargo_provincial_{dependencia_provincial.id}')
+            if numero_movil_provincial or nombre_a_cargo_provincial:
+                DetalleDependenciaProvincial.objects.create(
+                    dependencia_provincial=dependencia_provincial,
+                    comisaria_tercera=self.object,
+                    numero_movil_provincial=numero_movil_provincial,
+                    nombre_a_cargo_provincial=nombre_a_cargo_provincial
+                )
+
+        # Guardar los detalles adicionales para dependencias secundarias
+        for dependencia_secundaria in form.cleaned_data['dependencias_secundarias']:
+            numero_movil_secundaria = self.request.POST.get(f'numero_movil_secundaria_{dependencia_secundaria.id}')
+            nombre_a_cargo_secundaria = self.request.POST.get(f'nombre_a_cargo_secundaria_{dependencia_secundaria.id}')
+            if numero_movil_secundaria or nombre_a_cargo_secundaria:
+                DetalleDependenciaSecundaria.objects.create(
+                    dependencia_secundaria=dependencia_secundaria,
+                    comisaria_tercera=self.object,
+                    numero_movil_secundaria=numero_movil_secundaria,
+                    nombre_a_cargo_secundaria=nombre_a_cargo_secundaria
+                )
+
+        # Guardar los detalles adicionales para instituciones federales
+        for institucion_federal in form.cleaned_data['instituciones_federales']:
+            numero_movil_federal = self.request.POST.get(f'numero_movil_federal_{institucion_federal.id}')
+            nombre_a_cargo_federal = self.request.POST.get(f'nombre_a_cargo_federal_{institucion_federal.id}')
+            if numero_movil_federal or nombre_a_cargo_federal:
+                DetalleInstitucionFederal.objects.create(
+                    institucion_federal=institucion_federal,
+                    comisaria_tercera=self.object,
+                    numero_movil_federal=numero_movil_federal,
+                    nombre_a_cargo_federal=nombre_a_cargo_federal
+                )
+
+        messages.success(self.request, 'El código ha sido guardado exitosamente.')
+        return super().form_valid(form)
+
+
+
+#---------------------------------------upadate de comisaria tercera-------------------------------------
+
+
+class ComisariaTerceraUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = ComisariaTercera
+    form_class = ComisariaTerceraForm
+    template_name = 'comisarias/tercera/comisaria_tercera_form.html'
+    success_url = reverse_lazy('comisaria_tercera_list')
+
+    def test_func(self):
+        return user_is_in_group(self.request.user, 'comisariatercera')
+
+    def handle_no_permission(self):
+        return redirect('no_permission')
+
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        now = timezone.now()
+
+        if obj.fecha_hora.date() != now.date() and not obj.estado:
+            return redirect('comisaria_tercera_list')
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['codigos_policiales'] = CodigoPolicialUSH.objects.all()
+
+        # Convertir detalles en JSON para ser usados por Alpine.js
+        context['detalle_servicios_emergencia'] = json.dumps(list(
+            DetalleServicioEmergencia.objects.filter(comisaria_tercera=self.object.pk).values('id', 'servicio_emergencia_id', 'numero_movil_bomberos', 'nombre_a_cargo_bomberos')
+        ))
+
+        context['detalle_instituciones_hospitalarias'] = json.dumps(list(
+            DetalleInstitucionHospitalaria.objects.filter(comisaria_tercera=self.object.pk).values('id', 'institucion_hospitalaria_id', 'numero_movil_hospital', 'nombre_a_cargo_hospital')
+        ))
+
+        context['detalle_dependencias_municipales'] = json.dumps(list(
+            DetalleDependenciaMunicipal.objects.filter(comisaria_tercera=self.object.pk).values('id', 'dependencia_municipal_id', 'numero_movil_municipal', 'nombre_a_cargo_municipal')
+        ))
+
+        context['detalle_dependencias_provinciales'] = json.dumps(list(
+            DetalleDependenciaProvincial.objects.filter(comisaria_tercera=self.object.pk).values('id', 'dependencia_provincial_id', 'numero_movil_provincial', 'nombre_a_cargo_provincial')
+        ))
+
+        # Añadir los nuevos detalles para dependencias secundarias
+        context['detalle_dependencias_secundarias'] = json.dumps(list(
+            DetalleDependenciaSecundaria.objects.filter(comisaria_tercera=self.object.pk).values('id', 'dependencia_secundaria_id', 'numero_movil_secundaria', 'nombre_a_cargo_secundaria')
+        ))
+
+        # Añadir los nuevos detalles para instituciones federales
+        context['detalle_instituciones_federales'] = json.dumps(list(
+            DetalleInstitucionFederal.objects.filter(comisaria_tercera=self.object.pk).values('id', 'institucion_federal_id', 'numero_movil_federal', 'nombre_a_cargo_federal')
+        ))
+
+        return context
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.updated_by = self.request.user
+        self.object.updated_at = timezone.now()
+
+        latitude = self.request.POST.get('latitude').replace(',', '.')
+        longitude = self.request.POST.get('longitude').replace(',', '.')
+
+        self.object.latitude = float(latitude) if latitude else None
+        self.object.longitude = float(longitude) if longitude else None
+
+        self.object.save()
+        form.save_m2m()
+
+        # Mantener un registro de los IDs seleccionados
+        servicios_emergencia_ids = form.cleaned_data['servicios_emergencia'].values_list('id', flat=True)
+        instituciones_hospitalarias_ids = form.cleaned_data['instituciones_hospitalarias'].values_list('id', flat=True)
+        dependencias_municipales_ids = form.cleaned_data['dependencias_municipales'].values_list('id', flat=True)
+        dependencias_provinciales_ids = form.cleaned_data['dependencias_provinciales'].values_list('id', flat=True)
+        dependencias_secundarias_ids = form.cleaned_data['dependencias_secundarias'].values_list('id', flat=True)
+        instituciones_federales_ids = form.cleaned_data['instituciones_federales'].values_list('id', flat=True)
+
+        # Eliminar los detalles que ya no están seleccionados
+        DetalleServicioEmergencia.objects.filter(comisaria_tercera=self.object).exclude(servicio_emergencia_id__in=servicios_emergencia_ids).delete()
+        DetalleInstitucionHospitalaria.objects.filter(comisaria_tercera=self.object).exclude(institucion_hospitalaria_id__in=instituciones_hospitalarias_ids).delete()
+        DetalleDependenciaMunicipal.objects.filter(comisaria_tercera=self.object).exclude(dependencia_municipal_id__in=dependencias_municipales_ids).delete()
+        DetalleDependenciaProvincial.objects.filter(comisaria_tercera=self.object).exclude(dependencia_provincial_id__in=dependencias_provinciales_ids).delete()
+        DetalleDependenciaSecundaria.objects.filter(comisaria_tercera=self.object).exclude(dependencia_secundaria_id__in=dependencias_secundarias_ids).delete()
+        DetalleInstitucionFederal.objects.filter(comisaria_tercera=self.object).exclude(institucion_federal_id__in=instituciones_federales_ids).delete()
+
+
+        # Guardar los detalles adicionales para cada servicio de emergencia.
+        for servicio in form.cleaned_data['servicios_emergencia']:
+            numero_movil_bomberos = self.request.POST.get(f'numero_movil_bomberos_{servicio.id}')
+            nombre_a_cargo_bomberos = self.request.POST.get(f'nombre_a_cargo_bomberos_{servicio.id}')
+            DetalleServicioEmergencia.objects.update_or_create(
+                servicio_emergencia=servicio,
+                comisaria_tercera=self.object,
+                defaults={
+                    'numero_movil_bomberos': numero_movil_bomberos,
+                    'nombre_a_cargo_bomberos': nombre_a_cargo_bomberos
+                }
+            )
+
+        # Guardar los detalles adicionales para cada institución hospitalaria
+        for institucion in form.cleaned_data['instituciones_hospitalarias']:
+            numero_movil_hospital = self.request.POST.get(f'numero_movil_hospital_{institucion.id}')
+            nombre_a_cargo_hospital = self.request.POST.get(f'nombre_a_cargo_hospital_{institucion.id}')
+            DetalleInstitucionHospitalaria.objects.update_or_create(
+                institucion_hospitalaria=institucion,
+                comisaria_tercera=self.object,
+                defaults={
+                    'numero_movil_hospital': numero_movil_hospital,
+                    'nombre_a_cargo_hospital': nombre_a_cargo_hospital
+                }
+            )
+
+        # Guardar los detalles adicionales para cada dependencia municipal
+        for dependencia_municipal in form.cleaned_data['dependencias_municipales']:
+            numero_movil_municipal = self.request.POST.get(f'numero_movil_municipal_{dependencia_municipal.id}')
+            nombre_a_cargo_municipal = self.request.POST.get(f'nombre_a_cargo_municipal_{dependencia_municipal.id}')
+            DetalleDependenciaMunicipal.objects.update_or_create(
+                dependencia_municipal=dependencia_municipal,
+                comisaria_tercera=self.object,
+                defaults={
+                    'numero_movil_municipal': numero_movil_municipal,
+                    'nombre_a_cargo_municipal': nombre_a_cargo_municipal
+                }
+            )
+
+        # Guardar los detalles adicionales para cada dependencia provincial
+        for dependencia_provincial in form.cleaned_data['dependencias_provinciales']:
+            numero_movil_provincial = self.request.POST.get(f'numero_movil_provincial_{dependencia_provincial.id}')
+            nombre_a_cargo_provincial = self.request.POST.get(f'nombre_a_cargo_provincial_{dependencia_provincial.id}')
+            DetalleDependenciaProvincial.objects.update_or_create(
+                dependencia_provincial=dependencia_provincial,
+                comisaria_tercera=self.object,
+                defaults={
+                    'numero_movil_provincial': numero_movil_provincial,
+                    'nombre_a_cargo_provincial': nombre_a_cargo_provincial
+                }
+            )
+
+        # Guardar detalles adicionales para cada dependencia secundaria
+        for dependencia_secundaria in form.cleaned_data['dependencias_secundarias']:
+            numero_movil_secundaria = self.request.POST.get(f'numero_movil_secundaria_{dependencia_secundaria.id}')
+            nombre_a_cargo_secundaria = self.request.POST.get(f'nombre_a_cargo_secundaria_{dependencia_secundaria.id}')
+            DetalleDependenciaSecundaria.objects.update_or_create(
+                dependencia_secundaria=dependencia_secundaria,
+                comisaria_tercera=self.object,
+                defaults={
+                    'numero_movil_secundaria': numero_movil_secundaria,
+                    'nombre_a_cargo_secundaria': nombre_a_cargo_secundaria
+                }
+            )
+
+        # Guardar detalles adicionales para instituciones federales
+        for institucion_federal in form.cleaned_data['instituciones_federales']:
+            numero_movil_federal = self.request.POST.get(f'numero_movil_federal_{institucion_federal.id}')
+            nombre_a_cargo_federal = self.request.POST.get(f'nombre_a_cargo_federal_{institucion_federal.id}')
+            DetalleInstitucionFederal.objects.update_or_create(
+                institucion_federal=institucion_federal,
+                comisaria_tercera=self.object,
+                defaults={
+                    'numero_movil_federal': numero_movil_federal,
+                    'nombre_a_cargo_federal': nombre_a_cargo_federal
+                }
+            )
+
+        messages.success(self.request, 'El código ha sido guardado exitosamente.')
+        return super().form_valid(form)
+
+
+#--------------------------vista para ver todos completo cada registro------------------------------------------------------
+
+
+
+class ComisariaTerceraDetailView(DetailView):
+    model = ComisariaTercera
+    template_name = 'comisarias/tercera/comisaria_tercera_detail.html'
+    context_object_name = 'record'
+
+
+#----------------------------softdelete-------------------------------------------------------------
+
+# En views.py
+
+def eliminar_comisaria_tercera(request, pk):
+    # Obtén el registro a eliminar
+    comisaria = get_object_or_404(ComisariaTercera, pk=pk)
+    
+    # Marca el registro como inactivo
+    comisaria.activo = False
+    comisaria.save()
+    
+    # Envía un mensaje de confirmación
+    messages.success(request, 'El código ha sido eliminado correctamente.')
+    
+    # Redirige de vuelta a la lista
+    return redirect('comisaria_tercera_list')
+
+
+
+#--------------------------vista para para la comisria cuarta------------------------------------------------------
+
+
+
+class ComisariaCuartaListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = ComisariaCuarta
     template_name = 'comisarias/cuarta/comisaria_cuarta_list.html'
+    context_object_name = 'records'
 
-class ComisariaCuartaCreateView(LoginRequiredMixin, CreateView):
+    def test_func(self):
+        return user_is_in_group(self.request.user, 'comisariacuarta')
+
+    def handle_no_permission(self):
+        return redirect('no_permission')
+
+    def get_queryset(self):
+        queryset = super().get_queryset().filter(activo=True).order_by('-fecha_hora')
+        #queryset = super().get_queryset().order_by('-fecha_hora')
+        search_query = self.request.GET.get('q', '')
+        if search_query:
+            queryset = queryset.filter(cuarto__cuarto__icontains=search_query)
+        for comisaria in queryset:
+            if timezone.is_naive(comisaria.fecha_hora):
+                comisaria.fecha_hora = timezone.make_aware(comisaria.fecha_hora, timezone.get_current_timezone())
+            comisaria.fecha_hora = timezone.localtime(comisaria.fecha_hora)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        context['is_jefessuperiores'] = user.groups.filter(name='jefessuperiores').exists()
+        context['is_libreros'] = user.groups.filter(name='libreros').exists()
+        context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
+        context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
+        context['is_comisariacuarta'] = user.groups.filter(name='comisariacuarta').exists()
+
+        context['today'] = timezone.now().date()
+        context['resolveId'] = None
+        return context
+    
+
+#----------------------Creacion de comisaria cuarta------------------------------------------------------------
+
+class ComisariaCuartaCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = ComisariaCuarta
     form_class = ComisariaCuartaForm
     template_name = 'comisarias/cuarta/comisaria_cuarta_form.html'
     success_url = reverse_lazy('comisaria_cuarta_list')
 
-class ComisariaQuintaListView(LoginRequiredMixin, ListView):
+    def test_func(self):
+        return user_is_in_group(self.request.user, 'comisariacuarta')
+
+    def handle_no_permission(self):
+        return redirect('no_permission')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['codigos_policiales'] = CodigoPolicialUSH.objects.all()
+
+        # Inicializar detalles como listas vacías en el contexto
+        context['detalle_servicios_emergencia'] = json.dumps([])  # Para vista de creación, siempre es una lista vacía
+        context['detalle_instituciones_hospitalarias'] = json.dumps([])
+        context['detalle_dependencias_municipales'] = json.dumps([])
+        context['detalle_dependencias_provinciales'] = json.dumps([])
+        context['detalle_dependencias_secundarias'] = json.dumps([])
+        context['detalle_instituciones_federales'] = json.dumps([])  # Añadido para federales
+
+        return context
+
+    def form_valid(self, form): 
+        if self.request.POST.get('is_confirmed') == 'true':    
+            self.object = form.save(commit=False)
+            self.object.created_by = self.request.user
+            self.object.updated_by = None
+            self.object.updated_at = None
+
+            latitude = self.request.POST.get('latitude').replace(',', '.')
+            longitude = self.request.POST.get('longitude').replace(',', '.')
+
+            self.object.latitude = float(latitude) if latitude else None
+            self.object.longitude = float(longitude) if longitude else None
+
+            self.object.save()
+            form.save_m2m()
+
+            # Guardar los detalles adicionales para cada servicio de emergencia
+            for servicio in form.cleaned_data['servicios_emergencia']:
+                numero_movil_bomberos = self.request.POST.get(f'numero_movil_bomberos_{servicio.id}')
+                nombre_a_cargo_bomberos = self.request.POST.get(f'nombre_a_cargo_bomberos_{servicio.id}')
+                if numero_movil_bomberos or nombre_a_cargo_bomberos:
+                    DetalleServicioEmergencia.objects.create(
+                        servicio_emergencia=servicio,
+                        comisaria_cuarta=self.object,
+                        numero_movil_bomberos=numero_movil_bomberos,
+                        nombre_a_cargo_bomberos=nombre_a_cargo_bomberos
+                    )
+
+            # Guardar los detalles adicionales para cada institución hospitalaria
+            for institucion in form.cleaned_data['instituciones_hospitalarias']:
+                numero_movil_hospital = self.request.POST.get(f'numero_movil_hospital_{institucion.id}')
+                nombre_a_cargo_hospital = self.request.POST.get(f'nombre_a_cargo_hospital_{institucion.id}')
+                if numero_movil_hospital or nombre_a_cargo_hospital:
+                    DetalleInstitucionHospitalaria.objects.create(
+                        institucion_hospitalaria=institucion,
+                        comisaria_cuarta=self.object,
+                        numero_movil_hospital=numero_movil_hospital,
+                        nombre_a_cargo_hospital=nombre_a_cargo_hospital
+                    )
+
+            # Guardar los detalles adicionales para cada dependencia municipal
+            for dependencia_municipal in form.cleaned_data['dependencias_municipales']:
+                numero_movil_municipal = self.request.POST.get(f'numero_movil_municipal_{dependencia_municipal.id}')
+                nombre_a_cargo_municipal = self.request.POST.get(f'nombre_a_cargo_municipal_{dependencia_municipal.id}')
+                if numero_movil_municipal or nombre_a_cargo_municipal:
+                    DetalleDependenciaMunicipal.objects.create(
+                        dependencia_municipal=dependencia_municipal,
+                        comisaria_cuarta=self.object,
+                        numero_movil_municipal=numero_movil_municipal,
+                        nombre_a_cargo_municipal=nombre_a_cargo_municipal
+                    )
+
+            # Guardar los detalles adicionales para cada dependencia provincial
+            for dependencia_provincial in form.cleaned_data['dependencias_provinciales']:
+                numero_movil_provincial = self.request.POST.get(f'numero_movil_provincial_{dependencia_provincial.id}')
+                nombre_a_cargo_provincial = self.request.POST.get(f'nombre_a_cargo_provincial_{dependencia_provincial.id}')
+                if numero_movil_provincial or nombre_a_cargo_provincial:
+                    DetalleDependenciaProvincial.objects.create(
+                        dependencia_provincial=dependencia_provincial,
+                        comisaria_cuarta=self.object,
+                        numero_movil_provincial=numero_movil_provincial,
+                        nombre_a_cargo_provincial=nombre_a_cargo_provincial
+                    )
+
+            # Guardar los detalles adicionales para dependencias secundarias
+            for dependencia_secundaria in form.cleaned_data['dependencias_secundarias']:
+                numero_movil_secundaria = self.request.POST.get(f'numero_movil_secundaria_{dependencia_secundaria.id}')
+                nombre_a_cargo_secundaria = self.request.POST.get(f'nombre_a_cargo_secundaria_{dependencia_secundaria.id}')
+                if numero_movil_secundaria or nombre_a_cargo_secundaria:
+                    DetalleDependenciaSecundaria.objects.create(
+                        dependencia_secundaria=dependencia_secundaria,
+                        comisaria_cuarta=self.object,
+                        numero_movil_secundaria=numero_movil_secundaria,
+                        nombre_a_cargo_secundaria=nombre_a_cargo_secundaria
+                    )
+
+            # Guardar los detalles adicionales para instituciones federales
+            for institucion_federal in form.cleaned_data['instituciones_federales']:
+                numero_movil_federal = self.request.POST.get(f'numero_movil_federal_{institucion_federal.id}')
+                nombre_a_cargo_federal = self.request.POST.get(f'nombre_a_cargo_federal_{institucion_federal.id}')
+                if numero_movil_federal or nombre_a_cargo_federal:
+                    DetalleInstitucionFederal.objects.create(
+                        institucion_federal=institucion_federal,
+                        comisaria_cuarta=self.object,
+                        numero_movil_federal=numero_movil_federal,
+                        nombre_a_cargo_federal=nombre_a_cargo_federal
+                    )
+
+            messages.success(self.request, 'El código ha sido guardado exitosamente.')
+            return super().form_valid(form)
+        else:
+            # Si no ha sido confirmado, mostramos un mensaje de advertencia
+            messages.warning(self.request, 'La acción fue cancelada.')
+            return redirect('comisaria_cuarta_list')  # Redirigir a la lista u otra página
+
+
+#--------------------------update comisaria cuarta------------------------------------------------------
+
+class ComisariaCuartaUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = ComisariaCuarta
+    form_class = ComisariaCuartaForm
+    template_name = 'comisarias/cuarta/comisaria_cuarta_form.html'
+    success_url = reverse_lazy('comisaria_cuarta_list')
+
+    def test_func(self):
+        return user_is_in_group(self.request.user, 'comisariacuarta')
+
+    def handle_no_permission(self):
+        return redirect('no_permission')
+
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        now = timezone.now()
+
+        if obj.fecha_hora.date() != now.date() and not obj.estado:
+            return redirect('comisaria_cuarta_list')
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['codigos_policiales'] = CodigoPolicialUSH.objects.all()
+
+        # Convertir detalles en JSON para ser usados por Alpine.js
+        context['detalle_servicios_emergencia'] = json.dumps(list(
+            DetalleServicioEmergencia.objects.filter(comisaria_cuarta=self.object.pk).values('id', 'servicio_emergencia_id', 'numero_movil_bomberos', 'nombre_a_cargo_bomberos')
+        ))
+
+        context['detalle_instituciones_hospitalarias'] = json.dumps(list(
+            DetalleInstitucionHospitalaria.objects.filter(comisaria_cuarta=self.object.pk).values('id', 'institucion_hospitalaria_id', 'numero_movil_hospital', 'nombre_a_cargo_hospital')
+        ))
+
+        context['detalle_dependencias_municipales'] = json.dumps(list(
+            DetalleDependenciaMunicipal.objects.filter(comisaria_cuarta=self.object.pk).values('id', 'dependencia_municipal_id', 'numero_movil_municipal', 'nombre_a_cargo_municipal')
+        ))
+
+        context['detalle_dependencias_provinciales'] = json.dumps(list(
+            DetalleDependenciaProvincial.objects.filter(comisaria_cuarta=self.object.pk).values('id', 'dependencia_provincial_id', 'numero_movil_provincial', 'nombre_a_cargo_provincial')
+        ))
+
+        # Añadir los nuevos detalles para dependencias secundarias
+        context['detalle_dependencias_secundarias'] = json.dumps(list(
+            DetalleDependenciaSecundaria.objects.filter(comisaria_cuarta=self.object.pk).values('id', 'dependencia_secundaria_id', 'numero_movil_secundaria', 'nombre_a_cargo_secundaria')
+        ))
+
+        # Añadir los nuevos detalles para instituciones federales
+        context['detalle_instituciones_federales'] = json.dumps(list(
+            DetalleInstitucionFederal.objects.filter(comisaria_cuarta=self.object.pk).values('id', 'institucion_federal_id', 'numero_movil_federal', 'nombre_a_cargo_federal')
+        ))
+
+        return context
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.updated_by = self.request.user
+        self.object.updated_at = timezone.now()
+
+        latitude = self.request.POST.get('latitude').replace(',', '.')
+        longitude = self.request.POST.get('longitude').replace(',', '.')
+
+        self.object.latitude = float(latitude) if latitude else None
+        self.object.longitude = float(longitude) if longitude else None
+
+        self.object.save()
+        form.save_m2m()
+
+        # Mantener un registro de los IDs seleccionados
+        servicios_emergencia_ids = form.cleaned_data['servicios_emergencia'].values_list('id', flat=True)
+        instituciones_hospitalarias_ids = form.cleaned_data['instituciones_hospitalarias'].values_list('id', flat=True)
+        dependencias_municipales_ids = form.cleaned_data['dependencias_municipales'].values_list('id', flat=True)
+        dependencias_provinciales_ids = form.cleaned_data['dependencias_provinciales'].values_list('id', flat=True)
+        dependencias_secundarias_ids = form.cleaned_data['dependencias_secundarias'].values_list('id', flat=True)
+        instituciones_federales_ids = form.cleaned_data['instituciones_federales'].values_list('id', flat=True)
+        
+
+        # Eliminar los detalles que ya no están seleccionados
+        DetalleServicioEmergencia.objects.filter(comisaria_cuarta=self.object).exclude(servicio_emergencia_id__in=servicios_emergencia_ids).delete()
+        DetalleInstitucionHospitalaria.objects.filter(comisaria_cuarta=self.object).exclude(institucion_hospitalaria_id__in=instituciones_hospitalarias_ids).delete()
+        DetalleDependenciaMunicipal.objects.filter(comisaria_cuarta=self.object).exclude(dependencia_municipal_id__in=dependencias_municipales_ids).delete()
+        DetalleDependenciaProvincial.objects.filter(comisaria_cuarta=self.object).exclude(dependencia_provincial_id__in=dependencias_provinciales_ids).delete()
+        DetalleDependenciaSecundaria.objects.filter(comisaria_cuarta=self.object).exclude(dependencia_secundaria_id__in=dependencias_secundarias_ids).delete()
+        DetalleInstitucionFederal.objects.filter(comisaria_cuarta=self.object).exclude(institucion_federal_id__in=instituciones_federales_ids).delete()
+        
+
+        # Guardar los detalles adicionales para cada servicio de emergencia.
+        for servicio in form.cleaned_data['servicios_emergencia']:
+            numero_movil_bomberos = self.request.POST.get(f'numero_movil_bomberos_{servicio.id}')
+            nombre_a_cargo_bomberos = self.request.POST.get(f'nombre_a_cargo_bomberos_{servicio.id}')
+            DetalleServicioEmergencia.objects.update_or_create(
+                servicio_emergencia=servicio,
+                comisaria_cuarta=self.object,
+                defaults={
+                    'numero_movil_bomberos': numero_movil_bomberos,
+                    'nombre_a_cargo_bomberos': nombre_a_cargo_bomberos
+                }
+            )
+
+        # Guardar los detalles adicionales para cada institución hospitalaria
+        for institucion in form.cleaned_data['instituciones_hospitalarias']:
+            numero_movil_hospital = self.request.POST.get(f'numero_movil_hospital_{institucion.id}')
+            nombre_a_cargo_hospital = self.request.POST.get(f'nombre_a_cargo_hospital_{institucion.id}')
+            DetalleInstitucionHospitalaria.objects.update_or_create(
+                institucion_hospitalaria=institucion,
+                comisaria_cuarta=self.object,
+                defaults={
+                    'numero_movil_hospital': numero_movil_hospital,
+                    'nombre_a_cargo_hospital': nombre_a_cargo_hospital
+                }
+            )
+
+        # Guardar los detalles adicionales para cada dependencia municipal
+        for dependencia_municipal in form.cleaned_data['dependencias_municipales']:
+            numero_movil_municipal = self.request.POST.get(f'numero_movil_municipal_{dependencia_municipal.id}')
+            nombre_a_cargo_municipal = self.request.POST.get(f'nombre_a_cargo_municipal_{dependencia_municipal.id}')
+            DetalleDependenciaMunicipal.objects.update_or_create(
+                dependencia_municipal=dependencia_municipal,
+                comisaria_cuarta=self.object,
+                defaults={
+                    'numero_movil_municipal': numero_movil_municipal,
+                    'nombre_a_cargo_municipal': nombre_a_cargo_municipal
+                }
+            )
+
+        # Guardar los detalles adicionales para cada dependencia provincial
+        for dependencia_provincial in form.cleaned_data['dependencias_provinciales']:
+            numero_movil_provincial = self.request.POST.get(f'numero_movil_provincial_{dependencia_provincial.id}')
+            nombre_a_cargo_provincial = self.request.POST.get(f'nombre_a_cargo_provincial_{dependencia_provincial.id}')
+            DetalleDependenciaProvincial.objects.update_or_create(
+                dependencia_provincial=dependencia_provincial,
+                comisaria_cuarta=self.object,
+                defaults={
+                    'numero_movil_provincial': numero_movil_provincial,
+                    'nombre_a_cargo_provincial': nombre_a_cargo_provincial
+                }
+            )
+
+        # Guardar detalles adicionales para cada dependencia secundaria
+        for dependencia_secundaria in form.cleaned_data['dependencias_secundarias']:
+            numero_movil_secundaria = self.request.POST.get(f'numero_movil_secundaria_{dependencia_secundaria.id}')
+            nombre_a_cargo_secundaria = self.request.POST.get(f'nombre_a_cargo_secundaria_{dependencia_secundaria.id}')
+            DetalleDependenciaSecundaria.objects.update_or_create(
+                dependencia_secundaria=dependencia_secundaria,
+                comisaria_cuarta=self.object,
+                defaults={
+                    'numero_movil_secundaria': numero_movil_secundaria,
+                    'nombre_a_cargo_secundaria': nombre_a_cargo_secundaria
+                }
+            )
+
+        # Guardar detalles adicionales para instituciones federales
+        for institucion_federal in form.cleaned_data['instituciones_federales']:
+            numero_movil_federal = self.request.POST.get(f'numero_movil_federal_{institucion_federal.id}')
+            nombre_a_cargo_federal = self.request.POST.get(f'nombre_a_cargo_federal_{institucion_federal.id}')
+            DetalleInstitucionFederal.objects.update_or_create(
+                institucion_federal=institucion_federal,
+                comisaria_cuarta=self.object,
+                defaults={
+                    'numero_movil_federal': numero_movil_federal,
+                    'nombre_a_cargo_federal': nombre_a_cargo_federal
+                }
+            )
+
+        messages.success(self.request, 'El código ha sido guardado exitosamente.')
+        return super().form_valid(form)
+
+
+#---------------------detalle de comisaria cuarta-----------------------------------------------
+
+class ComisariaCuartaDetailView(DetailView):
+    model = ComisariaCuarta
+    template_name = 'comisarias/cuarta/comisaria_cuarta_detail.html'
+    context_object_name = 'record'
+
+
+#----------------------------softdelete-------------------------------------------------------------
+
+# En views.py
+
+def eliminar_comisaria_cuarta(request, pk):
+    # Obtén el registro a eliminar
+    comisaria = get_object_or_404(ComisariaCuarta, pk=pk)
+    
+    # Marca el registro como inactivo
+    comisaria.activo = False
+    comisaria.save()
+    
+    # Envía un mensaje de confirmación
+    messages.success(request, 'El código ha sido eliminado correctamente.')
+    
+    # Redirige de vuelta a la lista
+    return redirect('comisaria_cuarta_list')
+
+
+
+
+
+#---------------------comisaria quinta para ver ---------------------
+
+class ComisariaQuintaListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = ComisariaQuinta
     template_name = 'comisarias/quinta/comisaria_quinta_list.html'
+    context_object_name = 'records'
 
-class ComisariaQuintaCreateView(LoginRequiredMixin, CreateView):
+    def test_func(self):
+        return user_is_in_group(self.request.user, 'comisariaquinta')
+
+    def handle_no_permission(self):
+        return redirect('no_permission')
+
+    def get_queryset(self):
+        queryset = super().get_queryset().filter(activo=True).order_by('-fecha_hora')
+        #queryset = super().get_queryset().order_by('-fecha_hora')
+        search_query = self.request.GET.get('q', '')
+        if search_query:
+            queryset = queryset.filter(cuarto__cuarto__icontains=search_query)
+        for comisaria in queryset:
+            if timezone.is_naive(comisaria.fecha_hora):
+                comisaria.fecha_hora = timezone.make_aware(comisaria.fecha_hora, timezone.get_current_timezone())
+            comisaria.fecha_hora = timezone.localtime(comisaria.fecha_hora)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        context['is_jefessuperiores'] = user.groups.filter(name='jefessuperiores').exists()
+        context['is_libreros'] = user.groups.filter(name='libreros').exists()
+        context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
+        context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
+        context['is_comisariaquinta'] = user.groups.filter(name='comisariaquinta').exists()
+
+        context['today'] = timezone.now().date()
+        context['resolveId'] = None
+        return context
+
+
+#-----------------------creacion de comisaria quinta---------------
+
+class ComisariaQuintaCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = ComisariaQuinta
     form_class = ComisariaQuintaForm
     template_name = 'comisarias/quinta/comisaria_quinta_form.html'
     success_url = reverse_lazy('comisaria_quinta_list')
 
+    def test_func(self):
+        return user_is_in_group(self.request.user, 'comisariaquinta')
+
+    def handle_no_permission(self):
+        return redirect('no_permission')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['codigos_policiales'] = CodigoPolicialUSH.objects.all()
+
+        # Inicializar detalles como listas vacías en el contexto
+        context['detalle_servicios_emergencia'] = json.dumps([])  # Para vista de creación, siempre es una lista vacía
+        context['detalle_instituciones_hospitalarias'] = json.dumps([])
+        context['detalle_dependencias_municipales'] = json.dumps([])
+        context['detalle_dependencias_provinciales'] = json.dumps([])
+        context['detalle_dependencias_secundarias'] = json.dumps([])
+        context['detalle_instituciones_federales'] = json.dumps([])  # Añadido para federales
+
+        return context
+
+    def form_valid(self, form):
+        if self.request.POST.get('is_confirmed') == 'true': 
+            self.object = form.save(commit=False)
+            self.object.created_by = self.request.user
+            self.object.updated_by = None
+            self.object.updated_at = None
+
+            latitude = self.request.POST.get('latitude').replace(',', '.')
+            longitude = self.request.POST.get('longitude').replace(',', '.')
+
+            self.object.latitude = float(latitude) if latitude else None
+            self.object.longitude = float(longitude) if longitude else None
+
+            self.object.save()
+            form.save_m2m()
+
+            # Guardar los detalles adicionales para cada servicio de emergencia
+            for servicio in form.cleaned_data['servicios_emergencia']:
+                numero_movil_bomberos = self.request.POST.get(f'numero_movil_bomberos_{servicio.id}')
+                nombre_a_cargo_bomberos = self.request.POST.get(f'nombre_a_cargo_bomberos_{servicio.id}')
+                if numero_movil_bomberos or nombre_a_cargo_bomberos:
+                    DetalleServicioEmergencia.objects.create(
+                        servicio_emergencia=servicio,
+                        comisaria_quinta=self.object,
+                        numero_movil_bomberos=numero_movil_bomberos,
+                        nombre_a_cargo_bomberos=nombre_a_cargo_bomberos
+                    )
+
+            # Guardar los detalles adicionales para cada institución hospitalaria
+            for institucion in form.cleaned_data['instituciones_hospitalarias']:
+                numero_movil_hospital = self.request.POST.get(f'numero_movil_hospital_{institucion.id}')
+                nombre_a_cargo_hospital = self.request.POST.get(f'nombre_a_cargo_hospital_{institucion.id}')
+                if numero_movil_hospital or nombre_a_cargo_hospital:
+                    DetalleInstitucionHospitalaria.objects.create(
+                        institucion_hospitalaria=institucion,
+                        comisaria_quinta=self.object,
+                        numero_movil_hospital=numero_movil_hospital,
+                        nombre_a_cargo_hospital=nombre_a_cargo_hospital
+                    )
+
+            # Guardar los detalles adicionales para cada dependencia municipal
+            for dependencia_municipal in form.cleaned_data['dependencias_municipales']:
+                numero_movil_municipal = self.request.POST.get(f'numero_movil_municipal_{dependencia_municipal.id}')
+                nombre_a_cargo_municipal = self.request.POST.get(f'nombre_a_cargo_municipal_{dependencia_municipal.id}')
+                if numero_movil_municipal or nombre_a_cargo_municipal:
+                    DetalleDependenciaMunicipal.objects.create(
+                        dependencia_municipal=dependencia_municipal,
+                        comisaria_quinta=self.object,
+                        numero_movil_municipal=numero_movil_municipal,
+                        nombre_a_cargo_municipal=nombre_a_cargo_municipal
+                    )
+
+            # Guardar los detalles adicionales para cada dependencia provincial
+            for dependencia_provincial in form.cleaned_data['dependencias_provinciales']:
+                numero_movil_provincial = self.request.POST.get(f'numero_movil_provincial_{dependencia_provincial.id}')
+                nombre_a_cargo_provincial = self.request.POST.get(f'nombre_a_cargo_provincial_{dependencia_provincial.id}')
+                if numero_movil_provincial or nombre_a_cargo_provincial:
+                    DetalleDependenciaProvincial.objects.create(
+                        dependencia_provincial=dependencia_provincial,
+                        comisaria_quinta=self.object,
+                        numero_movil_provincial=numero_movil_provincial,
+                        nombre_a_cargo_provincial=nombre_a_cargo_provincial
+                    )
+
+            # Guardar los detalles adicionales para dependencias secundarias
+            for dependencia_secundaria in form.cleaned_data['dependencias_secundarias']:
+                numero_movil_secundaria = self.request.POST.get(f'numero_movil_secundaria_{dependencia_secundaria.id}')
+                nombre_a_cargo_secundaria = self.request.POST.get(f'nombre_a_cargo_secundaria_{dependencia_secundaria.id}')
+                if numero_movil_secundaria or nombre_a_cargo_secundaria:
+                    DetalleDependenciaSecundaria.objects.create(
+                        dependencia_secundaria=dependencia_secundaria,
+                        comisaria_quinta=self.object,
+                        numero_movil_secundaria=numero_movil_secundaria,
+                        nombre_a_cargo_secundaria=nombre_a_cargo_secundaria
+                    )
+
+            # Guardar los detalles adicionales para instituciones federales
+            for institucion_federal in form.cleaned_data['instituciones_federales']:
+                numero_movil_federal = self.request.POST.get(f'numero_movil_federal_{institucion_federal.id}')
+                nombre_a_cargo_federal = self.request.POST.get(f'nombre_a_cargo_federal_{institucion_federal.id}')
+                if numero_movil_federal or nombre_a_cargo_federal:
+                    DetalleInstitucionFederal.objects.create(
+                        institucion_federal=institucion_federal,
+                        comisaria_quinta=self.object,
+                        numero_movil_federal=numero_movil_federal,
+                        nombre_a_cargo_federal=nombre_a_cargo_federal
+                    )
+
+            messages.success(self.request, 'El código ha sido guardado exitosamente.')
+            return super().form_valid(form)
+        else:
+            # Si no ha sido confirmado, mostramos un mensaje de advertencia
+            messages.warning(self.request, 'La acción fue cancelada.')
+            return redirect('comisaria_cuarta_list')  # Redirigir a la lista u otra página
+
+#-------------------update de comisaria quinta-----------------------------
+
+class ComisariaQuintaUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = ComisariaQuinta
+    form_class = ComisariaQuintaForm
+    template_name = 'comisarias/quinta/comisaria_quinta_form.html'
+    success_url = reverse_lazy('comisaria_quinta_list')
+
+    def test_func(self):
+        return user_is_in_group(self.request.user, 'comisariaquinta')
+
+    def handle_no_permission(self):
+        return redirect('no_permission')
+
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        now = timezone.now()
+
+        if obj.fecha_hora.date() != now.date() and not obj.estado:
+            return redirect('comisaria_quinta_list')
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['codigos_policiales'] = CodigoPolicialUSH.objects.all()
+
+        # Convertir detalles en JSON para ser usados por Alpine.js
+        context['detalle_servicios_emergencia'] = json.dumps(list(
+            DetalleServicioEmergencia.objects.filter(comisaria_quinta=self.object.pk).values('id', 'servicio_emergencia_id', 'numero_movil_bomberos', 'nombre_a_cargo_bomberos')
+        ))
+
+        context['detalle_instituciones_hospitalarias'] = json.dumps(list(
+            DetalleInstitucionHospitalaria.objects.filter(comisaria_quinta=self.object.pk).values('id', 'institucion_hospitalaria_id', 'numero_movil_hospital', 'nombre_a_cargo_hospital')
+        ))
+
+        context['detalle_dependencias_municipales'] = json.dumps(list(
+            DetalleDependenciaMunicipal.objects.filter(comisaria_quinta=self.object.pk).values('id', 'dependencia_municipal_id', 'numero_movil_municipal', 'nombre_a_cargo_municipal')
+        ))
+
+        context['detalle_dependencias_provinciales'] = json.dumps(list(
+            DetalleDependenciaProvincial.objects.filter(comisaria_quinta=self.object.pk).values('id', 'dependencia_provincial_id', 'numero_movil_provincial', 'nombre_a_cargo_provincial')
+        ))
+
+        # Añadir los nuevos detalles para dependencias secundarias
+        context['detalle_dependencias_secundarias'] = json.dumps(list(
+            DetalleDependenciaSecundaria.objects.filter(comisaria_quinta=self.object.pk).values('id', 'dependencia_secundaria_id', 'numero_movil_secundaria', 'nombre_a_cargo_secundaria')
+        ))
+
+        # Añadir los nuevos detalles para instituciones federales
+        context['detalle_instituciones_federales'] = json.dumps(list(
+            DetalleInstitucionFederal.objects.filter(comisaria_quinta=self.object.pk).values('id', 'institucion_federal_id', 'numero_movil_federal', 'nombre_a_cargo_federal')
+        ))
+
+        return context
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.updated_by = self.request.user
+        self.object.updated_at = timezone.now()
+
+        latitude = self.request.POST.get('latitude').replace(',', '.')
+        longitude = self.request.POST.get('longitude').replace(',', '.')
+
+        self.object.latitude = float(latitude) if latitude else None
+        self.object.longitude = float(longitude) if longitude else None
+
+        self.object.save()
+        form.save_m2m()
+
+       # Mantener un registro de los IDs seleccionados
+        servicios_emergencia_ids = form.cleaned_data['servicios_emergencia'].values_list('id', flat=True)
+        instituciones_hospitalarias_ids = form.cleaned_data['instituciones_hospitalarias'].values_list('id', flat=True)
+        dependencias_municipales_ids = form.cleaned_data['dependencias_municipales'].values_list('id', flat=True)
+        dependencias_provinciales_ids = form.cleaned_data['dependencias_provinciales'].values_list('id', flat=True)
+        dependencias_secundarias_ids = form.cleaned_data['dependencias_secundarias'].values_list('id', flat=True)
+        instituciones_federales_ids = form.cleaned_data['instituciones_federales'].values_list('id', flat=True)
+
+        # Eliminar los detalles que ya no están seleccionados
+        DetalleServicioEmergencia.objects.filter(comisaria_quinta=self.object).exclude(servicio_emergencia_id__in=servicios_emergencia_ids).delete()
+        DetalleInstitucionHospitalaria.objects.filter(comisaria_quinta=self.object).exclude(institucion_hospitalaria_id__in=instituciones_hospitalarias_ids).delete()
+        DetalleDependenciaMunicipal.objects.filter(comisaria_quinta=self.object).exclude(dependencia_municipal_id__in=dependencias_municipales_ids).delete()
+        DetalleDependenciaProvincial.objects.filter(comisaria_quinta=self.object).exclude(dependencia_provincial_id__in=dependencias_provinciales_ids).delete()
+        DetalleDependenciaSecundaria.objects.filter(comisaria_quinta=self.object).exclude(dependencia_secundaria_id__in=dependencias_secundarias_ids).delete()
+        DetalleInstitucionFederal.objects.filter(comisaria_quinta=self.object).exclude(institucion_federal_id__in=instituciones_federales_ids).delete()
+
+        # Guardar los detalles adicionales para cada servicio de emergencia
+        for servicio in form.cleaned_data['servicios_emergencia']:
+            numero_movil_bomberos = self.request.POST.get(f'numero_movil_bomberos_{servicio.id}')
+            nombre_a_cargo_bomberos = self.request.POST.get(f'nombre_a_cargo_bomberos_{servicio.id}')
+            DetalleServicioEmergencia.objects.update_or_create(
+                servicio_emergencia=servicio,
+                comisaria_quinta=self.object,
+                defaults={
+                    'numero_movil_bomberos': numero_movil_bomberos,
+                    'nombre_a_cargo_bomberos': nombre_a_cargo_bomberos
+                }
+            )
+
+        # Guardar los detalles adicionales para cada institución hospitalaria
+        for institucion in form.cleaned_data['instituciones_hospitalarias']:
+            numero_movil_hospital = self.request.POST.get(f'numero_movil_hospital_{institucion.id}')
+            nombre_a_cargo_hospital = self.request.POST.get(f'nombre_a_cargo_hospital_{institucion.id}')
+            DetalleInstitucionHospitalaria.objects.update_or_create(
+                institucion_hospitalaria=institucion,
+                comisaria_quinta=self.object,
+                defaults={
+                    'numero_movil_hospital': numero_movil_hospital,
+                    'nombre_a_cargo_hospital': nombre_a_cargo_hospital
+                }
+            )
+
+        # Guardar los detalles adicionales para cada dependencia municipal
+        for dependencia_municipal in form.cleaned_data['dependencias_municipales']:
+            numero_movil_municipal = self.request.POST.get(f'numero_movil_municipal_{dependencia_municipal.id}')
+            nombre_a_cargo_municipal = self.request.POST.get(f'nombre_a_cargo_municipal_{dependencia_municipal.id}')
+            DetalleDependenciaMunicipal.objects.update_or_create(
+                dependencia_municipal=dependencia_municipal,
+                comisaria_quinta=self.object,
+                defaults={
+                    'numero_movil_municipal': numero_movil_municipal,
+                    'nombre_a_cargo_municipal': nombre_a_cargo_municipal
+                }
+            )
+
+        # Guardar los detalles adicionales para cada dependencia provincial
+        for dependencia_provincial in form.cleaned_data['dependencias_provinciales']:
+            numero_movil_provincial = self.request.POST.get(f'numero_movil_provincial_{dependencia_provincial.id}')
+            nombre_a_cargo_provincial = self.request.POST.get(f'nombre_a_cargo_provincial_{dependencia_provincial.id}')
+            DetalleDependenciaProvincial.objects.update_or_create(
+                dependencia_provincial=dependencia_provincial,
+                comisaria_quinta=self.object,
+                defaults={
+                    'numero_movil_provincial': numero_movil_provincial,
+                    'nombre_a_cargo_provincial': nombre_a_cargo_provincial
+                }
+            )
+
+        # Guardar los detalles adicionales para dependencias secundarias
+        for dependencia_secundaria in form.cleaned_data['dependencias_secundarias']:
+            numero_movil_secundaria = self.request.POST.get(f'numero_movil_secundaria_{dependencia_secundaria.id}')
+            nombre_a_cargo_secundaria = self.request.POST.get(f'nombre_a_cargo_secundaria_{dependencia_secundaria.id}')
+            DetalleDependenciaSecundaria.objects.update_or_create(
+                dependencia_secundaria=dependencia_secundaria,
+                comisaria_quinta=self.object,
+                defaults={
+                    'numero_movil_secundaria': numero_movil_secundaria,
+                    'nombre_a_cargo_secundaria': nombre_a_cargo_secundaria
+                }
+            )
+
+        # Guardar los detalles adicionales para instituciones federales
+        for institucion_federal in form.cleaned_data['instituciones_federales']:
+            numero_movil_federal = self.request.POST.get(f'numero_movil_federal_{institucion_federal.id}')
+            nombre_a_cargo_federal = self.request.POST.get(f'nombre_a_cargo_federal_{institucion_federal.id}')
+            DetalleInstitucionFederal.objects.update_or_create(
+                institucion_federal=institucion_federal,
+                comisaria_quinta=self.object,
+                defaults={
+                    'numero_movil_federal': numero_movil_federal,
+                    'nombre_a_cargo_federal': nombre_a_cargo_federal
+                }
+            )
+
+        messages.success(self.request, 'El código ha sido guardado exitosamente.')
+
+        return super().form_valid(form)
+    
+
+#--------------------detalle comisria quinta---------------------------------------------
+
+
+class ComisariaQuintaDetailView(DetailView):
+    model = ComisariaQuinta
+    template_name = 'comisarias/quinta/comisaria_quinta_detail.html'
+    context_object_name = 'record'
+
+
+#----------------------------softdelete-------------------------------------------------------------
+
+# En views.py
+
+def eliminar_comisaria_quinta(request, pk):
+    # Obtén el registro a eliminar
+    comisaria = get_object_or_404(ComisariaQuinta, pk=pk)
+    
+    # Marca el registro como inactivo
+    comisaria.activo = False
+    comisaria.save()
+    
+    # Envía un mensaje de confirmación
+    messages.success(request, 'El código ha sido eliminado correctamente.')
+    
+    # Redirige de vuelta a la lista
+    return redirect('comisaria_quinta_list')
+
 
 
 #--------------------vista dee todas las comisarias-------------------------------------    
 
-# Vista para listar todas las comisarías
+from django.db.models import Value, Q, CharField
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
 class ComisariasCompletaListView(LoginRequiredMixin, ListView):
-    # Especifica la plantilla que se utilizará para renderizar la vista.
     template_name = 'comisarias/comisarias_completa_list.html'
-    
-    # Define el nombre del contexto que contendrá la lista de comisarías en la plantilla.
-    context_object_name = 'comisarias'
+    context_object_name = 'page_obj'
 
-    # Obtiene el conjunto de consultas combinado de todas las comisarías
+    def get_paginate_by(self, queryset):
+        """Define el número de registros por página dinámicamente."""
+        items_per_page = self.request.GET.get('items_per_page', 10)
+        try:
+            return int(items_per_page)
+        except ValueError:
+            return 10  # Valor por defecto si no es válido
+
     def get_queryset(self):
-        # Obtiene el valor de la consulta de búsqueda desde la URL (si existe).
-        query = self.request.GET.get('q', '')
-    
-        # Inicializa una lista vacía que contendrá las comisarías combinadas.
-        combined_list = []
+        query = self.request.GET.get('q', '').strip()  # Obtiene y limpia la consulta
 
-        # Obtiene todas las instancias de ComisariaPrimera, con relaciones pre-cargadas para mejorar el rendimiento.
-        comisarias_primera = ComisariaPrimera.objects.select_related('cuarto').all()
-        
-        # Obtiene todas las instancias de ComisariaSegunda, con relaciones pre-cargadas para mejorar el rendimiento.
-        comisarias_segunda = ComisariaSegunda.objects.select_related('cuarto').all()
-        
-        # Obtiene todas las instancias de ComisariaTercera, con relaciones pre-cargadas para mejorar el rendimiento.
-        comisarias_tercera = ComisariaTercera.objects.select_related('cuarto').all()
-        
-        # Obtiene todas las instancias de ComisariaCuarta, con relaciones pre-cargadas para mejorar el rendimiento.
-        comisarias_cuarta = ComisariaCuarta.objects.select_related('cuarto').all()
-        
-        # Obtiene todas las instancias de ComisariaQuinta, con relaciones pre-cargadas para mejorar el rendimiento.
-        comisarias_quinta = ComisariaQuinta.objects.select_related('cuarto').all()
+        # Crea un filtro Q común para reutilizarlo
+        search_filter = (
+            Q(comisaria_nombre__icontains=query) |
+            Q(cuarto__cuarto__icontains=query) |
+            Q(codigo__codigo__icontains=query) |
+            Q(codigo__nombre_codigo__icontains=query) |
+            Q(movil_patrulla__icontains=query) |
+            Q(a_cargo__icontains=query) |
+            Q(secundante__icontains=query) |
+            Q(lugar_codigo__icontains=query) |
+            Q(tareas_judiciales__icontains=query) |
+            Q(descripcion__icontains=query) |
+            Q(fecha_hora__icontains=query)
+        ) if query else Q()  # Solo aplica el filtro si hay una consulta
 
-        # Asigna el nombre 'Comisaria Primera' a cada instancia de ComisariaPrimera.
-        for comisaria in comisarias_primera:
-            comisaria.comisaria_nombre = 'Comisaria Primera'
-        
-        # Asigna el nombre 'Comisaria Segunda' a cada instancia de ComisariaSegunda.
-        for comisaria in comisarias_segunda:
-            comisaria.comisaria_nombre = 'Comisaria Segunda'
-        
-        # Asigna el nombre 'Comisaria Tercera' a cada instancia de ComisariaTercera.
-        for comisaria in comisarias_tercera:
-            comisaria.comisaria_nombre = 'Comisaria Tercera'
-        
-        # Asigna el nombre 'Comisaria Cuarta' a cada instancia de ComisariaCuarta.
-        for comisaria in comisarias_cuarta:
-            comisaria.comisaria_nombre = 'Comisaria Cuarta'
-        
-        # Asigna el nombre 'Comisaria Quinta' a cada instancia de ComisariaQuinta.
-        for comisaria in comisarias_quinta:
-            comisaria.comisaria_nombre = 'Comisaria Quinta'
+        # Filtra y anota cada QuerySet individualmente
+        comisarias_primera = ComisariaPrimera.objects.filter(
+            activo=True
+        ).select_related('cuarto').annotate(
+            comisaria_nombre=Value('Comisaria Primera', output_field=CharField())
+        ).filter(search_filter)
 
-        # Combina todas las listas de comisarías en una sola lista.
-        combined_list = list(comisarias_primera) + list(comisarias_segunda) + \
-                        list(comisarias_tercera) + list(comisarias_cuarta) + \
-                        list(comisarias_quinta)
+        comisarias_segunda = ComisariaSegunda.objects.filter(
+            activo=True
+        ).select_related('cuarto').annotate(
+            comisaria_nombre=Value('Comisaria Segunda', output_field=CharField())
+        ).filter(search_filter)
 
-        # Si hay una consulta de búsqueda, filtra la lista combinada.
-        if query:
-            # Filtra las comisarías en la lista combinada para que coincidan con la consulta.
-            combined_list = [comisaria for comisaria in combined_list if self.query_in_comisaria(comisaria, query)]
+        comisarias_tercera = ComisariaTercera.objects.filter(
+            activo=True
+        ).select_related('cuarto').annotate(
+            comisaria_nombre=Value('Comisaria Tercera', output_field=CharField())
+        ).filter(search_filter)
 
-        # Ordena la lista combinada por la fecha de creación (o actualización), de la más reciente a la más antigua.
-        combined_list = sorted(combined_list, key=lambda x: x.created_at, reverse=True)
+        comisarias_cuarta = ComisariaCuarta.objects.filter(
+            activo=True
+        ).select_related('cuarto').annotate(
+            comisaria_nombre=Value('Comisaria Cuarta', output_field=CharField())
+        ).filter(search_filter)
 
-        # Devuelve la lista combinada y filtrada como el queryset final.
-        return combined_list
+        comisarias_quinta = ComisariaQuinta.objects.filter(
+            activo=True
+        ).select_related('cuarto').annotate(
+            comisaria_nombre=Value('Comisaria Quinta', output_field=CharField())
+        ).filter(search_filter)
 
-    # Verifica si la consulta coincide con algún campo de la comisaría
-    def query_in_comisaria(self, comisaria, query):
-        # Convierte la consulta de búsqueda a minúsculas para una comparación insensible a mayúsculas.
-        query_lower = query.lower()
-        
-        # Retorna True si la consulta coincide con alguno de los campos relevantes en la comisaría.
-        return (
-            (query_lower in comisaria.comisaria_nombre.lower() if comisaria.comisaria_nombre else False) or
-            (query_lower in comisaria.cuarto.cuarto.lower() if comisaria.cuarto and comisaria.cuarto.cuarto else False) or
-            (query_lower in comisaria.codigo.codigo.lower() if comisaria.codigo and comisaria.codigo.codigo else False) or
-            (query_lower in comisaria.movil_patrulla.lower() if comisaria.movil_patrulla else False) or
-            (query_lower in comisaria.a_cargo.lower() if comisaria.a_cargo else False) or
-            (query_lower in comisaria.secundante.lower() if comisaria.secundante else False) or
-            (query_lower in comisaria.lugar_codigo.lower() if comisaria.lugar_codigo else False) or
-            (query_lower in comisaria.descripcion.lower() if comisaria.descripcion else False) or
-            (query_lower in comisaria.instituciones_intervinientes.lower() if comisaria.instituciones_intervinientes else False) or
-            (query_lower in comisaria.tareas_judiciales.lower() if comisaria.tareas_judiciales else False) or
-            (query_lower in comisaria.fecha_hora.strftime('%Y-%m-%d %H:%M:%S').lower() if comisaria.fecha_hora else False)
+        # Unión de los QuerySets
+        combined_queryset = comisarias_primera.union(
+            comisarias_segunda,
+            comisarias_tercera,
+            comisarias_cuarta,
+            comisarias_quinta
         )
 
-    # Añade información adicional al contexto
+        # Ordenar por fecha de creación
+        return combined_queryset.order_by('-created_at')
+    
+    
+
     def get_context_data(self, **kwargs):
-        # Llama al método original para obtener el contexto predeterminado.
         context = super().get_context_data(**kwargs)
-        
-        # Añade la consulta de búsqueda al contexto.
+        queryset = self.get_queryset()
+
+    # Paginación
+        paginate_by = self.get_paginate_by(queryset)
+        paginator = Paginator(queryset, paginate_by)
+        page = self.request.GET.get('page')
+
+        try:
+           page_obj = paginator.page(page)
+        except PageNotAnInteger:
+           page_obj = paginator.page(1)
+        except EmptyPage:
+           page_obj = paginator.page(paginator.num_pages)
+
+    # Calcular el rango dinámico de páginas
+        current_page = page_obj.number
+        total_pages = page_obj.paginator.num_pages
+        range_start = max(current_page - 5, 1)
+        range_end = min(current_page + 5, total_pages) + 1  # Incluye la última página
+
+        context['page_obj'] = page_obj
         context['query'] = self.request.GET.get('q', '')
-        
-        # Añade el valor de paginación al contexto, por defecto 10 elementos por página.
-        context['paginate_by'] = self.request.GET.get('items_per_page', 10)
-        
-        # Devuelve el contexto completo para ser utilizado en la plantilla.
+        context['items_per_page'] = paginate_by
+        context['page_range'] = range(range_start, range_end)
         return context
 
-    
-    
+
+
+
+        
+
+
 
 #-------------------------------genera pdf para firma y descarga------------------------------------------------------
 
@@ -1093,7 +2212,8 @@ def generate_pdf_content(request, comisaria_model, add_signature=False):
     # 3. Filtrar los registros del modelo de la comisaría según las fechas de creación o actualización del día actual
     registros = comisaria_model.objects.filter(
         models.Q(created_at__range=(start_of_day, end_of_day)) |
-        models.Q(updated_at__range=(start_of_day, end_of_day))
+        models.Q(updated_at__range=(start_of_day, end_of_day)),
+        activo=True  # Filtrar solo los registros activos
     )
 
     # 4. Cargar la plantilla HTML que se usará para generar el PDF
@@ -1104,7 +2224,6 @@ def generate_pdf_content(request, comisaria_model, add_signature=False):
     escudo_path = os.path.join(settings.BASE_DIR, 'comisarias', 'static', 'comisarias', 'images', 'ESCUDO POLICIA.jpeg')
     with open(escudo_path, "rb") as img_file:
         escudo_base64 = base64.b64encode(img_file.read()).decode('utf-8')
-    
     
 
     # 5. Preparar el contexto que se pasará a la plantilla
@@ -1170,6 +2289,7 @@ def view_pdf_content(request, comisaria_model):
     
     # Devuelve la respuesta HTTP que contiene el PDF, lo que hará que el navegador lo muestre.
     return response
+
 #---------------------------esta funcion retorna el view_pdf_content ---------------------------------------------------
 
 
@@ -1227,7 +2347,7 @@ def generate_comisaria_primera_pdf_download_previous_day(request):
     # y lo devolverá como una respuesta HTTP.
     return generate_pdf_for_specific_date(request, ComisariaPrimera, previous_day, filename, add_signature=add_signature)
 
-
+#--------------------------------------------------------------------------------------------------------------------------------------
 
 # Función para generar un PDF para una fecha específica
 def generate_pdf_for_specific_date(request, comisaria_model, specific_date, filename, add_signature=False):
@@ -1370,7 +2490,6 @@ def generate_comisaria_segunda_pdf_download(request):
     add_signature = 'signature' in request.GET
     now = datetime.now()
 
-
     # Obtiene el nombre de la comisaría desde el modelo (por ejemplo, "Comisaria Primera").
     comisaria_name = ComisariaSegunda._meta.verbose_name.title().replace(' ', '-')
     
@@ -1380,7 +2499,7 @@ def generate_comisaria_segunda_pdf_download(request):
 
     return generate_pdf(request, ComisariaSegunda, filename, add_signature=add_signature)
 
-#------------------------------decragar de comisaria segunda pdf del dia anterior------------------------------------------------------
+#------------------------------descargar de comisaria segunda pdf del dia anterior------------------------------------------------------
 
 # Función para descargar el PDF del día anterior
 def generate_comisaria_segunda_pdf_download_previous_day(request):
@@ -1392,7 +2511,6 @@ def generate_comisaria_segunda_pdf_download_previous_day(request):
 
     # Obtiene el nombre de la comisaría desde el modelo (por ejemplo, "Comisaria Primera").
     comisaria_name = ComisariaSegunda._meta.verbose_name.title().replace(' ', '-')
-    
     
     # Calcula la fecha del día anterior.
     previous_day = now - timedelta(days=1)
@@ -1410,247 +2528,135 @@ def generate_comisaria_segunda_pdf_download_previous_day(request):
 
 #--------------------------aqui empieza comisiaria tercefra los pdf------------------------------------------------------
 
+
 def generate_comisaria_tercera_pdf_view(request):
     return view_pdf_content(request, ComisariaTercera)
 
+#------------------------------------------------------------------------------------------------------------------
 def generate_comisaria_tercera_pdf_download(request):
     add_signature = 'signature' in request.GET
     now = datetime.now()
-    filename = f"parte-diario-{now.strftime('%d-%m-%Y_%H-%M-%S')}.pdf"
+
+    # Obtiene el nombre de la comisaría desde el modelo (por ejemplo, "Comisaria Tercera").
+    comisaria_name = ComisariaTercera._meta.verbose_name.title().replace(' ', '-')
+    
+    # Define el nombre del archivo, incluyendo "libro-diario", el nombre de la comisaría, y la fecha actual.
+    filename = f"libro-diario-{comisaria_name}-Ush-{now.strftime('%d-%m-%Y')}.pdf"
+
     return generate_pdf(request, ComisariaTercera, filename, add_signature=add_signature)
 
+#------------------------------Descargar PDF del día anterior para Comisaria Tercera----------------------------------------
 
-#-----------------------aqui empieza comisaria cuarta las funciones ---------------------------------------------
+def generate_comisaria_tercera_pdf_download_previous_day(request):
+    # Verifica si la URL contiene el parámetro 'signature' en la cadena de consulta (GET).
+    add_signature = 'signature' in request.GET
+    
+    # Obtiene la fecha y hora actual.
+    now = datetime.now()
+
+    # Obtiene el nombre de la comisaría desde el modelo (por ejemplo, "Comisaria Tercera").
+    comisaria_name = ComisariaTercera._meta.verbose_name.title().replace(' ', '-')
+    
+    # Calcula la fecha del día anterior.
+    previous_day = now - timedelta(days=1)
+    
+    # Define el nombre del archivo para el PDF, incluyendo "libro-diario", 
+    # la fecha del día anterior, y la extensión ".pdf".
+    filename = f"libro-diario-{comisaria_name}-Ush-{previous_day.strftime('%d-%m-%Y')}.pdf"
+    
+    # Genera el PDF para la fecha específica y lo devuelve como una respuesta HTTP.
+    return generate_pdf_for_specific_date(request, ComisariaTercera, previous_day, filename, add_signature=add_signature)
+
+
+
+#-----------------------aqui empieza comisaria cuarta las funciones pdf ---------------------------------------------
 
 def generate_comisaria_cuarta_pdf_view(request):
     return view_pdf_content(request, ComisariaCuarta)
 
+
+
+#------------------------------------------------------------------------------------------------------------------
 def generate_comisaria_cuarta_pdf_download(request):
     add_signature = 'signature' in request.GET
     now = datetime.now()
-    filename = f"parte-diario-{now.strftime('%d-%m-%Y_%H-%M-%S')}.pdf"
+
+    # Obtiene el nombre de la comisaría desde el modelo (por ejemplo, "Comisaria Tercera").
+    comisaria_name = ComisariaCuarta._meta.verbose_name.title().replace(' ', '-')
+    
+    # Define el nombre del archivo, incluyendo "libro-diario", el nombre de la comisaría, y la fecha actual.
+    filename = f"libro-diario-{comisaria_name}-Ush-{now.strftime('%d-%m-%Y')}.pdf"
+
     return generate_pdf(request, ComisariaCuarta, filename, add_signature=add_signature)
+
+
+#------------------------------Descargar PDF del día anterior para Comisaria Tercera----------------------------------------
+
+def generate_comisaria_cuarta_pdf_download_previous_day(request):
+    # Verifica si la URL contiene el parámetro 'signature' en la cadena de consulta (GET).
+    add_signature = 'signature' in request.GET
+    
+    # Obtiene la fecha y hora actual.
+    now = datetime.now()
+
+    # Obtiene el nombre de la comisaría desde el modelo (por ejemplo, "Comisaria Tercera").
+    comisaria_name = ComisariaCuarta._meta.verbose_name.title().replace(' ', '-')
+    
+    # Calcula la fecha del día anterior.
+    previous_day = now - timedelta(days=1)
+    
+    # Define el nombre del archivo para el PDF, incluyendo "libro-diario", 
+    # la fecha del día anterior, y la extensión ".pdf".
+    filename = f"libro-diario-{comisaria_name}-Ush-{previous_day.strftime('%d-%m-%Y')}.pdf"
+    
+    # Genera el PDF para la fecha específica y lo devuelve como una respuesta HTTP.
+    return generate_pdf_for_specific_date(request, ComisariaCuarta, previous_day, filename, add_signature=add_signature)
+
+
+
+#-----------------------aqui empieza comisaria cuarta las funciones pdf ---------------------------------------------
 
 def generate_comisaria_quinta_pdf_view(request):
     return view_pdf_content(request, ComisariaQuinta)
 
+
+
+#------------------------------------------------------------------------------------------------------------------
 def generate_comisaria_quinta_pdf_download(request):
     add_signature = 'signature' in request.GET
     now = datetime.now()
-    filename = f"parte-diario-{now.strftime('%d-%m-%Y_%H-%M-%S')}.pdf"
+
+    # Obtiene el nombre de la comisaría desde el modelo (por ejemplo, "Comisaria Tercera").
+    comisaria_name = ComisariaQuinta._meta.verbose_name.title().replace(' ', '-')
+    
+    # Define el nombre del archivo, incluyendo "libro-diario", el nombre de la comisaría, y la fecha actual.
+    filename = f"libro-diario-{comisaria_name}-Ush-{now.strftime('%d-%m-%Y')}.pdf"
+
     return generate_pdf(request, ComisariaQuinta, filename, add_signature=add_signature)
 
-#--------------------------------------------
 
-import folium
-from django.shortcuts import render
-from .models import ComisariaPrimera
+#------------------------------Descargar PDF del día anterior para Comisaria Tercera----------------------------------------
 
-def generar_mapa(request):
-    # Crear un mapa centrado en Ushuaia
-    mapa = folium.Map(location=[-54.8019, -68.3029], zoom_start=12)
-
-    # Obtener todas las comisarías con coordenadas
-    comisarias = ComisariaPrimera.objects.exclude(latitude__isnull=True, longitude__isnull=True)
-
-    # Diccionario de colores según el código policial
+def generate_comisaria_quinta_pdf_download_previous_day(request):
+    # Verifica si la URL contiene el parámetro 'signature' en la cadena de consulta (GET).
+    add_signature = 'signature' in request.GET
     
-    colores = {
-        "00": "red",         # Persona fallecida
-        "01": "blue",        # Homicidio
-        "02": "green",       # Suicidio
-        "03": "orange",      # Robo
-        "04": "purple",      # Accidente de tránsito
-        "05": "brown",       # Daños
-        "06": "pink",        # Contravención
-        "07": "lightblue",   # Apoyo policial
-        "08": "darkred",     # Violencia de género
-        "09": "darkblue",    # Violencia de género en curso
-        "10": "darkgreen",   # Violencia de género con agresiones físicas
-        "11": "cadetblue",   # Incendio
-        "12": "darkpurple",  # Persona con prohibición de acercamiento
-        "13": "black",       # Persona armada
-        "14": "lightgray",   # Persona tirada en la vía pública
-        "15": "darkorange",  # Persona herida
-        "16": "darkpink",    # Persona con abuso sexual
-        "17": "lightgreen",  # Persona con intento de suicidio
-        "18": "lightyellow", # Persona extraviada o perdida
-        "19": "violet",      # Presencia de drogas
-        "20": "yellow",      # Pedido de auxilio
-        "21": "lightred",    # Violencia familiar en curso
-        "22": "darkbrown",   # Violencia familiar histórica
-        "23": "magenta",     # Amenaza de bomba
-        "24": "gray",        # Artefacto explosivo
-        "25": "lightorange", # Animales sueltos
-        "26": "teal",        # Cordón sanitario
-        "27": "indigo",      # Fuga de gas
-        "28": "olive",       # Usurpación
-        "29": "lime",        # Picadas, exceso de velocidad
-        "30": "cyan",        # Corte o desvío de tránsito
-        "31": "tan",         # Manifestación o grupos de personas
-        "32": "lightbrown",  # Ruidos molestos
-        "33": "gold",        # Alarma
-        "34": "aqua"         # Presencia policial.
-    }
+    # Obtiene la fecha y hora actual.
+    now = datetime.now()
 
-    # Agrupar las coordenadas por código policial
-    agrupado_por_codigo = {}
+    # Obtiene el nombre de la comisaría desde el modelo (por ejemplo, "Comisaria Tercera").
+    comisaria_name = ComisariaQuinta._meta.verbose_name.title().replace(' ', '-')
     
-    for comisaria in comisarias:
-        if comisaria.codigo:
-            codigo = comisaria.codigo.codigo
-            if codigo not in agrupado_por_codigo:
-                agrupado_por_codigo[codigo] = []
-            agrupado_por_codigo[codigo].append([comisaria.latitude, comisaria.longitude])
+    # Calcula la fecha del día anterior.
+    previous_day = now - timedelta(days=1)
     
-    # Dibujar círculos o polígonos para agrupar zonas
-    for codigo, coordenadas_grupo in agrupado_por_codigo.items():
-        color = colores.get(codigo, 'gray')
-        
-        # Crear un polígono que rodee las comisarías con el mismo código
-        folium.Polygon(
-            locations=coordenadas_grupo,  # Coordenadas de las comisarías
-            color=color,  # Color según el código
-            fill=True,
-            fill_color=color,
-            fill_opacity=0.3,  # Ajustar la transparencia del relleno
-            popup=f"Zona con código {codigo}"
-        ).add_to(mapa)
-
-    # También agregar los marcadores para cada comisaría
-    for comisaria in comisarias:
-        coordenadas = [comisaria.latitude, comisaria.longitude]
-        
-        if comisaria.codigo:
-            codigo = comisaria.codigo.codigo
-            nombre_codigo = comisaria.codigo.nombre_codigo or 'Sin nombre'
-            color = colores.get(codigo, 'gray')
-        else:
-            codigo = 'N/A'
-            nombre_codigo = 'N/A'
-            color = 'gray'
-        
-        # Añadir marcador con popup
-        folium.Marker(
-            location=coordenadas,
-            popup=f"Código: {codigo}<br> {nombre_codigo}<br> {comisaria}",
-            icon=folium.Icon(color=color)
-        ).add_to(mapa)
-
-    # Generar HTML del mapa
-    mapa_html = mapa._repr_html_()
-
-    # Renderizar la plantilla con el mapa
-    return render(request, 'comisarias/mapa_codigos.html', {'mapa': mapa_html})
-
-#----------estadistica
-
-from django.utils import timezone
-from django.db.models import Count
-from datetime import timedelta
-from .models import (
-    ComisariaPrimera, ComisariaSegunda, ComisariaTercera,
-    ComisariaCuarta, ComisariaQuinta, DetalleInstitucionHospitalaria, 
-    DetalleServicioEmergencia
-)
-
-def estadisticas_comisarias(request):
-    hoy = timezone.now()
-    inicio_semana = hoy - timedelta(days=hoy.weekday())  # Lunes de esta semana
-    inicio_mes = hoy.replace(day=1)  # Primer día del mes actual
-
-    # Función para obtener estadísticas por comisaría
-    def obtener_estadisticas_por_comisaria(model, fecha_inicio, fecha_fin):
-        return model.objects.filter(fecha_hora__date__range=[fecha_inicio, fecha_fin]).values(
-            'codigo__codigo', 'fecha_hora', 'created_by__username'
-        ).annotate(total=Count('codigo__codigo'))
-
-    # Función para obtener códigos secundarios por comisaría
-    def obtener_secundarios_por_comisaria(model, fecha_inicio, fecha_fin):
-        return model.objects.filter(fecha_hora__date__range=[fecha_inicio, fecha_fin]).values(
-            'codigos_secundarios__codigo', 'fecha_hora', 'created_by__username'
-        ).annotate(total=Count('codigos_secundarios__codigo'))
-
-    # Estadísticas por día
-    total_por_dia = {
-        'primera': obtener_estadisticas_por_comisaria(ComisariaPrimera, hoy.date(), hoy.date()),
-        'segunda': obtener_estadisticas_por_comisaria(ComisariaSegunda, hoy.date(), hoy.date()),
-        'tercera': obtener_estadisticas_por_comisaria(ComisariaTercera, hoy.date(), hoy.date()),
-        'cuarta': obtener_estadisticas_por_comisaria(ComisariaCuarta, hoy.date(), hoy.date()),
-        'quinta': obtener_estadisticas_por_comisaria(ComisariaQuinta, hoy.date(), hoy.date())
-    }
-
-    total_secundarios_dia = {
-        'primera': obtener_secundarios_por_comisaria(ComisariaPrimera, hoy.date(), hoy.date()),
-        'segunda': obtener_secundarios_por_comisaria(ComisariaSegunda, hoy.date(), hoy.date()),
-        'tercera': obtener_secundarios_por_comisaria(ComisariaTercera, hoy.date(), hoy.date()),
-        'cuarta': obtener_secundarios_por_comisaria(ComisariaCuarta, hoy.date(), hoy.date()),
-        'quinta': obtener_secundarios_por_comisaria(ComisariaQuinta, hoy.date(), hoy.date())
-    }
-
-    # Estadísticas por semana
-    total_por_semana = {
-        'primera': obtener_estadisticas_por_comisaria(ComisariaPrimera, inicio_semana.date(), hoy.date()),
-        'segunda': obtener_estadisticas_por_comisaria(ComisariaSegunda, inicio_semana.date(), hoy.date()),
-        'tercera': obtener_estadisticas_por_comisaria(ComisariaTercera, inicio_semana.date(), hoy.date()),
-        'cuarta': obtener_estadisticas_por_comisaria(ComisariaCuarta, inicio_semana.date(), hoy.date()),
-        'quinta': obtener_estadisticas_por_comisaria(ComisariaQuinta, inicio_semana.date(), hoy.date())
-    }
-
-    total_secundarios_semana = {
-        'primera': obtener_secundarios_por_comisaria(ComisariaPrimera, inicio_semana.date(), hoy.date()),
-        'segunda': obtener_secundarios_por_comisaria(ComisariaSegunda, inicio_semana.date(), hoy.date()),
-        'tercera': obtener_secundarios_por_comisaria(ComisariaTercera, inicio_semana.date(), hoy.date()),
-        'cuarta': obtener_secundarios_por_comisaria(ComisariaCuarta, inicio_semana.date(), hoy.date()),
-        'quinta': obtener_secundarios_por_comisaria(ComisariaQuinta, inicio_semana.date(), hoy.date())
-    }
-
-    # Estadísticas por mes
-    total_por_mes = {
-        'primera': obtener_estadisticas_por_comisaria(ComisariaPrimera, inicio_mes.date(), hoy.date()),
-        'segunda': obtener_estadisticas_por_comisaria(ComisariaSegunda, inicio_mes.date(), hoy.date()),
-        'tercera': obtener_estadisticas_por_comisaria(ComisariaTercera, inicio_mes.date(), hoy.date()),
-        'cuarta': obtener_estadisticas_por_comisaria(ComisariaCuarta, inicio_mes.date(), hoy.date()),
-        'quinta': obtener_estadisticas_por_comisaria(ComisariaQuinta, inicio_mes.date(), hoy.date())
-    }
-
-    total_secundarios_mes = {
-        'primera': obtener_secundarios_por_comisaria(ComisariaPrimera, inicio_mes.date(), hoy.date()),
-        'segunda': obtener_secundarios_por_comisaria(ComisariaSegunda, inicio_mes.date(), hoy.date()),
-        'tercera': obtener_secundarios_por_comisaria(ComisariaTercera, inicio_mes.date(), hoy.date()),
-        'cuarta': obtener_secundarios_por_comisaria(ComisariaCuarta, inicio_mes.date(), hoy.date()),
-        'quinta': obtener_secundarios_por_comisaria(ComisariaQuinta, inicio_mes.date(), hoy.date())
-    }
-
-    # Totales de móviles (Hospitales y Bomberos)
-    moviles_hospital_dia = {
-        'primera': DetalleInstitucionHospitalaria.objects.filter(comisaria_primera__fecha_hora__date=hoy.date()).count(),
-        'segunda': DetalleInstitucionHospitalaria.objects.filter(comisaria_segunda__fecha_hora__date=hoy.date()).count(),
-        'tercera': DetalleInstitucionHospitalaria.objects.filter(comisaria_tercera__fecha_hora__date=hoy.date()).count(),
-        'cuarta': DetalleInstitucionHospitalaria.objects.filter(comisaria_cuarta__fecha_hora__date=hoy.date()).count(),
-        'quinta': DetalleInstitucionHospitalaria.objects.filter(comisaria_quinta__fecha_hora__date=hoy.date()).count()
-    }
-
-    moviles_bomberos_dia = {
-        'primera': DetalleServicioEmergencia.objects.filter(comisaria_primera__fecha_hora__date=hoy.date()).count(),
-        'segunda': DetalleServicioEmergencia.objects.filter(comisaria_segunda__fecha_hora__date=hoy.date()).count(),
-        'tercera': DetalleServicioEmergencia.objects.filter(comisaria_tercera__fecha_hora__date=hoy.date()).count(),
-        'cuarta': DetalleServicioEmergencia.objects.filter(comisaria_cuarta__fecha_hora__date=hoy.date()).count(),
-        'quinta': DetalleServicioEmergencia.objects.filter(comisaria_quinta__fecha_hora__date=hoy.date()).count()
-    }
-
-    # Pasar los datos al template
-    return render(request, 'comisarias/estadisticas.html', {
-        'total_por_dia': total_por_dia,
-        'total_secundarios_dia': total_secundarios_dia,
-        'moviles_hospital_dia': moviles_hospital_dia,
-        'moviles_bomberos_dia': moviles_bomberos_dia,
-        'total_por_semana': total_por_semana,
-        'total_secundarios_semana': total_secundarios_semana,
-        'total_por_mes': total_por_mes,
-        'total_secundarios_mes': total_secundarios_mes,
-    })
+    # Define el nombre del archivo para el PDF, incluyendo "libro-diario", 
+    # la fecha del día anterior, y la extensión ".pdf".
+    filename = f"libro-diario-{comisaria_name}-Ush-{previous_day.strftime('%d-%m-%Y')}.pdf"
+    
+    # Genera el PDF para la fecha específica y lo devuelve como una respuesta HTTP.
+    return generate_pdf_for_specific_date(request, ComisariaQuinta, previous_day, filename, add_signature=add_signature)
 
 
-
+#--------------------FUNCION PARA MAPEAR CADA CODIGO todo se coloco en temporales comisarias------------------------------------------------
 
