@@ -1,7 +1,7 @@
 # Libropolicial/comisariasriogrande/forms.py
 from django import forms
 from .models import ComisariaPrimeraRG, ComisariaSegundaRG, ComisariaTerceraRG, ComisariaCuartaRG, ComisariaQuintaRG
-from Libropolicial.forms import CustomLoginForm  # Importar desde la ubicación común
+from Libropolicial.forms import CustomLoginForm  # Importar desde la ubicación comúnsubo nuevo
 
 # Formularios para las comisarías
 class BaseComisariaRGForm(forms.ModelForm):
