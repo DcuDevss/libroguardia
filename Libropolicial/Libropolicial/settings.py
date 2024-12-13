@@ -123,7 +123,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # Utiliza el backend MySQL
         'NAME': 'libro',  # Nombre de la base de datos
-        'USER': 'libropolicial',  # Usuario de la base de datos
+        'USER': 'libropolicial',  # Usuario de la base de datos vamos
         'PASSWORD': 'Dcu911+-',  # Contraseña de la base de datos
         'HOST': 'localhost',  # Host de la base de datos
         'PORT': '3306',  # Puerto de la base de datos
