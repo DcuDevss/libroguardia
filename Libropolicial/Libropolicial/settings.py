@@ -148,7 +148,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internacionalización
+# Internacionalización nuevo
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = 'es-ar'  # Código de idioma para español de Argentina
