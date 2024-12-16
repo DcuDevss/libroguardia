@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Permisos de Carga</title>
+</head>
+<body>
+    <h1>Lista de Permisos de Carga</h1>
+    <ul>
+        {% for permiso in permisos %}
+            <li>{{ permiso.usuario.username }}: {{ permiso.hora_inicio }} - {{ permiso.hora_fin }}</li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'asignar_permiso' %}">Asignar nuevo permiso</a>
+    <a href="{% url 'home_opciones' %}">Volver al Inicio</a>
+</body>
+</html>

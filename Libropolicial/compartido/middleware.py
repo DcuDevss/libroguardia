@@ -6,6 +6,8 @@ from django.shortcuts import redirect
 from django.utils import timezone
 # Importa timedelta para trabajar con diferencias de tiempo
 from datetime import timedelta
+from django.utils.timezone import localtime
+from datetime import time
 
 
 class NoCacheMiddleware(MiddlewareMixin):
@@ -74,3 +76,20 @@ class InactivityLogoutMiddleware(MiddlewareMixin):
                     return redirect('login')
             # Actualiza la última actividad del usuario en la sesión con la hora actual
             request.session['last_activity'] = timezone.now().isoformat()
+
+#Midleware que asigna los permisos para carga de datos
+def verificar_permiso_carga(usuario):
+    permiso = CargaDatosPermiso.objects.filter(usuario=usuario).first()
+    if permiso:
+        hora_actual = localtime().time()
+        if permiso.hora_inicio <= hora_actual <= permiso.hora_fin:
+            return True
+    return False
+
+# Vista o función donde el usuario intenta cargar datos
+def cargar_datos(request):
+    if not verificar_permiso_carga(request.user):
+        return HttpResponse("No tiene permiso para cargar datos en este horario.")
+    
+    # Aquí va la lógica de carga de datos
+    return HttpResponse("Datos cargados con éxito.")

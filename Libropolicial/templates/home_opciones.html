@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Bienvenido a la plataforma</h1>
+
+    {% if group == 'asignar_permiso' %}
+        <p>Como parte de su rol, tiene la opción de asignar permisos:</p>
+        <a href="{% url 'asignar_permiso' %}">Asignar Permisos</a>
+
+    {% elif group == 'usuario_con_permiso' %}
+        <p>Usted tiene permisos para cargar datos en la plataforma. Seleccione su área:</p>
+        <ul>
+            <li><a href="{% url 'comisaria_primera_list' %}">Comisaría Primera</a></li>
+            <li><a href="{% url 'comisaria_segunda_list' %}">Comisaría Segunda</a></li>
+            <li><a href="{% url 'comisariaprimeraRG_list' %}">Comisaría Primera RG</a></li>
+            <li><a href="{% url 'comisariasegundaRG_list' %}">Comisaría Segunda RG</a></li>
+            <!-- Agrega las demás opciones según tu lógica de grupos -->
+        </ul>
+
+    {% elif group == 'sin_permiso' %}
+        <p>No tiene permisos asignados. Necesita asignar permisos para acceder a la plataforma.</p>
+        <a href="{% url 'asignar_permiso' %}">Asignar Permisos</a>
+
+    {% endif %}
+{% endblock %}

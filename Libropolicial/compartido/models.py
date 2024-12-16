@@ -94,3 +94,15 @@ class UploadedPDFRG(models.Model):
     # Método para obtener solo el nombre del archivo PDF.
     def filename(self):
         return self.file.name.split('/')[-1]  # Retorna solo el nombre del archivo, eliminando el camino de la ruta.
+    
+# Clase para manejar permisos a lahora de cargar datos
+
+class CargaDatosPermiso(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    hora_inicio = models.TimeField()
+    hora_fin = models.TimeField()
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Permiso de carga para {self.usuario.username} desde {self.hora_inicio} hasta {self.hora_fin}"
+    

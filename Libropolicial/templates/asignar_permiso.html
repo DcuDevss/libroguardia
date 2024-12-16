@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Asignar Permiso de Carga</title>
+</head>
+<body>
+    <h1>Asignar Permiso de Carga de Datos</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}  <!-- Muestra el formulario -->
+        <button type="submit">Asignar Permiso</button>
+    </form>
+    <a href="{% url 'vista_permisos' %}">Lista de Personal asignado</a>
+</body>
+</html>
