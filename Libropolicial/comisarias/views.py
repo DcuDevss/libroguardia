@@ -2301,6 +2301,15 @@ def generate_comisaria_primera_pdf_view(request):
 #-------------------------------esta funcion retorna la funcion generate_pdf-----------------------------------------------------
 
 def generate_comisaria_primera_pdf_download(request):
+    
+    force_download = request.GET.get('force', 'false') == 'true'
+    # Verificar si hay registros con estado activo
+    registros_activos = ComisariaPrimera.objects.filter(estado=True, activo=True).exists()
+
+    if registros_activos and not force_download:
+        # Retornar una respuesta JSON indicando que hay registros activos
+        return JsonResponse({'warning': 'Existen registros con el estado "Activo". ¿Deseas continuar con la descarga del PDF?'})
+    
     # Verifica si la URL contiene el parámetro 'signature' en la cadena de consulta (GET).
     # Si está presente, add_signature será True; de lo contrario, será False.
     add_signature = 'signature' in request.GET

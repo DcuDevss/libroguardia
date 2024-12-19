@@ -167,8 +167,14 @@
     
         <!-- Botón para 'oficialesservicios' y 'jefessuperiores' -->
         {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias %}
-        <a href="{% url 'generate_comisaria_primera_pdf_download' %}?signature=true" target="_blank" class="btn bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-700">Ver y Descargar PDF</a>
+        <a href="{% url 'generate_comisaria_primera_pdf_download' %}?signature=true" 
+           id="download-pdf-button" 
+           class="btn bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-700">
+           Ver y Descargar PDF
+        </a>
         {% endif %}
+        
+        
     
         {% if user.is_authenticated and user.is_superuser %}
         <a href="{% url 'generate_comisaria_primera_pdf_download_previous_day' %}" target="_blank" class="btn bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700">Descargar PDF del Día Anterior</a>
@@ -379,21 +385,92 @@
                 $('.dataTables_wrapper').addClass('dark');
             }
     });
+    
+    
+    document.addEventListener('DOMContentLoaded', () => {
+    const downloadButton = document.getElementById('download-pdf-button');
+
+    downloadButton.addEventListener('click', function (event) {
+        event.preventDefault(); // Evita la acción por defecto
+
+        // Realizar una petición AJAX para verificar si hay registros activos
+        fetch(downloadButton.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(response => {
+                const contentType = response.headers.get('Content-Type');
+                if (contentType && contentType.includes('application/json')) {
+                    // Si la respuesta es JSON, procesarla como JSON
+                    return response.json();
+                } else {
+                    // Si no es JSON, continuar con un flujo genérico para abrir el PDF
+                    return {}; // Retorna un objeto vacío para manejarlo en el siguiente paso
+                }
+            })
+            .then(data => {
+                if (data.warning) {
+                    // Mostrar el SweetAlert si hay una advertencia
+                    Swal.fire({
+                        title: 'Advertencia',
+                        text: data.warning,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, continuar',
+                        cancelButtonText: 'Cancelar',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Si el usuario confirma, realiza una nueva solicitud con 'force=true'
+                            const forceUrl = downloadButton.href + (downloadButton.href.includes('?') ? '&' : '?') + 'force=true';
+                            window.open(forceUrl, '_blank');
+                        } else {
+                            // Si el usuario cancela, muestra otro mensaje
+                            Swal.fire('Cancelado', 'La descarga del PDF fue cancelada.', 'info');
+                        }
+                    });
+                } else {
+                    // Si no hay advertencia, mostrar el SweetAlert para confirmar la descarga
+                    Swal.fire({
+                        title: 'Confirmación',
+                        text: '¿Deseas proceder con la descarga del PDF?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, continuar',
+                        cancelButtonText: 'Cancelar',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Si el usuario confirma, realiza la descarga
+                            window.open(downloadButton.href, '_blank');
+                        } else {
+                            // Si el usuario cancela, muestra otro mensaje
+                            Swal.fire('Cancelado', 'La descarga del PDF fue cancelada.', 'info');
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire('Error', 'Ocurrió un problema inesperado al procesar la solicitud.', 'error');
+            });
+    });
+});
+
+
 </script>
-<!-- SweetAlert2 para mostrar el mensaje de éxito -->
-{% if messages %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            {% for message in messages %}
-                Swal.fire({
-                    icon: 'success',  // Cambia el ícono según el tipo de mensaje (success, error, etc.)
-                    title: 'Hecho!',
-                    text: '{{ message }}',
-                    confirmButtonText: 'OK',
-                    timer: 3000  // La alerta se cierra automáticamente después de 3 segundos
-                });
-            {% endfor %}
-        });
-    </script>
-{% endif %}
+    <!-- SweetAlert2 para mostrar el mensaje de éxito -->
+    {% if messages %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                {% for message in messages %}
+                    Swal.fire({
+                        icon: 'success',  // Cambia el ícono según el tipo de mensaje (success, error, etc.)
+                        title: 'Hecho!',
+                        text: '{{ message }}',
+                        confirmButtonText: 'OK',
+                        timer: 3000  // La alerta se cierra automáticamente después de 3 segundos
+                    });
+                {% endfor %}
+            });
+        </script>
+        
+        
+    {% endif %}
+
 {% endblock %}
