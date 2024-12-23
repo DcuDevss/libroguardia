@@ -2658,5 +2658,26 @@ def generate_comisaria_quinta_pdf_download_previous_day(request):
     return generate_pdf_for_specific_date(request, ComisariaQuinta, previous_day, filename, add_signature=add_signature)
 
 
-#--------------------FUNCION PARA MAPEAR CADA CODIGO todo se coloco en temporales comisarias------------------------------------------------
+#--------------------FUNCION PARA VER LOS PARTES------------------------------------------------
 
+def serve_pdf(request, folder_name):
+    # Define la ruta base
+    base_path = os.path.join(settings.MEDIA_ROOT, folder_name)
+
+    # Verifica si la carpeta existe
+    if not os.path.exists(base_path):
+        return render(request, '404.html', status=404)
+
+    # Construye una lista de archivos con datos enriquecidos
+    files = []
+    for file_name in os.listdir(base_path):
+        file_path = os.path.join(base_path, file_name)
+        if os.path.isfile(file_path):
+            files.append({
+                'name': file_name,
+                'modified_at': datetime.fromtimestamp(os.path.getmtime(file_path)).strftime('%d/%m/%Y %H:%M:%S'),
+                'url': f"{settings.MEDIA_URL}{folder_name}/{file_name}",
+            })
+
+    # Renderiza la plantilla con los datos
+    return render(request, 'comisarias/pdf_list.html', {'folder_name': folder_name, 'files': files})

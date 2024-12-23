@@ -1,4 +1,5 @@
 from django.urls import path
+from . import views
 from .views import (
     # Funciones para generar PDFs y firmas
     generate_comisaria_primera_pdf_view, generate_comisaria_primera_pdf_download,
@@ -98,6 +99,9 @@ urlpatterns = [
     path('subir-pdf/', subir_pdf, name='subir_pdf'),
     path('ver-pdfs/', ver_pdfs, name='ver_pdfs'),  # Nueva URL para ver los PDFs
     path('mostrar-pdf/<int:pdf_id>/', mostrar_pdf, name='mostrar_pdf'),
+    path('media/<str:folder_name>/', views.serve_pdf, name='serve_pdf'),
+
+    
    
 
     # Completas

@@ -1,5 +1,6 @@
 # Libropolicial/comisariastolhuin/urls.py
 from django.urls import path
+from . import views
 from .views import (
     # Funciones para generar PDFs y firmas
     generate_comisaria_tolhuin_pdf_view, generate_comisaria_tolhuin_pdf_download,
@@ -39,6 +40,7 @@ urlpatterns = [
     path('subir-pdfTOL/', subir_pdfTOL, name='subir_pdfTOL'),
     path('ver-pdfsTOL/', ver_pdfsTOL, name='ver_pdfsTOL'),  # Nueva URL para ver los PDFs
     path('mostrar-pdfTOL/<int:pdf_id>/', mostrar_pdfTOL, name='mostrar_pdfTOL'),
+  
    
 
 ]

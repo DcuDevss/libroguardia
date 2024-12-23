@@ -1,5 +1,6 @@
 # Libropolicial/comisariasriogrande/urls.py
 from django.urls import path
+from . import views
 from .views import (
     # Funciones para generar PDFs y firmas
     generate_comisaria_primeraRG_pdf_view, generate_comisaria_primeraRG_pdf_download,
@@ -99,6 +100,7 @@ urlpatterns = [
     path('subir-pdfRG/', subir_pdfRG, name='subir_pdfRG'),
     path('ver-pdfsRG/', ver_pdfsRG, name='ver_pdfsRG'),  # Nueva URL para ver los PDFs
     path('mostrar-pdfRG/<int:pdf_id>/', mostrar_pdfRG, name='mostrar_pdfRG'),
+  
    
 
     # Completas

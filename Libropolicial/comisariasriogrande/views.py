@@ -2827,5 +2827,4 @@ def generate_comisaria_quintaRG_pdf_download_previous_day(request):
     return generate_pdf_for_specific_date(request, ComisariaQuintaRG, previous_day, filename, add_signature=add_signature)  
 
 
-#--------------------FUNCION PARA MAPEAR CADA CODIGO todo se coloco en temporales comisarias------------------------------------------------
 

@@ -904,3 +904,8 @@ def generate_comisaria_tolhuin_pdf_download_previous_day(request):
     # Genera el PDF para la fecha específica y lo devuelve como una respuesta HTTP.
     return generate_pdf_for_specific_date(request, ComisariaTolhuin, previous_day, filename, add_signature=add_signature)  
 
+
+
+
+
+
