@@ -5,7 +5,7 @@ from .views import (
     # Funciones para generar PDFs y firmas
     generate_comisaria_tolhuin_pdf_view, generate_comisaria_tolhuin_pdf_download,
     generate_comisaria_tolhuin_pdf_download_previous_day,
-    sign_comisaria_tolhuin,
+    sign_comisaria_tolhuin, 
     # Otras funciones y vistas
     subir_pdfTOL, ver_pdfsTOL, mostrar_pdfTOL,
     
@@ -20,6 +20,10 @@ from .views import (
     ComisariaTolhuinDetailView,
      #softdelete
     eliminar_comisaria_tolhuin,
+    #vista para generar pdf con rango nespecifico
+    generate_pdf_custom_range_view,
+    #ruta para renderizar la vista
+    select_range_view
 )
 
 urlpatterns = [
@@ -40,6 +44,9 @@ urlpatterns = [
     path('subir-pdfTOL/', subir_pdfTOL, name='subir_pdfTOL'),
     path('ver-pdfsTOL/', ver_pdfsTOL, name='ver_pdfsTOL'),  # Nueva URL para ver los PDFs
     path('mostrar-pdfTOL/<int:pdf_id>/', mostrar_pdfTOL, name='mostrar_pdfTOL'),
+     path('seleccionar-rango-tolhuin/', select_range_view, name='select_range_view'),
+    path('generar-pdf-rango/', generate_pdf_custom_range_view, name='generate_pdf_custom_range_view'),
+   
   
    
 

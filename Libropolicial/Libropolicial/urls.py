@@ -25,6 +25,7 @@ urlpatterns = [
     # Incluye las rutas definidas en 'divisioncomunicaciones.urls'
     path('divisioncomunicaciones/', include('divisioncomunicaciones.urls')),  
 
+
     # Puedes incluir otras aplicaciones de la misma manera
 ]
 

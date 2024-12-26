@@ -669,8 +669,8 @@ def view_pdf_content(request, comisaria_model):
 
 
 def generate_comisaria_tolhuin_pdf_view(request):
-    # Llama a la función view_pdf_content, pasando el request y el modelo ComisariaPrimera.
-    # Esta función generará el contenido del PDF para la ComisariaPrimera y lo devolverá como una respuesta HTTP.
+    # Llama a la función view_pdf_content, pasando el request y el modelo ComisariaTolhuin.
+    # Esta función generará el contenido del PDF para la ComisariaTolhuin y lo devolverá como una respuesta HTTP.
     return view_pdf_content(request, ComisariaTolhuin)
 
 def generate_comisaria_tolhuin_pdf_download(request):
@@ -908,4 +908,86 @@ def generate_comisaria_tolhuin_pdf_download_previous_day(request):
 
 
 
+#--------------------FUNCION PARA GENERAR PDFS PARA FECHAS ESPECIFICAS---------------------#
 
+def generate_pdf_for_date_and_range(request, comisaria_model, start_time, end_time, filename, add_signature=False):
+    """
+    Genera un PDF basado en un rango de fechas y horas especificado.
+
+    :param request: Solicitud HTTP de Django.
+    :param comisaria_model: Modelo de la base de datos a filtrar.
+    :param start_time: Fecha y hora de inicio del rango.
+    :param end_time: Fecha y hora de fin del rango.
+    :param filename: Nombre del archivo PDF.
+    :param add_signature: Booleano para indicar si se agrega firma.
+    """
+    # Filtrar los registros en el rango horario
+    registros = comisaria_model.objects.filter(
+        models.Q(created_at__range=(start_time, end_time)) |
+        models.Q(updated_at__range=(start_time, end_time)),
+        activo=True  # Filtrar solo registros activos
+    )
+
+    # Cargar la plantilla HTML
+    template = get_template('comisariastolhuin/comisariaTOL_pdf_template.html')
+
+    # Convertir la imagen a base64
+    escudo_path = os.path.join(settings.BASE_DIR, 'comisariastolhuin', 'static', 'comisariastolhuin', 'images', 'ESCUDO POLICIA.jpeg')
+    with open(escudo_path, "rb") as img_file:
+        escudo_base64 = base64.b64encode(img_file.read()).decode('utf-8')
+
+    # Preparar el contexto para la plantilla
+    context = {
+        'registros': registros,
+        'comisaria_name': comisaria_model._meta.verbose_name.title(),
+        'add_signature': add_signature,
+        'username': request.user.get_full_name(),
+        'start_time': start_time,
+        'end_time': end_time,
+        'escudo_base64': escudo_base64,
+    }
+
+    # Renderizar la plantilla HTML
+    html = template.render(context)
+
+    # Crear un buffer en memoria para el PDF
+    response = BytesIO()
+
+    # Generar el PDF a partir del HTML renderizado
+    pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), response)
+
+    # Verificar si la generación del PDF fue exitosa
+    if not pdf.err:
+        return HttpResponse(
+            response.getvalue(),
+            content_type='application/pdf',
+            headers={'Content-Disposition': f'inline; filename="{filename}"'}
+        )
+    else:
+        return HttpResponse('Error al generar el PDF', status=500)
+
+#-----------FUNCION PARA GENERAR LA VISTA QUE MANEJA EL RANGO Y HORARIO SELECCIONADO----------#
+
+
+def generate_pdf_custom_range_view(request):
+    # Obtener los valores del formulario
+    start_date = request.GET.get('start_date')  # Formato: 'YYYY-MM-DD'
+    start_time = request.GET.get('start_time')  # Formato: 'HH:MM'
+    end_date = request.GET.get('end_date')      # Formato: 'YYYY-MM-DD'
+    end_time = request.GET.get('end_time')      # Formato: 'HH:MM'
+
+    # Combinar fecha y hora en objetos datetime
+    try:
+        start_datetime = datetime.strptime(f"{start_date} {start_time}", '%Y-%m-%d %H:%M')
+        end_datetime = datetime.strptime(f"{end_date} {end_time}", '%Y-%m-%d %H:%M')
+    except (ValueError, TypeError):
+        return HttpResponse('Error en el formato de fecha/hora', status=400)
+
+    # Usar start_datetime y end_datetime como siempre
+    filename = f"reporte-{start_datetime.strftime('%Y-%m-%d_%H-%M')}_to_{end_datetime.strftime('%Y-%m-%d_%H-%M')}.pdf"
+    return generate_pdf_for_date_and_range(request, ComisariaTolhuin, start_datetime, end_datetime, filename)
+
+#----------FUNCION PARA RENDERIZAR LA VISTA----------
+def select_range_view(request):
+    # Renderizar el formulario para seleccionar el rango
+    return render(request, 'comisariastolhuin/select_range_tolhuin.html')
