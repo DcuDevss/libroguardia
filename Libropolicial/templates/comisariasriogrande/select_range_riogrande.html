@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Generar Pdf's{% endblock %}
+{% block title %}Generar PDFs Rio Grande{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.dataTables.css" />
@@ -143,6 +143,7 @@
                 <div class="w-full">
                     <label for="comisaria" class="py-1 block text-gray-700 dark:text-gray-300">Comisaría</label>
                     <select id="comisaria" name="comisaria" required class="bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-200 border rounded-lg p-3 w-full">
+                        <option value="" disabled selected>Seleccione una comisaría</option>
                         <option value="primera">Primera</option>
                         <option value="segunda">Segunda</option>
                         <option value="tercera">Tercera</option>

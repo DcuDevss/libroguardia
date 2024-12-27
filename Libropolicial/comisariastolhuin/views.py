@@ -988,6 +988,6 @@ def generate_pdf_custom_range_view(request):
     return generate_pdf_for_date_and_range(request, ComisariaTolhuin, start_datetime, end_datetime, filename)
 
 #----------FUNCION PARA RENDERIZAR LA VISTA----------
-def select_range_view(request):
+def select_range_view_tol(request):
     # Renderizar el formulario para seleccionar el rango
     return render(request, 'comisariastolhuin/select_range_tolhuin.html')

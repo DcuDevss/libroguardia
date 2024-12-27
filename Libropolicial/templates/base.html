@@ -198,19 +198,19 @@
                 <!-- Dropdown Content -->
                 <ul x-show="open" @click.away="open = false" class="absolute bg-white text-black py-2 rounded shadow-lg mt-2 w-48 z-50">
                     <li>
-                        <a href="{% url 'serve_pdf' 'partespdf' %}"
+                        <a href="{% url 'select_range_view_ush' %}"
                             class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
                             Partes PDF Ushuaia
                         </a>
                     </li>
                     <li>
-                        <a href="{% url 'serve_pdf' 'partespdfRG' %}"
+                        <a href="{% url 'select_range_view_rg' %}"
                             class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
                             Partes PDF Rio Grande
                         </a>
                     </li>
                     <li>
-                        <a href="{% url 'select_range_view' %}"
+                        <a href="{% url 'select_range_view_tol' %}"
                             class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
                             Partes PDF Tolhuin
                         </a>

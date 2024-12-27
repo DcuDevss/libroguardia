@@ -23,7 +23,7 @@ from .views import (
     #vista para generar pdf con rango nespecifico
     generate_pdf_custom_range_view,
     #ruta para renderizar la vista
-    select_range_view
+    select_range_view_tol
 )
 
 urlpatterns = [
@@ -44,7 +44,7 @@ urlpatterns = [
     path('subir-pdfTOL/', subir_pdfTOL, name='subir_pdfTOL'),
     path('ver-pdfsTOL/', ver_pdfsTOL, name='ver_pdfsTOL'),  # Nueva URL para ver los PDFs
     path('mostrar-pdfTOL/<int:pdf_id>/', mostrar_pdfTOL, name='mostrar_pdfTOL'),
-     path('seleccionar-rango-tolhuin/', select_range_view, name='select_range_view'),
+     path('seleccionar-rango-tolhuin/', select_range_view_tol, name='select_range_view_tol'),
     path('generar-pdf-rango/', generate_pdf_custom_range_view, name='generate_pdf_custom_range_view'),
    
   

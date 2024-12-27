@@ -218,7 +218,7 @@
                 <table>
                     {% for detalle in registro.detalles_dependencia_secundaria.all %}
                     <tr>
-                        <td><strong>Dependencia:</strong> {{ detalle.dependencia_secundaria.nombre|default:"S/N" }}</td>
+                        <td><strong>Dependencia:</strong> {{ detalle.dependencia_secundaria.dependencia|default:"S/N" }}</td>
                         <td><strong>Móvil:</strong> {{ detalle.numero_movil_secundaria|default:"S/N" }}</td>
                         <td><strong>A Cargo:</strong> {{ detalle.nombre_a_cargo_secundaria|default:"S/N" }}</td>
                     </tr>

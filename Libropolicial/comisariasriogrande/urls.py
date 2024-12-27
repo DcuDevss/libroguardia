@@ -39,7 +39,7 @@ from .views import (
     #vista para generar pdf con rango nespecifico
     generate_pdf_custom_range_view_rg,
     #ruta para renderizar la vista
-    select_range_view
+    select_range_view_rg
 )
 
 urlpatterns = [
@@ -106,7 +106,7 @@ urlpatterns = [
     path('ver-pdfsRG/', ver_pdfsRG, name='ver_pdfsRG'),  # Nueva URL para ver los PDFs
     path('mostrar-pdfRG/<int:pdf_id>/', mostrar_pdfRG, name='mostrar_pdfRG'),
     path('generar-pdf-rango/', generate_pdf_custom_range_view_rg, name='generate_pdf_custom_range_view_rg'),
-    path('seleccionar-rango-riogrande/', select_range_view, name='select_range_view'),
+    path('seleccionar-rango-riogrande/', select_range_view_rg, name='select_range_view_rg'),
   
    
 

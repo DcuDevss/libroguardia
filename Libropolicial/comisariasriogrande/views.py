@@ -2828,7 +2828,7 @@ def generate_comisaria_quintaRG_pdf_download_previous_day(request):
 
 #-----------FUNCION PARA GENERAR LA VISTA QUE MANEJA EL RANGO Y HORARIO SELECCIONADO----------#
 
-def generate_pdf_for_date_and_range(request, comisaria_model, start_time, end_time, filename, add_signature=False):
+def generate_pdf_for_date_and_range(request, comisaria_model, start_time, end_time, filename, comisaria_title, add_signature=False ):
     """
     Genera un PDF basado en un rango de fechas y horas especificado para una comisaría específica.
     """
@@ -2850,7 +2850,7 @@ def generate_pdf_for_date_and_range(request, comisaria_model, start_time, end_ti
     # Preparar el contexto para la plantilla
     context = {
         'registros': registros,
-        'comisaria_name': comisaria_model._meta.verbose_name.title(),
+        'comisaria_name': comisaria_title,
         'add_signature': add_signature,
         'username': request.user.get_full_name(),
         'start_time': start_time,
@@ -2895,9 +2895,21 @@ def generate_pdf_custom_range_view_rg(request):
         'cuarta': ComisariaCuartaRG,
         'quinta': ComisariaQuintaRG,
     }
+    
+    # Mapear el modelo y el nombre de la comisaría 
+
+    comisaria_title_map = {
+    'primera': 'Comisaria Primera',
+    'segunda': 'Comisaria Segunda',
+    'tercera': 'Comisaria Tercera',
+    'cuarta': 'Comisaria Cuarta',
+    'quinta': 'Comisaria Quinta',
+    }
 
     comisaria_model = comisaria_map.get(comisaria_name)
-    if not comisaria_model:
+    comisaria_title = comisaria_title_map.get(comisaria_name)
+
+    if not comisaria_title:
         return HttpResponse('Comisaría no válida', status=400)
 
     # Combinar fecha y hora en objetos datetime
@@ -2906,12 +2918,13 @@ def generate_pdf_custom_range_view_rg(request):
         end_datetime = datetime.strptime(f"{end_date} {end_time}", '%Y-%m-%d %H:%M')
     except (ValueError, TypeError):
         return HttpResponse('Error en el formato de fecha/hora', status=400)
+ 
 
-    # Usar start_datetime y end_datetime como siempre
-    filename = f"libro-diario-{comisaria_name}-{start_datetime.strftime('%Y-%m-%d_%H-%M')}_to_{end_datetime.strftime('%Y-%m-%d_%H-%M')}.pdf"
-    return generate_pdf_for_date_and_range(request, comisaria_model, start_datetime, end_datetime, filename)
-
+    # Usar el nombre completo de la comisaría en el título del archivo
+    filename = f"libro-diario-{comisaria_title.replace(' ', '_')}-{start_datetime.strftime('%Y-%m-%d_%H-%M')}_to_{end_datetime.strftime('%Y-%m-%d_%H-%M')}.pdf"
+    return generate_pdf_for_date_and_range(request, comisaria_model, start_datetime, end_datetime, filename, comisaria_title=comisaria_title)
+    
 #----------FUNCION PARA RENDERIZAR LA VISTA----------
-def select_range_view(request):
+def select_range_view_rg(request):
     # Renderizar el formulario para seleccionar el rango
     return render(request, 'comisariasriogrande/select_range_riogrande.html')
