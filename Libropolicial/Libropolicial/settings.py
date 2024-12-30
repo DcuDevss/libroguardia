@@ -164,7 +164,7 @@ USE_L10N = True  # Habilita la localización
 
 STATIC_URL = '/static/'  # URL para archivos estáticos
 STATICFILES_DIRS = [
-    BASE_DIR / "static",  # Directorio de archivos estáticos
+    BASE_DIR / "static",  # Directorio de archivos estáticos xx
 ]
 
 # url de firma https://firmar.gob.ar/firmador/#/x
