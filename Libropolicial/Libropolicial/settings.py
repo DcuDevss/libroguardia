@@ -167,7 +167,7 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",  # Directorio de archivos estáticos
 ]
 
-# url de firma https://firmar.gob.ar/firmador/#/
+# url de firma https://firmar.gob.ar/firmador/#/x
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 import os
