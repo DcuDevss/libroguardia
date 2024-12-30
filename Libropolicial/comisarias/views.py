@@ -2668,7 +2668,7 @@ def serve_pdf(request, folder_name):
     if not os.path.exists(base_path):
         return render(request, '404.html', status=404)
 
-    # Construye una lista de archivos con datos enriquecidos
+    # Construye una lista de archivos con datos enriquecidos nuevos cambios
     files = []
     for file_name in os.listdir(base_path):
         file_path = os.path.join(base_path, file_name)
