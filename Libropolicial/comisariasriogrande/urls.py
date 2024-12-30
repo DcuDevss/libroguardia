@@ -1,5 +1,6 @@
 # Libropolicial/comisariasriogrande/urls.py
 from django.urls import path
+from . import views
 from .views import (
     # Funciones para generar PDFs y firmas
     generate_comisaria_primeraRG_pdf_view, generate_comisaria_primeraRG_pdf_download,
@@ -33,7 +34,12 @@ from .views import (
 
      #softdelete
     eliminar_comisaria_primeraRG, eliminar_comisaria_segundaRG, eliminar_comisaria_terceraRG, eliminar_comisaria_cuartaRG,
-    eliminar_comisaria_quintaRG
+    eliminar_comisaria_quintaRG,
+
+    #vista para generar pdf con rango nespecifico
+    generate_pdf_custom_range_view_rg,
+    #ruta para renderizar la vista
+    select_range_view_rg
 )
 
 urlpatterns = [
@@ -99,6 +105,9 @@ urlpatterns = [
     path('subir-pdfRG/', subir_pdfRG, name='subir_pdfRG'),
     path('ver-pdfsRG/', ver_pdfsRG, name='ver_pdfsRG'),  # Nueva URL para ver los PDFs
     path('mostrar-pdfRG/<int:pdf_id>/', mostrar_pdfRG, name='mostrar_pdfRG'),
+    path('generar-pdf-rango/', generate_pdf_custom_range_view_rg, name='generate_pdf_custom_range_view_rg'),
+    path('seleccionar-rango-riogrande/', select_range_view_rg, name='select_range_view_rg'),
+  
    
 
     # Completas

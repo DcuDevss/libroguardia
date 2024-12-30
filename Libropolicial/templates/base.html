@@ -186,6 +186,38 @@
                     </svg> 
                 </button>
             </div> 
+            <!--Partes-->
+            {% if can_access_comisarias %}
+            <div x-data="{ open: false }" class="relative">
+                <button @click="open = !open" class="cerrar-sesion focus:outline-none bg-transparent text-white font-semibold py-2 px-4 rounded inline-flex items-center">
+                    <span>Partes PDF</span>
+                    <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </button>
+                <!-- Dropdown Content -->
+                <ul x-show="open" @click.away="open = false" class="absolute bg-white text-black py-2 rounded shadow-lg mt-2 w-48 z-50">
+                    <li>
+                        <a href="{% url 'select_range_view_ush' %}"
+                            class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
+                            Partes PDF Ushuaia
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'select_range_view_rg' %}"
+                            class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
+                            Partes PDF Rio Grande
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'select_range_view_tol' %}"
+                            class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
+                            Partes PDF Tolhuin
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            {% endif %}
             <!-- COMISARIAS -->
             <div class="luz-and-droopdown flex">
                 <!-- SELECT USHUAIA -->
@@ -227,6 +259,11 @@
                             <a href="{% url 'comisaria_quinta_list' %}"
                                 class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">Comisaría
                                 Quinta</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'comisaria_tolhuin_list' %}"
+                                class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">Comisaría
+                                Tolhuin</a>
                         </li>
                     </ul>
                 </div>
@@ -515,8 +552,12 @@
                 // Coordenadas para Río Grande
                 initialLat = -53.7769;
                 initialLng = -67.7076;
+            } else if (url.includes("/comisariastolhuin/")) {
+                // Coordenadas para Río Grande
+                initialLat = -54.510539136774526;
+                initialLng = -67.19172620825704;
             } else {
-                // Coordenadas por defecto Ushuaia
+                // Coordenadas por defecto tolhuin
                 initialLat = -54.8019;
                 initialLng = -68.3029;
             }
