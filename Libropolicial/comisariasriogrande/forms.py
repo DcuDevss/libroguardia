@@ -8,7 +8,7 @@ ServiciosEmergenciaRG, DetalleServicioEmergenciaRG, DetalleInstitucionHospitalar
 DetalleDependenciaMunicipalRG, DetalleDependenciaProvincialRG, DetalleDependenciaSecundariaRG, DetalleInstitucionFederal, SolicitanteCodigoRG)
 
 
-# Formulario para DetalleDependenciaSecundariaRG
+# Formulario para DetalleDependenciaSecundariaRG se agrego nuevo
 class DetalleDependenciaSecundariaRGForm(forms.ModelForm):
     dependencia_secundariaRG = forms.ModelChoiceField(
         queryset=DependenciasSecundariasRG.objects.filter(activo=True),  # Solo dependencias secundarias activas
