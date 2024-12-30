@@ -1,0 +1,65 @@
+<table id="comisarias-table" class="min-w-full bg-gray-600 border dark:text-white border-gray-600 mt-4 dark:bg-gray-800 dark:border-gray-700">
+    <thead class="bg-slate-800 text-white dark:bg-slate-900 dark:text-gray-200">
+        <tr>
+            <th class="px-2 py-2">Cuarto</th>
+            <th class="px-2 py-2">Fecha y hora del código</th>
+            <th class="px-2 py-2">Código</th>
+            <th class="px-2 py-2">Lugar Código</th>
+            <th class="px-2 py-2">Descripción</th>
+            <th class="px-2 py-2">Estado del código</th>
+            <th class="px-2 py-2">Creado por Usuario</th>
+            <th class="px-2 py-2">Primer Registro</th>
+            <th class="px-2 py-2">Editado por Usuario</th>
+            <th class="px-2 py-2">Ultima Actualización</th>
+            <th class="px-2 py-2">Acciones</th>
+            <th class="px-2 py-2">Audio</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in records %}
+        <tr>
+            <td>{{ record.cuarto.cuarto }}</td>
+            <td>{{ record.fecha_hora|date:"d/m/Y H:i:s" }}</td>
+            <td>{{ record.codigo|default_if_none:'' }}</td>
+            <td>{{ record.lugar_codigo|default_if_none:'' }}</td>
+            <td>
+                <button @click="descripcion = '{{ record.descripcion|escapejs }}'; showModal = true" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Ver</button>
+            </td>
+            <td>{{ record.estado|yesno:"Activo,Finalizado" }}</td>
+            <td>{{ record.created_by.get_full_name|default_if_none:'' }}</td>
+            <td>{{ record.created_at|date:"d/m/Y H:i:s" }}</td>
+            <td>{{ record.updated_by.get_full_name|default:record.updated_by.username }}</td>
+            <td>{{ record.updated_at|date:"d/m/Y H:i:s" }}</td>
+            <td>
+                <a href="{% url 'comisaria_primera_edit' record.pk %}" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Editar</a>
+                <button @click.prevent="recordIdToSign = {{ record.pk }}; showConfirmModal = true" class="bg-purple-500 text-white py-1 px-4 rounded hover:bg-purple-700 block text-center">Firmar</button>
+                <a href="{% url 'comisaria_primera_detail' record.pk %}" class="bg-blue-500 text-white py-1 px-4 rounded hover:bg-blue-700 block text-center">Full</a>
+            </td>
+            <td>
+                <!-- Botón para leer en voz alta -->
+                <button class="bg-pink-500 text-white py-1 px-4 rounded hover:bg-pink-700 block text-center" onclick="readRecord('{{ record.cuarto.cuarto }}', '{{ record.fecha_hora|date:"d/m/Y H:i:s" }}', '{{ record.codigo.codigo }}', '{{ record.codigo.nombre_codigo }}', '{{ record.lugar_codigo }}', '{{ record.descripcion|escapejs }}', '{{ record.estado|yesno:"Activo,Finalizado" }}', '{{ record.created_by.get_full_name }}', '{{ record.updated_by.get_full_name }}')">
+                    Audio
+                </button>
+                <!-- Botón para detener el audio -->
+                <button class="bg-red-500 text-white py-1 px-4 rounded hover:bg-red-700 block text-center" onclick="stopAudio()">Detener</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div class="pagination">
+    <span class="step-links">
+        {% if records.has_previous %}
+            <a href="?page=1" hx-get="?page=1">&laquo; Primero</a>
+            <a href="?page={{ records.previous_page_number }}" hx-get="?page={{ records.previous_page_number }}">Anterior</a>
+        {% endif %}
+
+        <span class="current">Página {{ records.number }} de {{ records.paginator.num_pages }}.</span>
+
+        {% if records.has_next %}
+            <a href="?page={{ records.next_page_number }}" hx-get="?page={{ records.next_page_number }}">Siguiente</a>
+            <a href="?page={{ records.paginator.num_pages }}" hx-get="?page={{ records.paginator.num_pages }}">Último &raquo;</a>
+        {% endif %}
+    </span>
+</div>
