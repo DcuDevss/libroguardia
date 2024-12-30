@@ -27,7 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 #el setting esta para desarrollo nuevos cambios
-# ALLOWED_HOSTS = ['192.168.1.114', 'localhost', '127.0.0.1']
+#ALLOWED_HOSTS = ['10.0.200.73', 'localhost', '127.0.0.1']
 
 # Definición de la aplicación
 
@@ -148,7 +148,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internacionalización
+# Internacionalización nuevo
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = 'es-ar'  # Código de idioma para español de Argentina
@@ -164,14 +164,15 @@ USE_L10N = True  # Habilita la localización
 
 STATIC_URL = '/static/'  # URL para archivos estáticos
 STATICFILES_DIRS = [
-    BASE_DIR / "static",  # Directorio de archivos estáticos
+    BASE_DIR / "static",  # Directorio de archivos estáticos xx
 ]
 
-# url de firma https://firmar.gob.ar/firmador/#/
+# url de firma https://firmar.gob.ar/firmador/#/x
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 import os
 
-# ... otras configuraciones
+# ... otras configuracionesxx
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

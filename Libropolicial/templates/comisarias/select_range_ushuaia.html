@@ -1,0 +1,314 @@
+{% extends "base.html" %} 
+{% block title %}Generar PDFs Ushuaia{% endblock %} 
+{%block content %}
+<link
+  rel="stylesheet"
+  href="https://cdn.datatables.net/2.1.3/css/dataTables.dataTables.css"
+/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/2.1.3/js/dataTables.js"></script>
+
+<style>
+  h1 {
+    font-family: "Roboto Slab", serif;
+  }
+  .dt-layout-row {
+    font-size: 13px;
+  }
+  #dt-search-0 {
+    border-radius: 6px;
+    min-width: 300px;
+  }
+  #dt-length-0 {
+    border-radius: 6px;
+  }
+  /* cambio de posicion buscador y selector de registros */
+  .dt-layout-row {
+    display: flex;
+  }
+  div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {
+    order: 1;
+    justify-content: flex-start;
+    margin-left: 0;
+  }
+  div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-start {
+    order: 2;
+    justify-content: flex-end;
+    margin-right: 0;
+  }
+
+  /* Estilos para el modo oscuro */
+  .dark .dataTables_wrapper {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+  }
+
+  .dark .dataTables_wrapper .dataTables_paginate .paginate_button {
+    background-color: #444;
+    color: #e0e0e0;
+  }
+
+  .dark .dataTables_wrapper .dataTables_filter input {
+    background-color: #333;
+    color: #e0e0e0;
+    border: 1px solid #555;
+  }
+
+  .dark .dataTables_wrapper .dataTables_info {
+    color: #e0e0e0;
+  }
+
+  .dark .dataTables_wrapper .dataTables_header {
+    background-color: #333;
+    color: #e0e0e0;
+  }
+
+  .dark .dataTables_wrapper .dataTables_body {
+    background-color: #2d2d2d;
+  }
+
+  .dark #myTablePDF thead th {
+    background-color: #111 !important;
+    color: white !important;
+  }
+
+  .dark #myTablePDF tbody td {
+    background-color: #333 !important;
+    color: #e0e0e0 !important;
+  }
+
+  #myTablePDF tbody tr:hover {
+    background-color: transparent; /* Elimina el color de fondo en hover */
+  }
+
+  /* Bordes de la tabla en modo oscuro */
+  .carajo {
+    border: 1px solid #555 !important;
+  }
+
+  /* Efecto hover en modo oscuro */
+  .dark .dataTables_wrapper tbody tr:hover {
+    background-color: #3b82f6; /* Equivalente a blue-500 */
+  }
+  /* Estilo general para inputs de fecha y hora */
+  input[type="date"],
+  input[type="time"] {
+    background-color: var(--bg-color, white); /* Fondo dinámico según tema */
+    color: var(--text-color, black); /* Texto dinámico según tema */
+    border: 1px solid var(--border-color, #ccc);
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 16px;
+    appearance: none; /* Deshabilita el estilo nativo */
+    -webkit-appearance: none; /* Para navegadores basados en Webkit */
+    position: relative;
+  }
+
+  /* Ajustar iconos para campos nativos */
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: var(--icon-filter, none);
+    opacity: 2; /* Asegurar que el ícono sea visible */
+    background-color: transparent;
+    cursor: pointer;
+  }
+
+  /* Modo claro */
+  body {
+    --bg-color: white;
+    --text-color: black;
+    --border-color: #ccc;
+    --icon-filter: none;
+  }
+
+  /* Modo oscuro */
+  body.dark {
+    --bg-color: #1e293b; /* Fondo oscuro */
+    --text-color: #cbd5e1; /* Texto claro */
+    --border-color: #475569; /* Borde claro */
+    --icon-filter: invert(1); /* Invertir iconos para que sean claros */
+  }
+  input[type="date"]::-webkit-calendar-picker-indicator:focus,
+  input[type="time"]::-webkit-calendar-picker-indicator:focus {
+    outline: none;
+  }
+</style>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center dark">
+  <div
+    style="
+      width: 400px;
+      margin-top: 50px;
+      margin-left: auto;
+      margin-right: auto;
+    "
+    class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg"
+  >
+    <h1
+      class="text-lg font-bold mb-4 text-center text-gray-700 dark:text-gray-300"
+    >
+      Generar PDF por Rango de Fecha y Hora
+    </h1>
+    <form
+      method="get"
+      action="{% url 'generate_pdf_custom_range_view_ush' %}"
+      target="_blank"
+    >
+      <div class="bloques grid grid-cols-1 gap-y-4">
+        <!-- Seleccionar Comisaría -->
+        <div class="w-full">
+          <label
+            for="comisaria"
+            class="py-1 block text-gray-700 dark:text-gray-300"
+            >Comisaría</label
+          >
+          <select
+            id="comisaria"
+            name="comisaria"
+            required
+            class="bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-200 border rounded-lg p-3 w-full"
+          >
+            <option value="" disabled selected>Seleccione una comisaría</option>
+            <option value="primera">Primera</option>
+            <option value="segunda">Segunda</option>
+            <option value="tercera">Tercera</option>
+            <option value="cuarta">Cuarta</option>
+            <option value="quinta">Quinta</option>
+          </select>
+        </div>
+        <!-- Fecha y Hora de Inicio -->
+        <div class="w-full">
+          <label
+            for="start_date"
+            class="py-1 block text-gray-700 dark:text-gray-300"
+            >Fecha de Inicio</label
+          >
+          <input
+            type="date"
+            id="start_date"
+            name="start_date"
+            required
+            class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3"
+          />
+        </div>
+        <div class="w-full">
+          <label
+            for="start_time"
+            class="py-1 block text-gray-700 dark:text-gray-300"
+            >Hora de Inicio</label
+          >
+          <input
+            type="time"
+            id="start_time"
+            name="start_time"
+            required
+            class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3"
+          />
+        </div>
+        <!-- Fecha y Hora de Fin -->
+        <div class="w-full">
+          <label
+            for="end_date"
+            class="py-1 block text-gray-700 dark:text-gray-300"
+            >Fecha de Fin</label
+          >
+          <input
+            type="date"
+            id="end_date"
+            name="end_date"
+            required
+            class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3"
+          />
+        </div>
+        <div class="w-full">
+          <label
+            for="end_time"
+            class="py-1 block text-gray-700 dark:text-gray-300"
+            >Hora de Fin</label
+          >
+          <input
+            type="time"
+            id="end_time"
+            name="end_time"
+            required
+            class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3"
+          />
+        </div>
+        <!-- Botón -->
+        <div>
+          <button
+            type="submit"
+            class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-700 w-full"
+          >
+            Generar PDF
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</body>
+
+<!-- DATATABLE CONFIG -->
+<script>
+  $(document).ready(function () {
+    // Añadimos un parser personalizado para la fecha en formato d/m/Y H:i:s
+    $.fn.dataTable.ext.type.order["date-eu-pre"] = function (date) {
+      if (!date) {
+        return 0;
+      }
+      // Extraemos día, mes, año, hora, minuto y segundo del formato d/m/Y H:i:s
+      const parts = date.split(/[\s/:]/);
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1; // Mes en JavaScript es 0-based
+      const year = parseInt(parts[2], 10);
+      const hour = parseInt(parts[3], 10);
+      const minute = parseInt(parts[4], 10);
+      const second = parseInt(parts[5], 10);
+      return new Date(year, month, day, hour, minute, second).getTime();
+    };
+
+    $("#myTablePDF").DataTable({
+      language: {
+        sProcessing: "Procesando...",
+        sLengthMenu: "Mostrar _MENU_ registros",
+        sZeroRecords: "No se encontraron resultados",
+        sInfo:
+          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+        sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
+        sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
+        sSearch: "Buscar:",
+        sLoadingRecords: "Cargando...",
+        oPaginate: {
+          sFirst: "Primero",
+          sLast: "Último",
+          sNext: "Siguiente",
+          sPrevious: "Anterior",
+        },
+      },
+      order: [[2, "desc"]], // Orden descendente por la columna "Fecha de Subida"
+      columnDefs: [
+        {
+          type: "date-eu",
+          targets: 2, // Aplica el parser de fecha personalizado a la tercera columna (Fecha de Subida)
+        },
+      ],
+      fixedHeader: true,
+    });
+
+    // Maneja la selección y deselección de filas
+    $("#myTablePDF tbody").on("click", "tr", function () {
+      if ($(this).hasClass("selected")) {
+        $(this).removeClass("selected");
+      } else {
+        $("#myTablePDF tbody tr.selected").removeClass("selected");
+        $(this).addClass("selected");
+      }
+    });
+
+    // Aplica estilos de modo oscuro si está activo
+    const isDarkMode = document.documentElement.classList.contains("dark");
+    if (isDarkMode) {
+      $(".dataTables_wrapper").addClass("dark");
+    }
+  });
+</script>
+{% endblock %}

@@ -3,7 +3,7 @@ from .models import CodigoPolicialUSH, CodigosSecundarios, CuartoGuardiaUSH
 from .models import CodigoPolicialRG, CodigosSecundariosRG, CuartoGuardiaRG
 
 # Register your models here.
-# Admin para CuartoGuardiaUSH con opción de activar/desactivar
+# Admin para CuartoGuardiaUSH con opción de activar/desactivar-
 @admin.register(CuartoGuardiaUSH)
 class CuartoGuardiaUSHAdmin(admin.ModelAdmin):
     list_display = ('cuarto', 'activo')  # Mostrar si está activo o no
