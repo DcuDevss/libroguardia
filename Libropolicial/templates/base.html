@@ -314,12 +314,15 @@
                 </div>
                 {% endif %}
             </div>
+            
             <!-- Puedes agregar aquí el nombre del usuario autenticado -->
             {% if user.is_authenticated %}
             <div class="">
                 <ul class="user-session flex space-x-4 items-center">
                     <li class="text-white font-semibold">
-                        {{ user.get_full_name|default:user.username }}
+                        <a href="{% url 'perfil_usuario' %}" class="hover:underline">
+                            {{ user.get_full_name|default:user.username }}
+                        </a>
                     </li>
                     <form method="post" action="{% url 'logout' %}">
                         {% csrf_token %}
@@ -331,6 +334,7 @@
                 </ul>
             </div>
             {% endif %}
+            
         </nav>
 
         <!-- Dropdown solo visible para superusuarios -->
