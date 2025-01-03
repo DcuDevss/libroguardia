@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # ADVERTENCIA DE SEGURIDAD: mantén la clave secreta utilizada en producción en secreto.
-#SECRET_KEY = os.getenv('SECRET_KEY')
+#SECRET_KEY = os.getenv('SECRET_KEY') nnnn
 
 
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'your-default-secret-key')
@@ -22,12 +22,12 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'your-default-secret-key')
 # Ruta absoluta a la imagen
 #IMAGE_PATH = os.path.join(BASE_DIR, 'comisarias', 'static', 'comisarias', 'images', 'ESCUDO POLICIA.jpeg')//
 # ADVERTENCIA DE SEGURIDAD: no ejecutes con debug activado en producción.
-DEBUG = False
+DEBUG = True
 
 
-#ALLOWED_HOSTS = []
+ALLOWED_HOSTS = []
 #el setting esta para desarrollo nuevos cambios
-ALLOWED_HOSTS = ['10.0.200.73', 'localhost', '127.0.0.1']
+#ALLOWED_HOSTS = ['10.0.200.73', 'localhost', '127.0.0.1']
 
 # Definición de la aplicación
 
@@ -123,8 +123,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # Utiliza el backend MySQL
         'NAME': 'libro',  # Nombre de la base de datos
-        'USER': 'libropolicial',  # Usuario de la base de datos vamos
-        'PASSWORD': 'Dcu911+-',  # Contraseña de la base de datos
+        'USER': 'root',  # Usuario de la base de datos vamos
+        'PASSWORD': '',  # Contraseña de la base de datos
         'HOST': 'localhost',  # Host de la base de datos
         'PORT': '3306',  # Puerto de la base de datos
     }
@@ -164,15 +164,15 @@ USE_L10N = True  # Habilita la localización
 
 STATIC_URL = '/static/'  # URL para archivos estáticos
 STATICFILES_DIRS = [
-    BASE_DIR / "static",  # Directorio de archivos estáticos
+    BASE_DIR / "static",  # Directorio de archivos estáticos xx
 ]
 
-# url de firma https://firmar.gob.ar/firmador/#/
+# url de firma https://firmar.gob.ar/firmador/#/x
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 import os
 
-# ... otras configuraciones
+# ... otras configuracionesxx
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

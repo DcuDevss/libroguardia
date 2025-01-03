@@ -1,4 +1,5 @@
 from django.urls import path
+from . import views
 from .views import (
     # Funciones para generar PDFs y firmas
     generate_comisaria_primera_pdf_view, generate_comisaria_primera_pdf_download,
@@ -32,7 +33,13 @@ from .views import (
 
      #softdelete
     eliminar_comisaria_primera, eliminar_comisaria_segunda, eliminar_comisaria_tercera, eliminar_comisaria_cuarta,
-    eliminar_comisaria_quinta
+    eliminar_comisaria_quinta,
+
+    
+    #vista para generar pdf con rango nespecifico
+    generate_pdf_custom_range_view_ush,
+    #ruta para renderizar la vista
+    select_range_view_ush
 )
 
 urlpatterns = [
@@ -98,6 +105,11 @@ urlpatterns = [
     path('subir-pdf/', subir_pdf, name='subir_pdf'),
     path('ver-pdfs/', ver_pdfs, name='ver_pdfs'),  # Nueva URL para ver los PDFs
     path('mostrar-pdf/<int:pdf_id>/', mostrar_pdf, name='mostrar_pdf'),
+    path('media/<str:folder_name>/', views.serve_pdf, name='serve_pdf'),
+    path('generar-pdf-rango/', generate_pdf_custom_range_view_ush, name='generate_pdf_custom_range_view_ush'),
+    path('seleccionar-rango-ushuaia/', select_range_view_ush, name='select_range_view_ush'),
+
+    
    
 
     # Completas

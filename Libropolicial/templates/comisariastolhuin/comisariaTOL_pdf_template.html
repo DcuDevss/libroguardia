@@ -65,8 +65,8 @@
             
                 <div colspan="3" style="text-align: center; font-size: 16px; font-weight: bold;">
                     <span style="color: blue;">CÓDIGO:</span>
-                    {% if registro.codigo %}
-                        <span style="color: red;">{{ registro.codigo.codigo }} - {{ registro.codigo.nombre_codigo|default:"S/N" }}</span>
+                    {% if registro.codigoTOL %}
+                        <span style="color: red;">{{ registro.codigoTOL.codigoTOL }} - {{ registro.codigoTOL.nombre_codigo|default:"S/N" }}</span>
                     {% else %}
                         <span style="color: red;">S/N</span>
                     {% endif %}
@@ -79,14 +79,14 @@
             </tr>
             <tr>
                 <td><strong>Códigos Secundarios:</strong> 
-                    {% if registro.codigos_secundarios.all %}
-                        {% for codigo in registro.codigos_secundarios.all %}
-                            {{ codigo.codigo }}{% if not forloop.last %}, {% endif %}
+                    {% if registro.codigos_secundariosTOL.all %}
+                        {% for codigoTOL in registro.codigos_secundariosTOL.all %}
+                            {{ codigoTOL.codigoTOL }}{% if not forloop.last %}, {% endif %}
                         {% endfor %}
                     {% else %}
                         S/N
                     {% endif %}
-                <td><strong>Cuarto de Guardia:</strong> {% if registro.cuarto %}{{ registro.cuarto.cuarto }}{% else %}N/A{% endif %}</td>
+                <td><strong>Cuarto de Guardia:</strong> {% if registro.cuartoTOL %}{{ registro.cuartoTOL.cuartoTOL }}{% else %}N/A{% endif %}</td>
                 <td><strong>Móvil Patrulla:</strong> {% if registro.movil_patrulla %}{{ registro.movil_patrulla }}{% else %}N/A{% endif %}</td>
             </tr>
             <tr>
@@ -101,14 +101,14 @@
 <table>
     <tr>
         <td><strong>Emergencia Bomberil:</strong></td>
-        {% if registro.detalles_servicio_emergencia.all %}
+        {% if registro.detalles_servicio_emergenciaTOL.all %}
             <td colspan="2">
                 <table>
-                    {% for detalle in registro.detalles_servicio_emergencia.all %}
+                    {% for detalle in registro.detalles_servicio_emergenciaTOL.all %}
                     <tr>
-                        <td><strong>Servicio:</strong> {{ detalle.servicio_emergencia.nombre|default:"S/N" }}</td>
-                        <td><strong>Móvil:</strong> {{ detalle.numero_movil_bomberos|default:"S/N" }}</td>
-                        <td><strong>A Cargo:</strong> {{ detalle.nombre_a_cargo_bomberos|default:"S/N" }}</td>
+                        <td><strong>Servicio:</strong> {{ detalle.servicio_emergenciaTOL.nombre|default:"S/N" }}</td>
+                        <td><strong>Móvil:</strong> {{ detalle.numero_movil_bomberosTOL|default:"S/N" }}</td>
+                        <td><strong>A Cargo:</strong> {{ detalle.nombre_a_cargo_bomberosTOL|default:"S/N" }}</td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -123,14 +123,14 @@
 <table>
     <tr>
         <td><strong>Instituciones Hospitalarias:</strong></td>
-        {% if registro.detalles_institucion_hospitalaria.all %}
+        {% if registro.detalles_institucion_hospitalariaTOL.all %}
             <td colspan="2">
                 <table>
-                    {% for detalle in registro.detalles_institucion_hospitalaria.all %}
+                    {% for detalle in registro.detalles_institucion_hospitalariaTOL.all %}
                     <tr>
-                        <td><strong>Institución:</strong> {{ detalle.institucion_hospitalaria.nombre|default:"S/N" }}</td>
-                        <td><strong>Móvil:</strong> {{ detalle.numero_movil_hospital|default:"S/N" }}</td>
-                        <td><strong>A Cargo:</strong> {{ detalle.nombre_a_cargo_hospital|default:"S/N" }}</td>
+                        <td><strong>Institución:</strong> {{ detalle.institucion_hospitalariaTOL.nombre|default:"S/N" }}</td>
+                        <td><strong>Móvil:</strong> {{ detalle.numero_movil_hospitalTOL|default:"S/N" }}</td>
+                        <td><strong>A Cargo:</strong> {{ detalle.nombre_a_cargo_hospitalTOL|default:"S/N" }}</td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -145,14 +145,14 @@
 <table>
     <tr>
         <td><strong>Instituciones Municipales:</strong></td>
-        {% if registro.detalles_dependencia_municipal.all %}
+        {% if registro.detalles_dependencia_municipalTOL.all %}
             <td colspan="2">
                 <table>
-                    {% for detalle in registro.detalles_dependencia_municipal.all %}
+                    {% for detalle in registro.detalles_dependencia_municipalTOL.all %}
                     <tr>
-                        <td><strong>Institucion:</strong> {{ detalle.dependencia_municipal.nombre|default:"S/N" }}</td>
-                        <td><strong>Móvil:</strong> {{ detalle.numero_movil_municipal|default:"S/N" }}</td>
-                        <td><strong>A Cargo:</strong> {{ detalle.nombre_a_cargo_municipal|default:"S/N" }}</td>
+                        <td><strong>Institucion:</strong> {{ detalle.dependencia_municipalTOL.nombre|default:"S/N" }}</td>
+                        <td><strong>Móvil:</strong> {{ detalle.numero_movil_municipalTOL|default:"S/N" }}</td>
+                        <td><strong>A Cargo:</strong> {{ detalle.nombre_a_cargo_municipalTOL|default:"S/N" }}</td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -167,14 +167,14 @@
 <table>
     <tr>
         <td><strong>Instituciones Provinciales:</strong></td>
-        {% if registro.detalles_dependencia_provincial.all %}
+        {% if registro.detalles_dependencia_provincialTOL.all %}
             <td colspan="2">
                 <table>
-                    {% for detalle in registro.detalles_dependencia_provincial.all %}
+                    {% for detalle in registro.detalles_dependencia_provincialTOL.all %}
                     <tr>
-                        <td><strong>Institucion:</strong> {{ detalle.dependencia_provincial.nombre|default:"S/N" }}</td>
-                        <td><strong>Móvil:</strong> {{ detalle.numero_movil_provincial|default:"S/N" }}</td>
-                        <td><strong>A Cargo:</strong> {{ detalle.nombre_a_cargo_provincial|default:"S/N" }}</td>
+                        <td><strong>Institucion:</strong> {{ detalle.dependencia_provincialTOL.nombre|default:"S/N" }}</td>
+                        <td><strong>Móvil:</strong> {{ detalle.numero_movil_provincialTOL|default:"S/N" }}</td>
+                        <td><strong>A Cargo:</strong> {{ detalle.nombre_a_cargo_provincialTOL|default:"S/N" }}</td>
                     </tr>
                     {% endfor %}
                 </table>
@@ -213,14 +213,14 @@
 <table>
     <tr>
         <td><strong>Dependencias Secundarias:</strong></td>
-        {% if registro.detalles_dependencia_secundaria.all %}
+        {% if registro.detalles_dependencia_secundariaTOL.all %}
             <td colspan="2">
                 <table>
-                    {% for detalle in registro.detalles_dependencia_secundaria.all %}
+                    {% for detalle in registro.detalles_dependencia_secundariaTOL.all %}
                     <tr>
-                        <td><strong>Dependencia:</strong> {{ detalle.dependencia_secundaria.dependencia|default:"S/N" }}</td>
-                        <td><strong>Móvil:</strong> {{ detalle.numero_movil_secundaria|default:"S/N" }}</td>
-                        <td><strong>A Cargo:</strong> {{ detalle.nombre_a_cargo_secundaria|default:"S/N" }}</td>
+                        <td><strong>Dependencia:</strong> {{ detalle.dependencia_secundariaTOL.dependenciaTOL|default:"S/N" }}</td>
+                        <td><strong>Móvil:</strong> {{ detalle.numero_movil_secundariaTOL|default:"S/N" }}</td>
+                        <td><strong>A Cargo:</strong> {{ detalle.nombre_a_cargo_secundariaTOL|default:"S/N" }}</td>
                     </tr>
                     {% endfor %}
                 </table>

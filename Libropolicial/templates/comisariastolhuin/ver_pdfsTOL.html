@@ -92,7 +92,7 @@
 </style>
 
 <div class="max-w-7xl mx-auto px-4 pb-4 pt-2 rounded-lg dark:text-white">
-    <h1 class="text-2xl font-bold mb-4 text-center">Lista de PDFs Subidos en Rio Grande</h1>
+    <h1 class="text-2xl font-bold mb-4 text-center">Lista de PDFs Subidos Tolhuin</h1>
     <div class="overflow-x-auto">
         <table id="myTablePDF" class="display carajo w-full text-[13px] rounded-lg">
             <thead class="bg-[#111] text-white text-[16px] rounded-lg">
@@ -106,11 +106,11 @@
             <tbody>
                 {% for pdf in pdfs %}
                 <tr>
-                    <td class="px-4 py-2">{{ pdf.file.name|cut:"partespdfRG/" }}</td>
+                    <td class="px-4 py-2">{{ pdf.file.name|cut:"partespdfTOL/" }}</td>
                     <td class="px-4 py-2">{{ pdf.uploaded_by.get_full_name }}</td>
                     <td class="px-4 py-2">{{ pdf.uploaded_at|date:"d/m/Y H:i:s" }}</td>
                     <td class="px-4 py-2">
-                        <a href="{% url 'mostrar_pdfRG' pdf.id %}" target="_blank" class="bg-[#00b3b3] text-white px-2 py-1 rounded hover:bg-gray-700">Ver</a>
+                        <a href="{% url 'mostrar_pdfTOL' pdf.id %}" target="_blank" class="bg-[#00b3b3] text-white px-2 py-1 rounded hover:bg-gray-700">Ver</a>
                     </td>
                 </tr>
                 {% endfor %}

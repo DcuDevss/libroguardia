@@ -2658,5 +2658,129 @@ def generate_comisaria_quinta_pdf_download_previous_day(request):
     return generate_pdf_for_specific_date(request, ComisariaQuinta, previous_day, filename, add_signature=add_signature)
 
 
-#--------------------FUNCION PARA MAPEAR CADA CODIGO todo se coloco en temporales comisarias------------------------------------------------
+#--------------------FUNCION PARA VER LOS PARTES------------------------------------------------
 
+def serve_pdf(request, folder_name):
+    # Define la ruta base
+    base_path = os.path.join(settings.MEDIA_ROOT, folder_name)
+
+    # Verifica si la carpeta existe
+    if not os.path.exists(base_path):
+        return render(request, '404.html', status=404)
+
+    # Construye una lista de archivos con datos enriquecidos nuevos cambios
+    files = []
+    for file_name in os.listdir(base_path):
+        file_path = os.path.join(base_path, file_name)
+        if os.path.isfile(file_path):
+            files.append({
+                'name': file_name,
+                'modified_at': datetime.fromtimestamp(os.path.getmtime(file_path)).strftime('%d/%m/%Y %H:%M:%S'),
+                'url': f"{settings.MEDIA_URL}{folder_name}/{file_name}",
+            })
+
+    # Renderiza la plantilla con los datos
+    return render(request, 'comisarias/pdf_list.html', {'folder_name': folder_name, 'files': files})
+
+#-----------FUNCION PARA GENERAR LA VISTA QUE MANEJA EL RANGO Y HORARIO SELECCIONADO----------#
+
+def generate_pdf_for_date_and_range(request, comisaria_model, start_time, end_time, filename, comisaria_title, add_signature=False ):
+    """
+    Genera un PDF basado en un rango de fechas y horas especificado para una comisaría específica.
+    """
+    # Filtrar los registros en el rango horario
+    registros = comisaria_model.objects.filter(
+        models.Q(created_at__range=(start_time, end_time)) |
+        models.Q(updated_at__range=(start_time, end_time)),
+        activo=True  # Filtrar solo registros activos
+    )
+
+    # Cargar la plantilla HTML
+    template = get_template('comisarias/comisarias_pdf_template.html')  # Ajustar ruta para la nueva app
+
+    # Convertir la imagen a base64
+    escudo_path = os.path.join(settings.BASE_DIR, 'comisarias', 'static', 'comisarias', 'images', 'ESCUDO POLICIA.jpeg')
+    with open(escudo_path, "rb") as img_file:
+        escudo_base64 = base64.b64encode(img_file.read()).decode('utf-8')
+
+    # Preparar el contexto para la plantilla
+    context = {
+        'registros': registros,
+        'comisaria_name': comisaria_title,
+        'add_signature': add_signature,
+        'username': request.user.get_full_name(),
+        'start_time': start_time,
+        'end_time': end_time,
+        'escudo_base64': escudo_base64,
+    }
+
+    # Renderizar la plantilla HTML
+    html = template.render(context)
+
+    # Crear un buffer en memoria para el PDF
+    response = BytesIO()
+
+    # Generar el PDF a partir del HTML renderizado
+    pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), response)
+
+    # Verificar si la generación del PDF fue exitosa
+    if not pdf.err:
+        return HttpResponse(
+            response.getvalue(),
+            content_type='application/pdf',
+            headers={'Content-Disposition': f'inline; filename="{filename}"'}
+        )
+    else:
+        return HttpResponse('Error al generar el PDF', status=500)
+    
+#-----------FUNCION PARA GENERAR LA VISTA QUE MANEJA EL RANGO Y HORARIO SELECCIONADO----------#
+
+def generate_pdf_custom_range_view_ush(request):
+    # Obtener los valores del formulario
+    start_date = request.GET.get('start_date')  # Formato: 'YYYY-MM-DD'
+    start_time = request.GET.get('start_time')  # Formato: 'HH:MM'
+    end_date = request.GET.get('end_date')      # Formato: 'YYYY-MM-DD'
+    end_time = request.GET.get('end_time')      # Formato: 'HH:MM'
+    comisaria_name = request.GET.get('comisaria')  # Nombre de la comisaría seleccionada
+
+    # Mapear el nombre de la comisaría al modelo
+    comisaria_map = {
+        'primera': ComisariaPrimera,
+        'segunda': ComisariaSegunda,
+        'tercera': ComisariaTercera,
+        'cuarta': ComisariaCuarta,
+        'quinta': ComisariaQuinta,
+    }
+    
+    # Mapear el modelo y el nombre de la comisaría 
+
+    comisaria_title_map = {
+    'primera': 'Comisaria Primera',
+    'segunda': 'Comisaria Segunda',
+    'tercera': 'Comisaria Tercera',
+    'cuarta': 'Comisaria Cuarta',
+    'quinta': 'Comisaria Quinta',
+    }
+
+    comisaria_model = comisaria_map.get(comisaria_name)
+    comisaria_title = comisaria_title_map.get(comisaria_name)
+
+    if not comisaria_title:
+        return HttpResponse('Comisaría no válida', status=400)
+
+    # Combinar fecha y hora en objetos datetime
+    try:
+        start_datetime = datetime.strptime(f"{start_date} {start_time}", '%Y-%m-%d %H:%M')
+        end_datetime = datetime.strptime(f"{end_date} {end_time}", '%Y-%m-%d %H:%M')
+    except (ValueError, TypeError):
+        return HttpResponse('Error en el formato de fecha/hora', status=400)
+ 
+
+    # Usar el nombre completo de la comisaría en el título del archivo
+    filename = f"libro-diario-{comisaria_title.replace(' ', '_')}-{start_datetime.strftime('%Y-%m-%d_%H-%M')}_to_{end_datetime.strftime('%Y-%m-%d_%H-%M')}.pdf"
+    return generate_pdf_for_date_and_range(request, comisaria_model, start_datetime, end_datetime, filename, comisaria_title=comisaria_title)
+    
+#----------FUNCION PARA RENDERIZAR LA VISTA----------
+def select_range_view_ush(request):
+    # Renderizar el formulario para seleccionar el rango
+    return render(request, 'comisarias/select_range_ushuaia.html')

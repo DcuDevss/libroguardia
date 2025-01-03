@@ -1,0 +1,348 @@
+<style>
+    html,
+    body {
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+    }
+
+    /* fuente roboto */
+    h1 {
+        font-family: "Roboto Slab", serif;
+    }
+
+    /*  */
+    .bg-red-500 {
+        background-color: #f56565;
+    }
+
+    .text-white {
+        color: #ffffff;
+    }
+
+    /* Estilos para el buscador y margen inferior del datatable */
+    .dataTables_filter input {
+        width: 300px;
+        margin-bottom: 5px;
+    }
+
+    /* Animación de parpadeo en rojo tenue */
+    @keyframes blink {
+        50% {
+            background-color: #fed7d7;
+            /* bg-red-200 */
+            color: black;
+            /* Texto en color oscuro */
+        }
+    }
+
+    .blink-red {
+        animation: blink 1s infinite;
+        background-color: #f56565;
+        /* bg-red-500 */
+        color: black;
+        /* Texto en color oscuro */
+    }
+
+    .descripcion-container {
+        margin-right: 28px;
+        !important
+    }
+
+    .descripcion-container span {
+        margin-right: 28px;
+        !important
+    }
+    /*  */
+    .bg-red-500 {
+        background-color: #f56565;
+    }
+
+    .text-white {
+        color: #ffffff;
+    }
+
+    /* Estilos para el buscador y margen inferior */
+    .dataTables_filter input {
+        width: 300px;
+        margin-bottom: 5px;
+    }
+
+    /* Animación de parpadeo en rojo tenue */
+    @keyframes blink {
+        50% {
+            background-color: #fed7d7;
+            /* bg-red-200 */
+            color: black;
+            /* Texto en color oscuro */
+        }
+    }
+
+    .blink-red {
+        animation: blink 1s infinite;
+        background-color: #f56565;
+        /* bg-red-500 */
+        color: black;
+        /* Texto en color oscuro */
+    }
+
+    /* Estilos personalizados para Leaflet en modo oscuro */
+    .dark .leaflet-control-geocoder-form input {
+        color: #000000;
+        /* Color de texto negro */
+        background-color: #ffffff;
+        /* Fondo blanco */
+    }
+
+    /* Asegurarse de que el texto del popup también sea visible en modo oscuro */
+    .dark .leaflet-popup-content {
+        color: #ffffff;
+        /* Color de texto blanco */
+    }
+
+    .dark .leaflet-control-geocoder-alternatives a {
+        color: #ffffff;
+        /* Color de texto blanco para las alternativas del geocoder */
+    }
+
+    .dark .leaflet-control-geocoder-button {
+        background-color: #1a202c;
+        /* Fondo acorde al tema oscuro */
+        color: #ffffff;
+        /* Color del ícono del botón */
+    }
+
+    .dark .leaflet-control-geocoder-icon {
+        filter: invert(1);
+        /* Invertir el color del ícono en modo oscuro */
+    }
+
+    .dark .leaflet-control-geocoder-icon {
+        filter: invert(1);
+        /* Invertir el color del ícono en modo oscuro */
+    /* detalle de codigo */
+    /* lugar del codigo */
+    #qwe {
+        line-height: 25px;
+    }
+
+    /* descripcion margin right */
+    .desc-detail {
+        padding-right: 38px;
+    }
+
+    /* rsponsivo de columnas de detallesde codigo */
+    @media (max-width: 640px) {
+        .cont {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .first {
+            grid-column: span 2;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    }
+
+    @media (max-width: 440px) {
+        .cont {
+            display: flex;
+            flex-direction: column;
+        }
+    }
+
+    /* DESBORDE DE TEXTO DE MODAL-DESCRIPCION */
+    .descripcion-container * {
+        margin-right: 0 !important;
+    }
+
+    /* COLOR TEXT MODAL DESCRIPCION */
+    html.dark .descripcion-container * {
+        color: rgba(245, 245, 245, 0.96) !important;
+        background-color: inherit !important;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+    /* responsivo menu y footer */
+@media (max-width: 640px) {
+    .menu-header {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    nav {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    nav button {
+        margin-left: 15px;
+    }
+
+    footer div {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 600px) {
+    .me-nu {
+        display: flex;
+        flex-direction: column;
+        width: fit-content;
+        margin: auto;
+        text-align: center;
+        row-gap: 8px;
+    }
+    nav {
+        flex-direction: column !important; 
+    }
+    
+}
+
+@media (max-width: 440px) {
+    .user-session {
+        display: flex;
+        align-items: center;
+        width: 90%;
+        justify-content: space-between;
+        padding-left: 0px;
+        margin-left: 0px;
+    }
+
+    .cerrar-sesion {
+        padding-left: 0
+            /* 16px */
+        ;
+        padding-right: 0
+            /* 16px */
+        ;
+        margin-left: 0;
+    }
+
+    nav {
+        
+    }
+
+    .luz-and-droopdown {
+        order: 2;
+        width: 90%;
+        justify-content: space-between;
+    }
+
+    .luz {
+        order: 2;
+    }
+}
+.cerrar-sesion span{
+    color: red!important;
+}
+</style>
+<!--  -->
+  <style>
+    html, 
+    body{
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+    }   
+    /* fuente roboto */
+    h1{
+        font-family: 'Roboto Slab', serif;
+    }
+    /* Animación de parpadeo en rojo tenue */
+    @keyframes blink {
+        50% {
+            background-color: #fed7d7; /* bg-red-200 */
+            color: black; /* Texto en color oscuro */
+        }
+    }
+    .blink-red {
+        animation: blink 1s infinite;
+        background-color: #f56565; /* bg-red-500 */
+        color: black; /* Texto en color oscuro */
+    }
+    /* ICONO MODO OSCURO */
+    /* Estilos personalizados para Leaflet en modo oscuro */
+    .dark .leaflet-control-geocoder-form input {
+        color: #000000;
+        background-color: #ffffff;
+    }
+    /* Asegurarse de que el texto del popup también sea visible en modo oscuro */
+    .dark .leaflet-popup-content {
+        color: #ffffff;
+    }
+    .dark .leaflet-control-geocoder-alternatives a {
+        color: #ffffff;
+    }
+    .dark .leaflet-control-geocoder-button {
+        background-color: #1a202c; /* Fondo acorde al tema oscuro */
+        color: #ffffff; /* Color del ícono del botón */
+    }
+    .dark .leaflet-control-geocoder-icon {
+        filter: invert(1); /* Invertir el color del ícono en modo oscuro */
+    }
+    /* EVITA QUE SE APARESCA EL MODAL DE CODIGO ANTES Q CARGUE LA PAGINA */
+    [x-cloak] {
+        display: none !important;
+    }
+    /* responsivo menu y footer */
+    @media (max-width: 640px){
+        .menu-header{
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        nav{
+            width: 100%;
+            justify-content: space-between;
+        }
+        nav button{
+            margin-left: 15px;
+        }
+        footer div{
+            display: flex;
+            flex-direction: column;
+        }
+    }
+    @media (max-width: 600px){
+        .me-nu{
+            display: flex;
+            flex-direction: column;
+            width: fit-content;
+            margin: auto;
+            text-align: center;
+            row-gap: 8px;
+        }
+    }
+    @media (max-width: 440px){
+        .user-session{
+            display: flex;
+            align-items: center;
+            width: 90%;
+            justify-content: space-between;
+            padding-left: 0px;
+            margin-left: 0px;
+            
+        }
+        .cerrar-sesion{
+            padding-left: 0 /* 16px */;
+            padding-right: 0 /* 16px */;
+            margin-left: 0;
+        }
+        nav{
+            flex-direction: column;
+        }
+        .luz-and-droopdown{
+            order: 2;
+            width: 90%;
+            justify-content: space-between;
+        }
+        .luz{
+            order: 2;
+        }
+    }
+  </style>

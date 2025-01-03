@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Estadísticas de Comisarías
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6 bg-white rounded-lg shadow-md dark:bg-gray-700">
+    <h1 class="text-3xl font-semibold text-gray-800 dark:text-white mb-4">Estadísticas de Comisarías</h1>
+
+    <!-- Total de Códigos por Día -->
+    <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-3">Total de Códigos por Día</h2>
+    {% for comisaria, resultados in total_por_dia.items %}
+        <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300">{{ comisaria|title }}</h3>
+        <ul class="list-disc list-inside mb-6">
+            {% for resultado in resultados %}
+                <li class="text-gray-600 dark:text-gray-300">
+                    Código: <strong>{{ resultado.codigo__codigo }}</strong><br>
+                    Fecha: <strong>{{ resultado.fecha_hora|date:"d/m/Y H:i:s" }}</strong><br>
+                    Total: <strong>{{ resultado.total }}</strong>
+                </li>
+            {% empty %}
+                <li class="text-gray-600 dark:text-gray-300">No se encontraron resultados para hoy en {{ comisaria|title }}.</li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+
+    <!-- Total de Códigos por Semana -->
+    <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-3">Total de Códigos por Semana</h2>
+    {% for comisaria, resultados in total_por_semana.items %}
+        <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300">{{ comisaria|title }}</h3>
+        <ul class="list-disc list-inside mb-6">
+            {% for resultado in resultados %}
+                <li class="text-gray-600 dark:text-gray-300">
+                    Código: <strong>{{ resultado.codigo__codigo }}</strong><br>
+                    Fecha: <strong>{{ resultado.fecha_hora|date:"d/m/Y H:i:s" }}</strong><br>
+                    Total: <strong>{{ resultado.total }}</strong>
+                </li>
+            {% empty %}
+                <li class="text-gray-600 dark:text-gray-300">No se encontraron resultados para esta semana en {{ comisaria|title }}.</li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+
+    <!-- Total de Códigos por Mes -->
+    <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-3">Total de Códigos por Mes</h2>
+    {% for comisaria, resultados in total_por_mes.items %}
+        <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300">{{ comisaria|title }}</h3>
+        <ul class="list-disc list-inside mb-6">
+            {% for resultado in resultados %}
+                <li class="text-gray-600 dark:text-gray-300">
+                    Código: <strong>{{ resultado.codigo__codigo }}</strong><br>
+                    Fecha: <strong>{{ resultado.fecha_hora|date:"d/m/Y H:i:s" }}</strong><br>
+                    Total: <strong>{{ resultado.total }}</strong>
+                </li>
+            {% empty %}
+                <li class="text-gray-600 dark:text-gray-300">No se encontraron resultados para este mes en {{ comisaria|title }}.</li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+
+    <!-- Total de Móviles de Hospitales por Día -->
+    <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-3">Total de Móviles de Hospitales por Día</h2>
+    <ul>
+        {% for comisaria, total in moviles_hospital_dia.items %}
+            <li>{{ comisaria|title }}: {{ total }} móviles</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Total de Móviles de Bomberos por Día -->
+    <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-3">Total de Móviles de Bomberos por Día</h2>
+    <ul>
+        {% for comisaria, total in moviles_bomberos_dia.items %}
+            <li>{{ comisaria|title }}: {{ total }} móviles</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Total de Móviles de Hospitales por Semana -->
+    <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-3">Total de Móviles de Hospitales por Semana</h2>
+    <ul>
+        {% for comisaria, total in moviles_hospital_semana.items %}
+            <li>{{ comisaria|title }}: {{ total }} móviles</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Total de Móviles de Bomberos por Semana -->
+    <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-3">Total de Móviles de Bomberos por Semana</h2>
+    <ul>
+        {% for comisaria, total in moviles_bomberos_semana.items %}
+            <li>{{ comisaria|title }}: {{ total }} móviles</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Total de Móviles de Hospitales por Mes -->
+    <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-3">Total de Móviles de Hospitales por Mes</h2>
+    <ul>
+        {% for comisaria, total in moviles_hospital_mes.items %}
+            <li>{{ comisaria|title }}: {{ total }} móviles</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Total de Móviles de Bomberos por Mes -->
+    <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-3">Total de Móviles de Bomberos por Mes</h2>
+    <ul>
+        {% for comisaria, total in moviles_bomberos_mes.items %}
+            <li>{{ comisaria|title }}: {{ total }} móviles</li>
+        {% endfor %}
+    </ul>
+
+</div>
+{% endblock %}
