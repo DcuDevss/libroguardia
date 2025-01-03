@@ -215,3 +215,12 @@ CKEDITOR_CONFIGS = {
         'font_names': 'Arial/Arial, Helvetica, sans-serif; Times New Roman/Times New Roman, Times, serif; Verdana/Verdana, Geneva, sans-serif; Courier New/Courier New, Courier, monospace',
     },
 }
+
+# Configuración de correo electrónico para Django
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'  # Servidor SMTP de Gmail
+EMAIL_PORT = 587               # Puerto para TLS
+EMAIL_USE_TLS = True           # Habilitar TLS
+EMAIL_HOST_USER = 'gabrielmolinalp@gmail.com'  # Tu correo electrónico
+EMAIL_HOST_PASSWORD = 'xuoceirxnhgpwkta'       # Contraseña generada de la app de Gmail
+DEFAULT_FROM_EMAIL = 'turnos.dicu@dcu.sistemas.com'  # Dirección del remitente
