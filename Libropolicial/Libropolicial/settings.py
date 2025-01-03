@@ -29,7 +29,7 @@ ALLOWED_HOSTS = []
 #el setting esta para desarrollo nuevos cambios
 #ALLOWED_HOSTS = ['10.0.200.73', 'localhost', '127.0.0.1']
 
-# Definición de la aplicación
+# Definición de la aplicación mas cambios
 
 INSTALLED_APPS = [
     'django.contrib.admin',  # Admin de Django
