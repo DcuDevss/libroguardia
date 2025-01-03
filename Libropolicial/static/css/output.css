@@ -877,6 +877,14 @@ video {
   margin-top: auto;
 }
 
+.ms-2 {
+  margin-inline-start: 0.5rem;
+}
+
+.mt-5 {
+  margin-top: 1.25rem;
+}
+
 .block {
   display: block;
 }
