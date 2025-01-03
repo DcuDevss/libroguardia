@@ -2300,7 +2300,15 @@ def generate_comisaria_primera_pdf_view(request):
 
 #-------------------------------esta funcion retorna la funcion generate_pdf-----------------------------------------------------
 
+from compartido.utils import verificar_registros_activos
 def generate_comisaria_primera_pdf_download(request):
+    
+    # Validar registros activos
+    alerta = verificar_registros_activos(ComisariaPrimera)
+    
+    if alerta:
+        return alerta
+    
     # Verifica si la URL contiene el parámetro 'signature' en la cadena de consulta (GET).
     # Si está presente, add_signature será True; de lo contrario, será False.
     add_signature = 'signature' in request.GET
@@ -2487,7 +2495,15 @@ def generate_comisaria_segunda_pdf_view(request):
 
 #------------------------------------------------------------------------------------------------------------------
 def generate_comisaria_segunda_pdf_download(request):
+
+    # Validar registros activos
+    alerta = verificar_registros_activos(ComisariaSegunda)
+    
+    if alerta:
+        return alerta
+    
     add_signature = 'signature' in request.GET
+
     now = datetime.now()
 
     # Obtiene el nombre de la comisaría desde el modelo (por ejemplo, "Comisaria Primera").
@@ -2534,6 +2550,13 @@ def generate_comisaria_tercera_pdf_view(request):
 
 #------------------------------------------------------------------------------------------------------------------
 def generate_comisaria_tercera_pdf_download(request):
+    
+    # Validar registros activos
+    alerta = verificar_registros_activos(ComisariaTercera)
+    
+    if alerta:
+        return alerta
+    
     add_signature = 'signature' in request.GET
     now = datetime.now()
 
@@ -2578,6 +2601,13 @@ def generate_comisaria_cuarta_pdf_view(request):
 
 #------------------------------------------------------------------------------------------------------------------
 def generate_comisaria_cuarta_pdf_download(request):
+
+     # Validar registros activos
+    alerta = verificar_registros_activos(ComisariaCuarta)
+    
+    if alerta:
+        return alerta
+    
     add_signature = 'signature' in request.GET
     now = datetime.now()
 
@@ -2620,9 +2650,14 @@ def generate_comisaria_quinta_pdf_view(request):
     return view_pdf_content(request, ComisariaQuinta)
 
 
-
 #------------------------------------------------------------------------------------------------------------------
 def generate_comisaria_quinta_pdf_download(request):
+    # Validar registros activos
+    alerta = verificar_registros_activos(ComisariaQuinta)
+    
+    if alerta:
+        return alerta
+    
     add_signature = 'signature' in request.GET
     now = datetime.now()
 

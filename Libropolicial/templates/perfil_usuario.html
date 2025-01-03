@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Perfil de Usuario{% endblock %}
+
+{% block content %}
+    <title>Perfil de Usuario</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <div class="profile-container mx-auto mt-5 p-4 shadow-lg rounded bg-white" style="max-width: 600px;">
+        <h1 class="mb-4">Bienvenido, <span class="fw-bold">{{ user.username }}</span></h1>
+        <p><strong>Nombre completo:</strong> {{ user.get_full_name|default:"No especificado" }}</p>
+        <p><strong>Correo electrónico:</strong> {{ user.email }}</p>
+        <p><strong>Fecha de ingreso:</strong> {{ user.date_joined|date:"d-m-Y" }}</p>
+    
+        <div class="actions mt-4 d-flex justify-content-between">
+            <!-- Botón para abrir el modal -->
+            <button type="button" class="btn btn-primary w-50 me-2" data-bs-toggle="modal" data-bs-target="#passwordChangeModal">
+                Cambiar contraseña
+            </button>
+
+            <a href="{% url 'home' %}"class="btn btn-secondary w-50 ms-2">
+                Cancelar / Volver
+            </a>
+        </div>
+    </div>
+
+    <!-- Modal para cambiar contraseña -->
+    <div class="modal fade" id="passwordChangeModal" tabindex="-1" aria-labelledby="passwordChangeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="passwordChangeModalLabel">Cambiar contraseña</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="passwordChangeForm" method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_old_password" class="form-label">Contraseña actual</label>
+                            <div class="input-group">
+                                <input type="password" name="old_password" id="id_old_password" class="form-control" required>
+                                <button type="button" class="btn btn-outline-secondary toggle-password" data-target="#id_old_password">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_new_password1" class="form-label">Nueva contraseña</label>
+                            <div class="input-group">
+                                <input type="password" name="new_password1" id="id_new_password1" class="form-control" required>
+                                <button type="button" class="btn btn-outline-secondary toggle-password" data-target="#id_new_password1">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_new_password2" class="form-label">Confirmar nueva contraseña</label>
+                            <div class="input-group">
+                                <input type="password" name="new_password2" id="id_new_password2" class="form-control" required>
+                                <button type="button" class="btn btn-outline-secondary toggle-password" data-target="#id_new_password2">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Guardar cambios</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<script>
+      // Funcionalidad de mostrar/ocultar contraseña
+      document.querySelectorAll('.toggle-password').forEach(button => {
+        button.addEventListener('click', () => {
+            const targetInput = document.querySelector(button.dataset.target);
+            const icon = button.querySelector('i');
+            if (targetInput.type === 'password') {
+                targetInput.type = 'text';
+                icon.classList.replace('bi-eye', 'bi-eye-slash');
+            } else {
+                targetInput.type = 'password';
+                icon.classList.replace('bi-eye-slash', 'bi-eye');
+            }
+        });
+    });
+
+
+    document.getElementById('passwordChangeForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const formData = new FormData(form);
+
+    fetch("{% url 'password_change' %}", {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+        },
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Contraseña cambiada exitosamente.");
+            form.reset();
+            const modal = bootstrap.Modal.getInstance(document.getElementById('passwordChangeModal'));
+            modal.hide();
+        } else if (data.errors) {
+            // Procesar y mostrar los errores correctamente
+            let errorMessages = '';
+            for (const [field, messages] of Object.entries(data.errors)) {
+                errorMessages += `${field}: ${messages.map(msg => msg.message).join(', ')}\n`;
+            }
+            alert(`Errores:\n${errorMessages}`);
+        } else {
+            alert("Hubo un error al cambiar la contraseña. Por favor verifica los campos.");
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("Ocurrió un error inesperado.");
+    });
+});
+
+</script>
+{% endblock %}
