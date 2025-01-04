@@ -2304,7 +2304,7 @@ from compartido.utils import verificar_registros_activos
 def generate_comisaria_primera_pdf_download(request):
     
     # Validar registros activos
-    alerta = verificar_registros_activos(ComisariaPrimera)
+    alerta = verificar_registros_activos(request, ComisariaPrimera)
     
     if alerta:
         return alerta
@@ -2497,7 +2497,7 @@ def generate_comisaria_segunda_pdf_view(request):
 def generate_comisaria_segunda_pdf_download(request):
 
     # Validar registros activos
-    alerta = verificar_registros_activos(ComisariaSegunda)
+    alerta = verificar_registros_activos(request, ComisariaSegunda)
     
     if alerta:
         return alerta
@@ -2552,7 +2552,7 @@ def generate_comisaria_tercera_pdf_view(request):
 def generate_comisaria_tercera_pdf_download(request):
     
     # Validar registros activos
-    alerta = verificar_registros_activos(ComisariaTercera)
+    alerta = verificar_registros_activos(request, ComisariaTercera)
     
     if alerta:
         return alerta
@@ -2603,7 +2603,7 @@ def generate_comisaria_cuarta_pdf_view(request):
 def generate_comisaria_cuarta_pdf_download(request):
 
      # Validar registros activos
-    alerta = verificar_registros_activos(ComisariaCuarta)
+    alerta = verificar_registros_activos(request, ComisariaCuarta)
     
     if alerta:
         return alerta
@@ -2653,8 +2653,7 @@ def generate_comisaria_quinta_pdf_view(request):
 #------------------------------------------------------------------------------------------------------------------
 def generate_comisaria_quinta_pdf_download(request):
     # Validar registros activos
-    alerta = verificar_registros_activos(ComisariaQuinta)
-    
+    alerta = verificar_registros_activos(request, ComisariaQuinta)
     if alerta:
         return alerta
     
