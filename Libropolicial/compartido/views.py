@@ -9,6 +9,8 @@ from django.http import JsonResponse
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.views import PasswordResetView
+from django.urls import reverse_lazy
 
 
 def no_permission(request):
@@ -57,15 +59,14 @@ def cambiar_contrasena(request):
             return JsonResponse({'success': False, 'errors': errors})
     return JsonResponse({'success': False, 'error': 'Método no permitido'})
 
+class CustomPasswordResetView(PasswordResetView):
+    email_template_name = "registration/password_reset_email.html"
+    subject_template_name = "registration/custom_password_reset_subject.txt"
+    html_email_template_name = "registration/password_reset_email.html"
+    success_url = reverse_lazy("registration/password_reset_done")
 
-    #def get_success_url(self):cambios
-    #    if self.request.user.groups.filter(name='comisariaprimera').exists():
-     #       return reverse_lazy('comisaria_primera_list')
-      #  elif self.request.user.groups.filter(name='comisariasegunda').exists():
-       #     return reverse_lazy('comisaria_segunda_list')
-       # elif self.request.user.groups.filter(name='divisioncomunicaciones').exists():
-        #    return reverse_lazy('divisioncomunicaciones_list')
-        #else:
-         #   return reverse_lazy('no_permission')
-
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["protocol"] = "https" if self.request.is_secure() else "http"
+        context["domain"] = self.request.get_host()
+        return context
