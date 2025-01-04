@@ -124,6 +124,7 @@
         <div class="blur-background">
             <img src="{% static 'comisarias/images/ESCUDO POLICIA.jpeg' %}" alt="Imagen descriptiva">
             <h1>Iniciar Sesión</h1>
+            
             <form method="post">
                 {% csrf_token %}
                 <div>
@@ -145,6 +146,14 @@
                 </div>
                 <button type="submit" class="">Ingresar</button>
             </form>
+
+            <!-- Enlace de restablecimiento de contraseña -->
+            <div class="text-center mt-3">
+                <a href="{% url 'password_reset' %}" class="text-primary" style="text-decoration: none;">
+                    ¿Olvidó su contraseña?
+                </a>
+            </div>
+
         </div>  
     </div>
     
