@@ -146,6 +146,18 @@ class UploadedPDFTOL(models.Model):
     
 from django.conf import settings
 from django.db import models
+from django.dispatch import receiver
+import os
+
+def user_photo_path(instance, filename):
+    """
+    Genera una ruta única para almacenar la foto de perfil, usando el número de legajo.
+    Si el legajo no está definido, usa el ID del usuario.
+    """
+    legajo = instance.legajo if instance.legajo else f"user_{instance.user.id}"
+    extension = filename.split('.')[-1]  # Obtener la extensión del archivo
+    return f'profiles/{legajo}/profile_image.{extension}'
+
 
 class Personal(models.Model):
     user = models.OneToOneField(
@@ -157,8 +169,19 @@ class Personal(models.Model):
     dni = models.CharField(max_length=15, unique=True, null=True, blank=True, verbose_name="DNI")
     telefono = models.CharField(max_length=15, null=True, blank=True, verbose_name="Teléfono")
     domicilio = models.CharField(max_length=100, null=True, blank=True, verbose_name="Domicilio")
-    photo = models.ImageField(upload_to='profile_photos/', null=True, blank=True, verbose_name="Foto de Perfil")  # Campo de foto
+    photo = models.ImageField(upload_to=user_photo_path, null=True, blank=True, verbose_name="Foto de perfil")
     campos_completados = models.BooleanField(default=False, verbose_name="Campos completados")
+
+    def save(self, *args, **kwargs):
+        # Si la instancia ya existe y se cambia la foto, eliminar la anterior
+        if self.pk:
+            old_instance = Personal.objects.filter(pk=self.pk).first()
+            if old_instance and old_instance.photo and old_instance.photo != self.photo:
+                if os.path.isfile(old_instance.photo.path):
+                    os.remove(old_instance.photo.path)
+
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.user.username} - {self.legajo}"
+

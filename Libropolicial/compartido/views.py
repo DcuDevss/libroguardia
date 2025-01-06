@@ -13,6 +13,9 @@ from django.contrib.auth.views import PasswordResetView
 from django.urls import reverse_lazy
 from compartido.models import Personal
 from django.contrib import messages
+from PIL import Image
+from io import BytesIO
+from django.core.files.base import ContentFile
 
 
 
@@ -77,8 +80,25 @@ def actualizar_perfil(request):
         personal.legajo = legajo
         personal.telefono = telefono
         personal.domicilio = domicilio
-        if photo:  # Si se sube una foto, actualízala
-            personal.photo = photo
+        
+        if photo:
+            # Abrir la imagen subida
+            img = Image.open(photo)
+
+            # Redimensionar la imagen
+            max_size = (150, 150)
+            img.thumbnail(max_size)
+
+            # Guardar la imagen redimensionada en un buffer
+            buffer = BytesIO()
+            img_format = 'JPEG' if img.format.lower() != 'png' else 'PNG'
+            img.save(buffer, format=img_format, quality=85)
+            buffer.seek(0)
+
+            # Reemplazar la imagen original por la procesada
+            photo_resized = ContentFile(buffer.read(), name=photo.name)
+            personal.photo = photo_resized
+
         personal.campos_completados = True  # Marca como completados
         personal.save()
 
