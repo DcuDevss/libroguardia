@@ -218,11 +218,11 @@ CKEDITOR_CONFIGS = {
 
 # Configuración de correo electrónico para Django
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-DEFAULT_FROM_EMAIL = 'Libro de Guardia <libroguardia@dcu.com>'
+DEFAULT_FROM_EMAIL = 'Libro de Guardia <libroguardia@dcu.sistemas.com>'
 PASSWORD_RESET_TIMEOUT = 3600  # Opcional: Tiempo de expiración en segundos (1 hora)
 EMAIL_HOST = 'smtp.gmail.com'  # Servidor SMTP de Gmail
 EMAIL_PORT = 587               # Puerto para TLS
 EMAIL_USE_TLS = True           # Habilitar TLS
 EMAIL_HOST_USER = 'gabrielmolinalp@gmail.com'  # Tu correo electrónico
 EMAIL_HOST_PASSWORD = 'xuoceirxnhgpwkta'       # Contraseña generada de la app de Gmail
-DEFAULT_FROM_EMAIL = 'turnos.dicu@dcu.sistemas.com'  # Dirección del remitente
+DEFAULT_FROM_EMAIL = 'libroguardia@dcu.sistemas.com'  # Dirección del remitente

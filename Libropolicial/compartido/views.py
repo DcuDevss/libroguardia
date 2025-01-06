@@ -59,11 +59,27 @@ def cambiar_contrasena(request):
             return JsonResponse({'success': False, 'errors': errors})
     return JsonResponse({'success': False, 'error': 'Método no permitido'})
 
+
 class CustomPasswordResetView(PasswordResetView):
+    """
+    Vista personalizada para manejar solicitudes de restablecimiento de contraseña.
+
+    Esta vista personaliza la generación de correos electrónicos para restablecer contraseñas.
+    - Incluye soporte para plantillas HTML y de texto personalizadas.
+    - Ajusta la URL de redirección tras el éxito.
+    - Permite agregar un contador para rastrear solicitudes de restablecimiento por usuario.
+
+    Configuración:
+    - `email_template_name`: Nombre de la plantilla para el cuerpo del correo.
+    - `subject_template_name`: Nombre de la plantilla para el asunto del correo.
+    - `html_email_template_name`: Plantilla para correos con formato HTML.
+    - `success_url`: URL a redirigir después de una solicitud exitosa.
+    """
+      
     email_template_name = "registration/password_reset_email.html"
     subject_template_name = "registration/custom_password_reset_subject.txt"
     html_email_template_name = "registration/password_reset_email.html"
-    success_url = reverse_lazy("registration/password_reset_done")
+    success_url = reverse_lazy("password_reset_done")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
