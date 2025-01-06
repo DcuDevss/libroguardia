@@ -1,4 +1,6 @@
 from django.db import models
+from django.conf import settings
+from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import User  # Importa el modelo User de Django, que representa a los usuarios del sistema.
 
 # Create your models here.
@@ -141,3 +143,21 @@ class UploadedPDFTOL(models.Model):
     # Método para obtener solo el nombre del archivo PDF.
     def filename(self):
         return self.file.name.split('/')[-1]  # Retorna solo el nombre del archivo, eliminando el camino de la ruta.    
+    
+from django.conf import settings
+from django.db import models
+
+class Personal(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="personal_profile"
+    )
+    legajo = models.CharField(max_length=50, unique=True, null=True, blank=True, verbose_name="Legajo Personal")
+    dni = models.CharField(max_length=15, unique=True, null=True, blank=True, verbose_name="DNI")
+    telefono = models.CharField(max_length=15, null=True, blank=True, verbose_name="Teléfono")
+    domicilio = models.CharField(max_length=100, null=True, blank=True, verbose_name="Domicilio")
+    photo = models.ImageField(upload_to='profile_photos/', null=True, blank=True, verbose_name="Foto de Perfil")  # Campo de foto
+
+    def __str__(self):
+        return f"{self.user.username} - {self.legajo}"

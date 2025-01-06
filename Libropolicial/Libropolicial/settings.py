@@ -226,3 +226,4 @@ EMAIL_USE_TLS = True           # Habilitar TLS
 EMAIL_HOST_USER = 'gabrielmolinalp@gmail.com'  # Tu correo electrónico
 EMAIL_HOST_PASSWORD = 'xuoceirxnhgpwkta'       # Contraseña generada de la app de Gmail
 DEFAULT_FROM_EMAIL = 'libroguardia@dcu.sistemas.com'  # Dirección del remitente
+

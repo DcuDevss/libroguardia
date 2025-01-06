@@ -1,5 +1,5 @@
 #compartidos/views
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
@@ -11,6 +11,10 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.views import PasswordResetView
 from django.urls import reverse_lazy
+from compartido.models import Personal
+from django.contrib import messages
+
+
 
 
 def no_permission(request):
@@ -42,8 +46,35 @@ class CustomLoginView(LoginView):
 
 @login_required
 def perfil_usuario(request):
-    return render(request, 'perfil_usuario.html', {'user': request.user})
+    # Obtener el perfil personalizado del usuario autenticado
+    personal_profile = get_object_or_404(Personal, user=request.user)
+    return render(request, 'perfil_usuario.html', {'user': request.user, 'personal_profile': personal_profile})
 
+@login_required
+def actualizar_perfil(request):
+    if request.method == 'POST':
+        personal = request.user.personal_profile  # Obtiene el perfil relacionado con el usuario
+        dni = request.POST.get('dni')
+        legajo = request.POST.get('legajo')
+        telefono = request.POST.get('telefono')
+        domicilio = request.POST.get('domicilio')
+        photo = request.FILES.get('photo')  # Obtiene la imagen si se sube una
+
+        # Actualiza los campos del perfil
+        personal.dni = dni
+        personal.legajo = legajo
+        personal.telefono = telefono
+        personal.domicilio = domicilio
+        if photo:  # Si se sube una foto, actualízala
+            personal.photo = photo
+        personal.save()
+
+        messages.success(request, "Perfil actualizado exitosamente.")
+        return redirect('perfil_usuario')  # Redirige al perfil después de guardar
+    else:
+        messages.error(request, "Error al procesar la solicitud.")
+        return redirect('perfil_usuario')
+    
 @csrf_exempt
 @login_required
 def cambiar_contrasena(request):
