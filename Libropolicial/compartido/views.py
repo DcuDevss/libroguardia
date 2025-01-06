@@ -52,6 +52,18 @@ def perfil_usuario(request):
 
 @login_required
 def actualizar_perfil(request):
+    try:
+        personal = request.user.personal_profile
+    except Personal.DoesNotExist:
+        # Crear un perfil si no existe
+        personal = Personal.objects.create(user=request.user)
+
+    # Verificar si los campos ya fueron completados
+    if personal.campos_completados:
+        messages.info(request, "Ya has completado tu perfil. Contacta al administrador para realizar cambios.")
+        return redirect('perfil_usuario')  # Redirige si los campos ya están completados
+
+
     if request.method == 'POST':
         personal = request.user.personal_profile  # Obtiene el perfil relacionado con el usuario
         dni = request.POST.get('dni')
@@ -67,6 +79,7 @@ def actualizar_perfil(request):
         personal.domicilio = domicilio
         if photo:  # Si se sube una foto, actualízala
             personal.photo = photo
+        personal.campos_completados = True  # Marca como completados
         personal.save()
 
         messages.success(request, "Perfil actualizado exitosamente.")

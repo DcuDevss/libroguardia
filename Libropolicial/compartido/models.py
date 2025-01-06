@@ -158,6 +158,7 @@ class Personal(models.Model):
     telefono = models.CharField(max_length=15, null=True, blank=True, verbose_name="Teléfono")
     domicilio = models.CharField(max_length=100, null=True, blank=True, verbose_name="Domicilio")
     photo = models.ImageField(upload_to='profile_photos/', null=True, blank=True, verbose_name="Foto de Perfil")  # Campo de foto
+    campos_completados = models.BooleanField(default=False, verbose_name="Campos completados")
 
     def __str__(self):
         return f"{self.user.username} - {self.legajo}"
