@@ -49,9 +49,15 @@ class CustomLoginView(LoginView):
 
 @login_required
 def perfil_usuario(request):
-    # Obtener el perfil personalizado del usuario autenticado
-    personal_profile = get_object_or_404(Personal, user=request.user)
+    # Obtener o crear el perfil personalizado del usuario autenticado
+    personal_profile, created = Personal.objects.get_or_create(user=request.user)
+
+    if created:
+        # Si se creó un nuevo perfil, puedes inicializar campos predeterminados aquí si es necesario
+        messages.info(request, "Se ha creado automáticamente un perfil para tu usuario.")
+    
     return render(request, 'perfil_usuario.html', {'user': request.user, 'personal_profile': personal_profile})
+
 
 @login_required
 def actualizar_perfil(request):
