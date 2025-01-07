@@ -34,6 +34,9 @@
     <script src="https://kit.fontawesome.com/b929cb1411.js" crossorigin="anonymous"></script>
     <!-- fuente roboto -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet" />
+    
+    
+    
     <!-- SweetAlert2 -->
 
     <!--  -->
@@ -85,6 +88,7 @@
         [x-cloak] {
             display: none !important;
         }
+
         /* responsivo menu y footer */
         @media (max-width: 840px){
             .menu-header{
@@ -170,6 +174,7 @@
         </div>
         <nav class="flex items-center">
             <!-- BOTON MODO OSCURO-->
+            
             <div class="">
                 <button id="theme-toggle" class="luz focus:outline-none"> 
                     <svg id="sun-icon" class="w-6 h-6 hidden" fill="none"
@@ -186,138 +191,135 @@
                     </svg> 
                 </button>
             </div> 
+
             <!--Partes-->
             {% if can_access_comisarias %}
-            <div x-data="{ open: false }" class="relative">
-                <button @click="open = !open" class="cerrar-sesion focus:outline-none bg-transparent text-white font-semibold py-2 px-4 rounded inline-flex items-center">
-                    <span>Partes PDF</span>
-                    <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </button>
-                <!-- Dropdown Content -->
-                <ul x-show="open" @click.away="open = false" class="absolute bg-white text-black py-2 rounded shadow-lg mt-2 w-48 z-50">
-                    <li>
-                        <a href="{% url 'select_range_view_ush' %}"
-                            class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
-                            Partes PDF Ushuaia
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'select_range_view_rg' %}"
-                            class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
-                            Partes PDF Rio Grande
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'select_range_view_tol' %}"
-                            class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
-                            Partes PDF Tolhuin
-                        </a>
-                    </li>
-                </ul>
-            </div>
+            <!-- Dropdown para Partes PDF -->
+<div x-data="{ open: false }" x-cloak class="relative">
+    <button @click="open = !open" class="cerrar-sesion focus:outline-none bg-transparent text-white font-semibold py-2 px-4 rounded inline-flex items-center">
+        <span>Partes PDF</span>
+        <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+    </button>
+    <!-- Dropdown Content -->
+    <ul x-show="open" x-cloak @click.away="open = false" class="absolute bg-white text-black py-2 rounded shadow-lg mt-2 w-48 z-50">
+        <li>
+            <a href="{% url 'select_range_view_ush' %}" class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
+                Partes PDF Ushuaia
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'select_range_view_rg' %}" class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
+                Partes PDF Rio Grande
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'select_range_view_tol' %}" class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
+                Partes PDF Tolhuin
+            </a>
+        </li>
+    </ul>
+</div>
             {% endif %}
             <!-- COMISARIAS -->
             <div class="luz-and-droopdown flex">
                 <!-- SELECT USHUAIA -->
                 <!-- Dropdown solo visible para superusuarios -->
                 {% if can_access_comisarias %}
-                <div x-data="{ open: false }" class="relative">
-                    <button @click="open = !open" class="cerrar-sesion focus:outline-none bg-transparent text-white font-semibold py-2 px-4 rounded inline-flex items-center">
-                        <span>Comisarías Ushuaia</span>
-                        <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-                    <!-- Dropdown cambios Content -->
-                    <ul x-show="open" @click.away="open = false"
-                        class="absolute bg-white text-black py-2 rounded shadow-lg mt-2 w-48 z-50">
-                        <li>
-                            <a href="{% url 'comisaria_primera_list' %}"
-                                class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">Comisaría
-                                Primera</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'comisaria_segunda_list' %}"
-                                class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">Comisaría
-                                Segunda</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'comisaria_tercera_list' %}"
-                                class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">Comisaría
-                                Tercera</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'comisaria_cuarta_list' %}"
-                                class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">Comisaría
-                                Cuarta</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'comisaria_quinta_list' %}"
-                                class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">Comisaría
-                                Quinta</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'comisaria_tolhuin_list' %}"
-                                class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">Comisaría
-                                Tolhuin</a>
-                        </li>
-                    </ul>
-                </div>
+                <!-- Dropdown para Comisarías Ushuaia -->
+<div x-data="{ open: false }" x-cloak class="relative">
+    <button @click="open = !open" class="cerrar-sesion focus:outline-none bg-transparent text-white font-semibold py-2 px-4 rounded inline-flex items-center">
+        <span>Comisarías Ushuaia</span>
+        <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+    </button>
+    <!-- Dropdown Content -->
+    <ul x-show="open" x-cloak @click.away="open = false" class="absolute bg-white text-black py-2 rounded shadow-lg mt-2 w-48 z-50">
+        <li>
+            <a href="{% url 'comisaria_primera_list' %}" class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
+                Comisaría Primera
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'comisaria_segunda_list' %}" class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
+                Comisaría Segunda
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'comisaria_tercera_list' %}" class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
+                Comisaría Tercera
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'comisaria_cuarta_list' %}" class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
+                Comisaría Cuarta
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'comisaria_quinta_list' %}" class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
+                Comisaría Quinta
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'comisaria_tolhuin_list' %}" class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
+                Comisaría Tolhuin
+            </a>
+        </li>
+    </ul>
+</div>
                 {% endif %}
                 <!-- SELECT RG -->
                 {% if can_access_comisariasRG %}
-                <div x-data="{ open: false }" class="relative">
-                    <button @click="open = !open"
-                        class="cerrar-sesion focus:outline-none bg-transparent text-white font-semibold py-2 px-4 rounded inline-flex items-center">
-                        <span>Comisarías Rio Grande</span>
-                        <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-                    <!-- Dropdown cambios Content -->
-                    <ul x-show="open" @click.away="open = false"
-                        class="absolute bg-white text-black py-2 rounded shadow-lg mt-2 w-48 z-50">
-                        <li>
-                            <a href="{% url 'comisaria_primeraRG_list' %}"
-                                class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">Comisaría
-                                Primera</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'comisaria_segundaRG_list' %}"
-                                class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">Comisaría
-                                Segunda</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'comisaria_terceraRG_list' %}"
-                                class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">Comisaría
-                                Tercera</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'comisaria_cuartaRG_list' %}"
-                                class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">Comisaría
-                                Cuarta</a>
-                        </li>
-                        <li>
-                            <a href="{% url 'comisaria_quintaRG_list' %}"
-                                class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">Comisaría
-                                Quinta</a>
-                        </li>
-                    </ul>
-                </div>
+                <!-- Dropdown para Comisarías Río Grande -->
+<div x-data="{ open: false }" x-cloak class="relative">
+    <button @click="open = !open" class="cerrar-sesion focus:outline-none bg-transparent text-white font-semibold py-2 px-4 rounded inline-flex items-center">
+        <span>Comisarías Rio Grande</span>
+        <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+    </button>
+    <!-- Dropdown Content -->
+    <ul x-show="open" x-cloak @click.away="open = false" class="absolute bg-white text-black py-2 rounded shadow-lg mt-2 w-48 z-50">
+        <li>
+            <a href="{% url 'comisaria_primeraRG_list' %}" class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
+                Comisaría Primera
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'comisaria_segundaRG_list' %}" class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
+                Comisaría Segunda
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'comisaria_terceraRG_list' %}" class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
+                Comisaría Tercera
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'comisaria_cuartaRG_list' %}" class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
+                Comisaría Cuarta
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'comisaria_quintaRG_list' %}" class="block px-4 py-2 hover:bg-blue-700 hover:shadow-md transition duration-150">
+                Comisaría Quinta
+            </a>
+        </li>
+    </ul>
+</div>
                 {% endif %}
             </div>
+            
             <!-- Puedes agregar aquí el nombre del usuario autenticado -->
             {% if user.is_authenticated %}
             <div class="">
                 <ul class="user-session flex space-x-4 items-center">
                     <li class="text-white font-semibold">
-                        {{ user.get_full_name|default:user.username }}
+                        <a href="{% url 'perfil_usuario' %}" class="hover:underline">
+                            {{ user.get_full_name|default:user.username }}
+                        </a>
                     </li>
                     <form method="post" action="{% url 'logout' %}">
                         {% csrf_token %}
@@ -329,7 +331,9 @@
                 </ul>
             </div>
             {% endif %}
+            
         </nav>
+
         <!-- Dropdown solo visible para superusuarios -->
         {% if user.is_authenticated and user.is_superuser %}
         <!-- 
@@ -870,6 +874,63 @@
             });
         });
     </script>
+
+<script>
+   document.addEventListener('DOMContentLoaded', () => {
+    // Seleccionar todos los botones con la clase 'download-pdf'
+    const downloadButtons = document.querySelectorAll('.download-pdf');
+
+    // Iterar sobre cada botón y agregar un manejador de eventos
+    downloadButtons.forEach(button => {
+        button.addEventListener('click', function (event) {
+            event.preventDefault(); // Evita la acción por defecto (navegar al enlace)
+
+            // Obtener el URL del botón
+            const url = button.href;
+
+            // Realizar una petición AJAX para verificar si hay registros activos
+            fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(response => {
+                    const contentType = response.headers.get('Content-Type');
+                    if (contentType && contentType.includes('application/json')) {
+                        return response.json();
+                    } else {
+                        return {};
+                    }
+                })
+                .then(data => {
+                    if (data.warning) {
+                        Swal.fire({
+                            title: 'Advertencia',
+                            text: data.warning,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Sí, continuar',
+                            cancelButtonText: 'Cancelar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                const forceUrl = url + (url.includes('?') ? '&' : '?') + 'force=true';
+                                window.open(forceUrl, '_blank');
+                            } else {
+                                Swal.fire('Cancelado', 'La descarga del PDF fue cancelada.', 'info');
+                            }
+                        });
+                    } else {
+                        window.open(url, '_blank');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire('Error', 'Ocurrió un problema inesperado al procesar la solicitud.', 'error');
+                });
+        });
+    });
+});
+
+
+</script>
+
+
 </body>
 
 </html>

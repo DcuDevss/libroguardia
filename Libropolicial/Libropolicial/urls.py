@@ -12,7 +12,7 @@ urlpatterns = [
     # Incluye las rutas definidas en 'compartido.urls'
     path('', include('compartido.urls')),
 
-    # Incluye las rutas definidas en 'comisarias.urls'
+    # Incluye las rutas definidas en 'comisarias.urls'cambios
     path('comisarias/', include('comisarias.urls')),
 
     # Incluye las rutas definidas en 'comisariasriogrande.urls'

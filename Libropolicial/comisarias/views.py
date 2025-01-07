@@ -1721,15 +1721,14 @@ def eliminar_comisaria_cuarta(request, pk):
     return redirect('comisaria_cuarta_list')
 
 
-
-
-
 #---------------------comisaria quinta para ver ---------------------
+
+
 
 class ComisariaQuintaListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = ComisariaQuinta
     template_name = 'comisarias/quinta/comisaria_quinta_list.html'
-    context_object_name = 'records'
+    context_object_name = 'page_obj'
 
     def test_func(self):
         return user_is_in_group(self.request.user, 'comisariaquinta')
@@ -1737,9 +1736,16 @@ class ComisariaQuintaListView(LoginRequiredMixin, UserPassesTestMixin, ListView)
     def handle_no_permission(self):
         return redirect('no_permission')
 
+    def get_paginate_by(self, queryset):
+        """Define el número de registros por página dinámicamente."""
+        items_per_page = self.request.GET.get('items_per_page', 10)
+        try:
+            return int(items_per_page)
+        except ValueError:
+            return 10  # Valor por defecto si no es válido
+
     def get_queryset(self):
         queryset = super().get_queryset().filter(activo=True).order_by('-fecha_hora')
-        #queryset = super().get_queryset().order_by('-fecha_hora')
         search_query = self.request.GET.get('q', '')
         if search_query:
             queryset = queryset.filter(cuarto__cuarto__icontains=search_query)
@@ -1761,7 +1767,33 @@ class ComisariaQuintaListView(LoginRequiredMixin, UserPassesTestMixin, ListView)
 
         context['today'] = timezone.now().date()
         context['resolveId'] = None
+        
+        # Paginación
+        queryset = self.get_queryset()
+        paginate_by = self.get_paginate_by(queryset)
+        paginator = Paginator(queryset, paginate_by)
+        page = self.request.GET.get('page')
+
+        try:
+            page_obj = paginator.page(page)
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+
+        # Calcular el rango dinámico de páginas
+        current_page = page_obj.number
+        total_pages = page_obj.paginator.num_pages
+        range_start = max(current_page - 5, 1)
+        range_end = min(current_page + 5, total_pages) + 1  # Incluye la última página
+
+        context['page_obj'] = page_obj
+        context['query'] = self.request.GET.get('q', '')
+        context['items_per_page'] = paginate_by
+        context['page_range'] = range(range_start, range_end)
+        
         return context
+
 
 
 #-----------------------creacion de comisaria quinta---------------
@@ -2300,7 +2332,15 @@ def generate_comisaria_primera_pdf_view(request):
 
 #-------------------------------esta funcion retorna la funcion generate_pdf-----------------------------------------------------
 
+from compartido.utils import verificar_registros_activos
 def generate_comisaria_primera_pdf_download(request):
+    
+    # Validar registros activos
+    alerta = verificar_registros_activos(request, ComisariaPrimera)
+    
+    if alerta:
+        return alerta
+    
     # Verifica si la URL contiene el parámetro 'signature' en la cadena de consulta (GET).
     # Si está presente, add_signature será True; de lo contrario, será False.
     add_signature = 'signature' in request.GET
@@ -2487,7 +2527,15 @@ def generate_comisaria_segunda_pdf_view(request):
 
 #------------------------------------------------------------------------------------------------------------------
 def generate_comisaria_segunda_pdf_download(request):
+
+    # Validar registros activos
+    alerta = verificar_registros_activos(request, ComisariaSegunda)
+    
+    if alerta:
+        return alerta
+    
     add_signature = 'signature' in request.GET
+
     now = datetime.now()
 
     # Obtiene el nombre de la comisaría desde el modelo (por ejemplo, "Comisaria Primera").
@@ -2534,6 +2582,13 @@ def generate_comisaria_tercera_pdf_view(request):
 
 #------------------------------------------------------------------------------------------------------------------
 def generate_comisaria_tercera_pdf_download(request):
+    
+    # Validar registros activos
+    alerta = verificar_registros_activos(request, ComisariaTercera)
+    
+    if alerta:
+        return alerta
+    
     add_signature = 'signature' in request.GET
     now = datetime.now()
 
@@ -2578,6 +2633,13 @@ def generate_comisaria_cuarta_pdf_view(request):
 
 #------------------------------------------------------------------------------------------------------------------
 def generate_comisaria_cuarta_pdf_download(request):
+
+     # Validar registros activos
+    alerta = verificar_registros_activos(request, ComisariaCuarta)
+    
+    if alerta:
+        return alerta
+    
     add_signature = 'signature' in request.GET
     now = datetime.now()
 
@@ -2620,9 +2682,13 @@ def generate_comisaria_quinta_pdf_view(request):
     return view_pdf_content(request, ComisariaQuinta)
 
 
-
 #------------------------------------------------------------------------------------------------------------------
 def generate_comisaria_quinta_pdf_download(request):
+    # Validar registros activos
+    alerta = verificar_registros_activos(request, ComisariaQuinta)
+    if alerta:
+        return alerta
+    
     add_signature = 'signature' in request.GET
     now = datetime.now()
 
@@ -2668,7 +2734,7 @@ def serve_pdf(request, folder_name):
     if not os.path.exists(base_path):
         return render(request, '404.html', status=404)
 
-    # Construye una lista de archivos con datos enriquecidos
+    # Construye una lista de archivos con datos enriquecidos nuevos cambios
     files = []
     for file_name in os.listdir(base_path):
         file_path = os.path.join(base_path, file_name)

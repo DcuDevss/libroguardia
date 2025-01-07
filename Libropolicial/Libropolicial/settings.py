@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # ADVERTENCIA DE SEGURIDAD: mantén la clave secreta utilizada en producción en secreto.
-#SECRET_KEY = os.getenv('SECRET_KEY')
+#SECRET_KEY = os.getenv('SECRET_KEY') nnnn
 
 
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'your-default-secret-key')
@@ -27,9 +27,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 #el setting esta para desarrollo nuevos cambios
-# ALLOWED_HOSTS = ['192.168.1.114', 'localhost', '127.0.0.1']
+#ALLOWED_HOSTS = ['10.0.200.73', 'localhost', '127.0.0.1']
 
-# Definición de la aplicación
+# Definición de la aplicación mas cambios
 
 INSTALLED_APPS = [
     'django.contrib.admin',  # Admin de Django
@@ -148,7 +148,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internacionalización
+# Internacionalización nuevo
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = 'es-ar'  # Código de idioma para español de Argentina
@@ -164,14 +164,15 @@ USE_L10N = True  # Habilita la localización
 
 STATIC_URL = '/static/'  # URL para archivos estáticos
 STATICFILES_DIRS = [
-    BASE_DIR / "static",  # Directorio de archivos estáticos
+    BASE_DIR / "static",  # Directorio de archivos estáticos xx
 ]
 
-# url de firma https://firmar.gob.ar/firmador/#/
+# url de firma https://firmar.gob.ar/firmador/#/x
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 import os
 
-# ... otras configuraciones
+# ... otras configuracionesxx
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -214,3 +215,15 @@ CKEDITOR_CONFIGS = {
         'font_names': 'Arial/Arial, Helvetica, sans-serif; Times New Roman/Times New Roman, Times, serif; Verdana/Verdana, Geneva, sans-serif; Courier New/Courier New, Courier, monospace',
     },
 }
+
+# Configuración de correo electrónico para Django
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+DEFAULT_FROM_EMAIL = 'Libro de Guardia <libroguardia@dcu.sistemas.com>'
+PASSWORD_RESET_TIMEOUT = 3600  # Opcional: Tiempo de expiración en segundos (1 hora)
+EMAIL_HOST = 'smtp.gmail.com'  # Servidor SMTP de Gmail
+EMAIL_PORT = 587               # Puerto para TLS
+EMAIL_USE_TLS = True           # Habilitar TLS
+EMAIL_HOST_USER = 'gabrielmolinalp@gmail.com'  # Tu correo electrónico
+EMAIL_HOST_PASSWORD = 'xuoceirxnhgpwkta'       # Contraseña generada de la app de Gmail
+DEFAULT_FROM_EMAIL = 'libroguardia@dcu.sistemas.com'  # Dirección del remitente
+

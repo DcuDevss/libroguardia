@@ -167,8 +167,14 @@
     
         <!-- Botón para 'oficialesservicios' y 'jefessuperiores' -->
         {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias %}
-        <a href="{% url 'generate_comisaria_primera_pdf_download' %}?signature=true" target="_blank" class="btn bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-700">Ver y Descargar PDF</a>
+      
+        <a href="{% url 'generate_comisaria_primera_pdf_download' %}?signature=true" 
+            class="download-pdf btn bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-700">
+            Ver y Descargar PDF
+        </a>
         {% endif %}
+        
+        
     
         {% if user.is_authenticated and user.is_superuser %}
         <a href="{% url 'generate_comisaria_primera_pdf_download_previous_day' %}" target="_blank" class="btn bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700">Descargar PDF del Día Anterior</a>
@@ -379,21 +385,27 @@
                 $('.dataTables_wrapper').addClass('dark');
             }
     });
+    
+    
+   
 </script>
-<!-- SweetAlert2 para mostrar el mensaje de éxito -->
-{% if messages %}
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            {% for message in messages %}
-                Swal.fire({
-                    icon: 'success',  // Cambia el ícono según el tipo de mensaje (success, error, etc.)
-                    title: 'Hecho!',
-                    text: '{{ message }}',
-                    confirmButtonText: 'OK',
-                    timer: 3000  // La alerta se cierra automáticamente después de 3 segundos
-                });
-            {% endfor %}
-        });
-    </script>
-{% endif %}
+    <!-- SweetAlert2 para mostrar el mensaje de éxito -->
+    {% if messages %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                {% for message in messages %}
+                    Swal.fire({
+                        icon: 'success',  // Cambia el ícono según el tipo de mensaje (success, error, etc.)
+                        title: 'Hecho!',
+                        text: '{{ message }}',
+                        confirmButtonText: 'OK',
+                        timer: 3000  // La alerta se cierra automáticamente después de 3 segundos
+                    });
+                {% endfor %}
+            });
+        </script>
+        
+        
+    {% endif %}
+
 {% endblock %}
