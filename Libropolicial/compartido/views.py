@@ -121,13 +121,16 @@ def cambiar_contrasena(request):
         form = PasswordChangeForm(request.user, data=request.POST)
         if form.is_valid():
             user = form.save()
-            update_session_auth_hash(request, user)  # Importante para mantener la sesión
-            return JsonResponse({'success': True})
+            update_session_auth_hash(request, user)  # Mantiene la sesión activa tras el cambio de contraseña
+            return JsonResponse({'success': True, 'message': 'Contraseña actualizada correctamente.'})
         else:
-            # Envía los errores específicos al cliente
-            errors = {field: error.get_json_data() for field, error in form.errors.items()}
+            # Envía errores detallados al cliente
+            errors = {field: [error['message'] for error in error_list] for field, error_list in form.errors.get_json_data().items()}
             return JsonResponse({'success': False, 'errors': errors})
-    return JsonResponse({'success': False, 'error': 'Método no permitido'})
+    return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
+
+
+
 
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail

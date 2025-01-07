@@ -89,22 +89,38 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="passwordChangeForm" method="post">
+                    <form id="passwordChangeForm" method="post" action="{% url 'password_change' %}">
                         {% csrf_token %}
                         <div class="mb-3">
-                            <label for="id_old_password" class="form-label">Contraseña Actual</label>
-                            <input type="password" name="old_password" id="id_old_password" class="form-control" required>
+                            <label for="id_old_password" class="form-label">Contraseña actual</label>
+                            <div class="input-group">
+                                <input type="password" name="old_password" id="id_old_password" class="form-control" required>
+                                <button type="button" class="btn btn-outline-secondary toggle-password" data-target="#id_old_password">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="mb-3">
-                            <label for="id_new_password1" class="form-label">Nueva Contraseña</label>
-                            <input type="password" name="new_password1" id="id_new_password1" class="form-control" required>
+                            <label for="id_new_password1" class="form-label">Nueva contraseña</label>
+                            <div class="input-group">
+                                <input type="password" name="new_password1" id="id_new_password1" class="form-control" required>
+                                <button type="button" class="btn btn-outline-secondary toggle-password" data-target="#id_new_password1">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="mb-3">
-                            <label for="id_new_password2" class="form-label">Confirmar Nueva Contraseña</label>
-                            <input type="password" name="new_password2" id="id_new_password2" class="form-control" required>
+                            <label for="id_new_password2" class="form-label">Confirmar nueva contraseña</label>
+                            <div class="input-group">
+                                <input type="password" name="new_password2" id="id_new_password2" class="form-control" required>
+                                <button type="button" class="btn btn-outline-secondary toggle-password" data-target="#id_new_password2">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-warning w-100">Actualizar Contraseña</button>
                     </form>
+                    
                 </div>
             </div>
         </div>
@@ -152,6 +168,43 @@
             });
             {% endfor %}
     });
+
+    document.getElementById('passwordChangeForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+
+        fetch(this.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+            },
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Cierra el modal manualmente
+                const modalElement = document.getElementById('passwordChangeModal');
+                const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                modalInstance.hide();
+
+                // Muestra el mensaje de éxito
+                Swal.fire('Éxito', data.message, 'success');
+                this.reset();  // Limpia el formulario
+            } else {
+                const errors = Object.entries(data.errors)
+                    .map(([field, messages]) => `${field}: ${messages.join(', ')}`)
+                    .join('\n');
+                Swal.fire('Error', errors, 'error');
+            }
+        })
+        .catch(error => {
+            Swal.fire('Error', 'Ocurrió un problema al cambiar la contraseña.', 'error');
+            console.error(error);
+        });
+    });
+
+
     </script>
     
 {% endblock %}
