@@ -16,9 +16,18 @@ from django.contrib import messages
 from PIL import Image
 from io import BytesIO
 from django.core.files.base import ContentFile
-
-
-
+from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
+from .models import OTP
+from django.template.loader import render_to_string
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import OTP
+from django.utils.timezone import now
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.contrib.auth.views import PasswordResetConfirmView
 
 def no_permission(request):
     return render(request, 'no_permission.html', {})
@@ -130,15 +139,7 @@ def cambiar_contrasena(request):
     return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
 
 
-
-
-from django.contrib.auth import get_user_model
-from django.core.mail import send_mail
-from .models import OTP
-from django.template.loader import render_to_string
-
 User = get_user_model()
-from django.template.loader import render_to_string
 
 class CustomPasswordResetView(PasswordResetView):
     email_template_name = "registration/password_reset_email.html"  # Esta plantilla se usará para enviar el OTP
@@ -188,12 +189,6 @@ class CustomPasswordResetView(PasswordResetView):
         )
 
 
-
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .models import OTP
-from django.utils.timezone import now
-
 def verificar_otp(request):
     user_id = request.session.get("reset_user_id")
     if not user_id:
@@ -210,9 +205,30 @@ def verificar_otp(request):
                 return redirect("password_reset")
             
             otp.invalidate()
-            return redirect("password_reset_confirm", uidb64=user_id, token="set-password")
+            
+            # Redirigir al PasswordResetConfirmView con uidb64 y token
+            user = User.objects.get(pk=user_id)
+            uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+            token = PasswordResetTokenGenerator().make_token(user)
+            return redirect("password_reset_confirm", uidb64=uidb64, token=token)
         except OTP.DoesNotExist:
             messages.error(request, "El código OTP ingresado es incorrecto.")
             return redirect("verificar_otp")
 
     return render(request, "registration/verificar_otp.html")
+
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'registration/password_reset_confirm.html'  # El template que usarás
+    success_url = reverse_lazy('password_reset_complete')  # Redirección tras éxito
+
+    def form_valid(self, form):
+        # Cambiar la contraseña y mostrar un mensaje de éxito
+        response = super().form_valid(form)
+        messages.success(self.request, "¡Tu contraseña ha sido cambiada exitosamente!")
+        return response
+
+    def form_invalid(self, form):
+        # Manejar errores en el formulario
+        messages.error(self.request, "Hubo un error al cambiar la contraseña. Revisa los datos ingresados.")
+        return super().form_invalid(form)
