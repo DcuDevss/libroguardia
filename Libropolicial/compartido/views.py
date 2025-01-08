@@ -70,12 +70,6 @@ class CustomLoginView(LoginView):
         """
         response = super().form_valid(form)
         user = self.request.user
-        personal_profile, created = Personal.objects.get_or_create(user=user)
-
-        # Incrementar el conteo de sesiones
-        personal_profile.total_sessions += 1
-        personal_profile.save()
-
         profile = getattr(user, 'personal_profile', None)
 
         if profile:
