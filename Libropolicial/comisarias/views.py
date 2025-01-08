@@ -23,6 +23,7 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView, CreateView, UpdateView,DetailView, TemplateView
+from compartido.models import Personal
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
@@ -197,6 +198,14 @@ class ComisariaPrimeraListView(LoginRequiredMixin, UserPassesTestMixin, ListView
         # Inicializa resolveId en None y lo agrega al contexto.
         context['resolveId'] = None  # Inicializa resolveId en None
         
+        # Usuarios conectados pertenecientes al grupo 'comisariaprimera'
+        usuarios_conectados = Personal.objects.filter(
+            user__groups__name='comisariaprimera',
+            is_online=True
+        ).select_related('user')
+
+        context['usuarios_conectados'] = usuarios_conectados
+
         # Devuelve el contexto completo.
         return context
 
@@ -657,6 +666,14 @@ class ComisariaSegundaListView(LoginRequiredMixin, UserPassesTestMixin, ListView
 
         context['today'] = timezone.now().date()
         context['resolveId'] = None
+
+        # Usuarios conectados pertenecientes al grupo 'comisariaprimera'
+        usuarios_conectados = Personal.objects.filter(
+            user__groups__name='comisariasegunda',
+            is_online=True
+        ).select_related('user')
+
+        context['usuarios_conectados'] = usuarios_conectados
         return context
 
 #-----------------------------------------------------------------------------------------------------------------   

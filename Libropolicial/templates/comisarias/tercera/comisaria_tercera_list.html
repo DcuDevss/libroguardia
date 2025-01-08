@@ -162,6 +162,10 @@
     <!-- SUB-MENU -->
     {% include "includes/submenu.html" with create_url='comisaria_tercera_create' download_url='generate_comisaria_tercera_pdf_download' download_previous_url='generate_comisaria_tercera_pdf_download_previous_day' %}
 
+    <!-- USUARIOS CONECTADOS-->
+    <div class="mb-4">
+        {% include "includes/usuarios_conectados.html" %}
+    </div>
     <!-- DATA TABLE -->
     <div class="overflow-x-auto rounded-lg">
         <table id="myTable" class="display carajo w-full text-[13px] rounded-lg">

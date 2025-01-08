@@ -174,6 +174,58 @@ def actualizar_perfil(request):
         messages.error(request, "Error al procesar la solicitud.")
         return redirect('perfil_usuario')
     
+
+from django.http import JsonResponse
+from compartido.models import Personal
+
+def obtener_usuarios_conectados(request):
+    """
+    Devuelve una lista de usuarios conectados clasificados por grupo.
+    """
+    usuarios = Personal.objects.filter(is_online=True).select_related('user')
+    usuarios_por_grupo = {}
+
+    for usuario in usuarios:
+        grupos = usuario.user.groups.values_list('name', flat=True)  # Obtén los nombres de los grupos del usuario
+        for grupo in grupos:
+            if grupo not in usuarios_por_grupo:
+                usuarios_por_grupo[grupo] = []
+            usuarios_por_grupo[grupo].append({
+                "username": usuario.user.username,
+                "nombre_completo": usuario.user.get_full_name() or usuario.user.username
+            })
+
+    return JsonResponse({"usuarios_por_grupo": usuarios_por_grupo})
+
+
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+def custom_logout(request):
+    """
+    Cierra la sesión del usuario y actualiza su estado `is_online` a False.
+    """
+    if request.user.is_authenticated:
+        # Actualiza el estado de conexión del usuario
+        personal_profile = request.user.personal_profile
+        personal_profile.is_online = False
+        personal_profile.save()
+
+    # Cierra la sesión del usuario
+    logout(request)
+    return redirect('login')  # Redirige a la página de inicio de sesión o donde deseesdef custom_logout(request):
+    """
+    Cierra la sesión del usuario y actualiza su estado `is_online` a False.
+    """
+    if request.user.is_authenticated:
+        # Actualiza el estado de conexión del usuario
+        personal_profile = request.user.personal_profile
+        personal_profile.is_online = False
+        personal_profile.save()
+
+    # Cierra la sesión del usuario
+    logout(request)
+    return redirect('login')  # Redirige a la página de inicio de sesión o donde desees
+
 @csrf_exempt
 @login_required
 def cambiar_contrasena(request):

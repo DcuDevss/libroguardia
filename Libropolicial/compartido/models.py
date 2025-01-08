@@ -191,7 +191,7 @@ class Personal(models.Model):
     last_ip = models.GenericIPAddressField(null=True, blank=True, verbose_name="Última IP")
     last_device = models.CharField(max_length=255, null=True, blank=True, verbose_name="Último dispositivo")
     last_login_time = models.DateTimeField(null=True, blank=True, verbose_name="Última hora de conexión")
-
+    is_online = models.BooleanField(default=False, verbose_name="Conectado")
     
 
     def save(self, *args, **kwargs):
