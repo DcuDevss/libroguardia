@@ -186,6 +186,7 @@ class Personal(models.Model):
     domicilio = models.CharField(max_length=100, null=True, blank=True, verbose_name="Domicilio")
     photo = models.ImageField(upload_to="profile_pictures/", null=True, blank=True, verbose_name="Foto de perfil")
     campos_completados = models.BooleanField(default=False, verbose_name="Campos completados")
+    session_key = models.CharField(max_length=40, null=True, blank=True)  # Clave de sesión activa
 
     # Nuevos campos
     last_ip = models.GenericIPAddressField(null=True, blank=True, verbose_name="Última IP")

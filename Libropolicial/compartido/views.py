@@ -28,6 +28,21 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.auth.views import PasswordResetConfirmView
+from django.contrib.auth.views import LoginView
+from django.utils.timezone import now
+from django.urls import reverse_lazy
+import user_agents  # Instalar con pip install user-agents
+from django.http import JsonResponse
+from compartido.models import Personal
+from django.shortcuts import redirect
+from django.contrib.auth import logout
+from user_agents import parse
+from django.contrib.sessions.models import Session
+from user_agents import parse  # Asegúrate de que `user-agents` esté instalado: pip install user-agents
+from django.utils.timezone import now
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+from django.utils.timezone import now
 
 def no_permission(request):
     return render(request, 'no_permission.html', {})
@@ -35,10 +50,6 @@ def no_permission(request):
 class HomeView(TemplateView):
     template_name = 'home.html'
 
-from django.contrib.auth.views import LoginView
-from django.utils.timezone import now
-from django.urls import reverse_lazy
-import user_agents  # Instalar con pip install user-agents
 
 
 class CustomLoginView(LoginView):
@@ -66,31 +77,46 @@ class CustomLoginView(LoginView):
 
     def form_valid(self, form):
         """
-        Registra la última IP, dispositivo y hora de conexión al iniciar sesión exitosamente.
+        Maneja la lógica al inicio de sesión exitoso:
+        - Cierra sesiones previas del usuario.
+        - Actualiza la IP, dispositivo y hora de conexión.
+        - Marca al usuario como "en línea".
         """
-        response = super().form_valid(form)
-        user = self.request.user
+        user = form.get_user()
         profile = getattr(user, 'personal_profile', None)
 
         if profile:
+            # Cerrar sesiones activas del usuario
+            active_sessions = Session.objects.filter(session_key=profile.session_key)
+            for session in active_sessions:
+                session.delete()
+
+            # Registrar nueva sesión
+            profile.session_key = self.request.session.session_key
+
             # Registrar última IP
             x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR')
             ip = x_forwarded_for.split(',')[0] if x_forwarded_for else self.request.META.get('REMOTE_ADDR')
             profile.last_ip = ip
 
             # Registrar dispositivo
-            user_agent = user_agents.parse(self.request.META.get('HTTP_USER_AGENT', ''))
-            profile.last_device = f"{user_agent.browser} on {user_agent.os} ({user_agent.device})"
+            user_agent = parse(self.request.META.get('HTTP_USER_AGENT', ''))
+            browser = user_agent.browser.family or "Navegador desconocido"
+            os = user_agent.os.family or "Sistema operativo desconocido"
+            device = user_agent.device.family if user_agent.device.family != "Other" else "Dispositivo desconocido"
+            profile.last_device = f"{browser} en {os} ({device})"
 
             # Registrar última hora de conexión
             profile.last_login_time = now()
 
+            # Marcar al usuario como "en línea"
+            profile.is_online = True
+
             # Guardar cambios en el perfil
             profile.save()
 
-        return response
-
-from user_agents import parse
+        # Continúa con el inicio de sesión normal
+        return super().form_valid(form)
 
 @login_required
 def perfil_usuario(request):
@@ -116,7 +142,6 @@ def perfil_usuario(request):
     }
 
     return render(request, 'perfil_usuario.html', context)
-
 
 
 @login_required
@@ -175,9 +200,6 @@ def actualizar_perfil(request):
         return redirect('perfil_usuario')
     
 
-from django.http import JsonResponse
-from compartido.models import Personal
-
 def obtener_usuarios_conectados(request):
     """
     Devuelve una lista de usuarios conectados clasificados por grupo.
@@ -198,20 +220,31 @@ def obtener_usuarios_conectados(request):
     return JsonResponse({"usuarios_por_grupo": usuarios_por_grupo})
 
 
-from django.shortcuts import redirect
-from django.contrib.auth.views import LogoutView
-from django.contrib.auth import logout
 def custom_logout(request):
     """
-    Función para cerrar sesión y actualizar el estado `is_online`.
+    Cierra la sesión del usuario y actualiza el estado `is_online` y `last_login_time` en su perfil.
     """
     if request.user.is_authenticated:
-        user_profile = getattr(request.user, 'personal_profile', None)
-        if user_profile:
-            user_profile.is_online = False
-            user_profile.save()
+        try:
+            # Obtén el perfil asociado al usuario
+            user_profile = getattr(request.user, 'personal_profile', None)
+
+            if user_profile:
+                # Actualiza el estado del perfil
+                user_profile.is_online = False
+                user_profile.last_login_time = now()  # Registrar la última hora antes de cerrar sesión
+                user_profile.session_key = None  # Elimina cualquier clave de sesión activa
+                user_profile.save()
+        except AttributeError:
+            # Maneja el caso en el que el perfil no existe
+            pass
+
+    # Cierra la sesión del usuario
     logout(request)
+
+    # Redirige al usuario a la página de inicio de sesión
     return redirect('login')
+
    
 @csrf_exempt
 @login_required

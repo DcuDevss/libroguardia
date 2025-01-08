@@ -8,7 +8,8 @@ urlpatterns = [
     path('', HomeView.as_view(), name='home'),
     path('login/', CustomLoginView.as_view(), name='login'),
     path('no-permission/', no_permission, name='no_permission'),
-    path('logout/', custom_logout, name='logout'),
+    #path('logout/', custom_logout.as_view(next_page='login'), name='logout'),  # Añadido el LogoutView
+    path('logout/', custom_logout, name='logout'), # Modicada por la anterior
 
    # path('check-message/', check_message, name='check_message'),
 
