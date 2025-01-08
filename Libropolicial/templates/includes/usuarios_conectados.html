@@ -1,0 +1,23 @@
+<div class="bg-white p-4 rounded-lg shadow-lg mb-4 border border-gray-200">
+    <h5 class="text-xl font-semibold text-gray-800 flex items-center mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500 mr-2" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16.5 11.5a4.5 4.5 0 10-9 0 4.5 4.5 0 009 0zM21 21c0-5.523-4.477-10-10-10S1 15.477 1 21h20z" />
+        </svg>
+        Usuarios Conectados
+    </h5>
+    <ul>
+        {% for usuario in usuarios_conectados %}
+            <li class="flex items-center justify-between py-3 border-b border-gray-200 last:border-0">
+                <div class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400 mr-3" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M16.5 11.5a4.5 4.5 0 10-9 0 4.5 4.5 0 009 0zM21 21c0-5.523-4.477-10-10-10S1 15.477 1 21h20z" />
+                    </svg>
+                    <span class="text-gray-700 font-medium">{{ usuario.user.get_full_name|default:usuario.user.username }}</span>
+                </div>
+                <span class="text-sm px-2 py-1 bg-green-100 text-green-600 rounded-full">En línea</span>
+            </li>
+        {% empty %}
+            <li class="text-center py-3 text-gray-500">No hay usuarios conectados</li>
+        {% endfor %}
+    </ul>
+</div>

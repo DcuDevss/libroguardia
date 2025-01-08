@@ -7,12 +7,16 @@ from django.conf import settings
 from django.db import models
 from django.dispatch import receiver
 from django.contrib.auth.models import User
-from datetime import timedelta
 from django.db import models
 from django.contrib.auth import get_user_model
 import random
 from django.utils.timezone import now
 from datetime import timedelta,datetime
+from django.db import models
+from django.contrib.auth import get_user_model
+import random
+from django.utils.timezone import now
+
 
 # Create your models here.
 
@@ -166,6 +170,10 @@ def user_photo_path(instance, filename):
     return f'profiles/{legajo}/profile_image.{extension}'
 
 
+from django.db import models
+from django.conf import settings
+import os
+
 class Personal(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -176,11 +184,18 @@ class Personal(models.Model):
     dni = models.CharField(max_length=15, unique=True, null=True, blank=True, verbose_name="DNI")
     telefono = models.CharField(max_length=15, null=True, blank=True, verbose_name="Teléfono")
     domicilio = models.CharField(max_length=100, null=True, blank=True, verbose_name="Domicilio")
-    photo = models.ImageField(upload_to=user_photo_path, null=True, blank=True, verbose_name="Foto de perfil")
+    photo = models.ImageField(upload_to="profile_pictures/", null=True, blank=True, verbose_name="Foto de perfil")
     campos_completados = models.BooleanField(default=False, verbose_name="Campos completados")
 
+    # Nuevos campos
+    last_ip = models.GenericIPAddressField(null=True, blank=True, verbose_name="Última IP")
+    last_device = models.CharField(max_length=255, null=True, blank=True, verbose_name="Último dispositivo")
+    last_login_time = models.DateTimeField(null=True, blank=True, verbose_name="Última hora de conexión")
+    is_online = models.BooleanField(default=False, verbose_name="Conectado")
+    
+
     def save(self, *args, **kwargs):
-        # Si la instancia ya existe y se cambia la foto, eliminar la anterior
+        # Eliminar la foto anterior si se reemplaza
         if self.pk:
             old_instance = Personal.objects.filter(pk=self.pk).first()
             if old_instance and old_instance.photo and old_instance.photo != self.photo:
@@ -189,14 +204,20 @@ class Personal(models.Model):
 
         super().save(*args, **kwargs)
 
+    def get_roles(self):
+        """
+        Devuelve una lista de nombres de grupos (roles) a los que pertenece el usuario.
+        """
+        return self.user.groups.values_list('name', flat=True)
+
+    def get_permissions(self):
+        """
+        Devuelve una lista de nombres de permisos asociados directamente al usuario.
+        """
+        return self.user.user_permissions.values_list('name', flat=True)
+
     def __str__(self):
         return f"{self.user.username} - {self.legajo}"
-
-from django.db import models
-from django.contrib.auth import get_user_model
-import random
-from django.utils.timezone import now
-from datetime import timedelta,datetime
 
 User = get_user_model()
 

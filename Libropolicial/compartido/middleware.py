@@ -54,25 +54,46 @@ class RedirectAuthenticatedUserMiddleware(MiddlewareMixin):
                 return redirect('no_permission')
         return None
 
-
+from django.contrib.auth import logout
 # Middleware que cierra la sesión de los usuarios después de un período de inactividad
 class InactivityLogoutMiddleware(MiddlewareMixin):
-    # Método que procesa la solicitud para comprobar la actividad del usuario
+    """
+    Middleware para cerrar la sesión de los usuarios después de un período de inactividad
+    y gestionar el estado 'is_online' de cada usuario.
+    """
+
     def process_request(self, request):
-        # Comprueba si el usuario está autenticado
+        # Si el usuario está autenticado
         if request.user.is_authenticated:
-            # Obtiene la última actividad del usuario desde la sesión
+            # Obtener o crear el perfil personal asociado al usuario
+            personal_profile = request.user.personal_profile
+
+            # Establecer el usuario como conectado si no está marcado como 'online'
+            if not personal_profile.is_online:
+                personal_profile.is_online = True
+                personal_profile.save()
+
+            # Comprobar la última actividad registrada en la sesión
             last_activity = request.session.get('last_activity')
             if last_activity:
-                # Convierte la última actividad en un objeto datetime
+                # Convertir la última actividad en un objeto datetime
                 last_activity = timezone.datetime.fromisoformat(last_activity)
-                # Comprueba si el tiempo transcurrido desde la última actividad es mayor que una hora
+                # Comprobar si ha pasado más de una hora desde la última actividad
                 if timezone.now() - last_activity > timedelta(hours=1):
-                    # Importa logout para cerrar la sesión del usuario
-                    from django.contrib.auth import logout
-                    # Cierra la sesión del usuario
+                    # Marcar al usuario como desconectado
+                    personal_profile.is_online = False
+                    personal_profile.save()
+                    # Cerrar la sesión del usuario
                     logout(request)
-                    # Redirige al usuario a la página de inicio de sesión
                     return redirect('login')
-            # Actualiza la última actividad del usuario en la sesión con la hora actual
+
+            # Actualizar la última actividad en la sesión
             request.session['last_activity'] = timezone.now().isoformat()
+
+        # Si el usuario no está autenticado pero tiene un perfil asociado
+        elif hasattr(request.user, 'personal_profile'):
+            personal_profile = request.user.personal_profile
+            if personal_profile.is_online:
+                # Marcar al usuario como desconectado
+                personal_profile.is_online = False
+                personal_profile.save()

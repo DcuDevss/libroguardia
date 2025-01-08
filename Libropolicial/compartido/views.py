@@ -35,16 +35,25 @@ def no_permission(request):
 class HomeView(TemplateView):
     template_name = 'home.html'
 
+from django.contrib.auth.views import LoginView
+from django.utils.timezone import now
+from django.urls import reverse_lazy
+import user_agents  # Instalar con pip install user-agents
+
+
 class CustomLoginView(LoginView):
     template_name = 'login.html'
     authentication_form = CustomLoginForm
 
     def get_success_url(self):
+        """
+        Redirige al usuario según su grupo asignado.
+        """
         user_group_redirects = {
             'comisariaprimera': 'comisaria_primera_list',
             'comisariasegunda': 'comisaria_segunda_list',
             'comisaria_primeraRG': 'comisariaprimeraRG_list',
-            'comisaria_segundaRG': 'comisariasegundaRG_list',
+            'comisaria_segundaRG': 'comisaria_segundaRG_list',
             'comisaria_terceraRG': 'comisariaterceraRG_list',
             'comisaria_cuartaRG': 'comisariacuartaRG_list',
             'comisaria_quintaRG': 'comisariaquintaRG_list',
@@ -55,17 +64,59 @@ class CustomLoginView(LoginView):
                 return reverse_lazy(url)
         return reverse_lazy('no_permission')
 
+    def form_valid(self, form):
+        """
+        Registra la última IP, dispositivo y hora de conexión al iniciar sesión exitosamente.
+        """
+        response = super().form_valid(form)
+        user = self.request.user
+        profile = getattr(user, 'personal_profile', None)
+
+        if profile:
+            # Registrar última IP
+            x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR')
+            ip = x_forwarded_for.split(',')[0] if x_forwarded_for else self.request.META.get('REMOTE_ADDR')
+            profile.last_ip = ip
+
+            # Registrar dispositivo
+            user_agent = user_agents.parse(self.request.META.get('HTTP_USER_AGENT', ''))
+            profile.last_device = f"{user_agent.browser} on {user_agent.os} ({user_agent.device})"
+
+            # Registrar última hora de conexión
+            profile.last_login_time = now()
+
+            # Guardar cambios en el perfil
+            profile.save()
+
+        return response
+
+from user_agents import parse
 
 @login_required
 def perfil_usuario(request):
-    # Obtener o crear el perfil personalizado del usuario autenticado
     personal_profile, created = Personal.objects.get_or_create(user=request.user)
 
-    if created:
-        # Si se creó un nuevo perfil, puedes inicializar campos predeterminados aquí si es necesario
-        messages.info(request, "Se ha creado automáticamente un perfil para tu usuario.")
-    
-    return render(request, 'perfil_usuario.html', {'user': request.user, 'personal_profile': personal_profile})
+    last_device_raw = personal_profile.last_device
+    if last_device_raw:
+        try:
+            user_agent = parse(last_device_raw)
+            browser = user_agent.browser.family or "Navegador desconocido"
+            os = user_agent.os.family or "Sistema operativo desconocido"
+            device = user_agent.device.family if user_agent.device.family != "Other" else "Dispositivo desconocido"
+            last_device = f"{browser} en {os} ({device})"
+        except Exception:
+            last_device = "Formato de dispositivo no reconocido"
+    else:
+        last_device = "No registrado"
+
+    context = {
+        'user': request.user,
+        'personal_profile': personal_profile,
+        'last_device': last_device,
+    }
+
+    return render(request, 'perfil_usuario.html', context)
+
 
 
 @login_required
@@ -123,6 +174,58 @@ def actualizar_perfil(request):
         messages.error(request, "Error al procesar la solicitud.")
         return redirect('perfil_usuario')
     
+
+from django.http import JsonResponse
+from compartido.models import Personal
+
+def obtener_usuarios_conectados(request):
+    """
+    Devuelve una lista de usuarios conectados clasificados por grupo.
+    """
+    usuarios = Personal.objects.filter(is_online=True).select_related('user')
+    usuarios_por_grupo = {}
+
+    for usuario in usuarios:
+        grupos = usuario.user.groups.values_list('name', flat=True)  # Obtén los nombres de los grupos del usuario
+        for grupo in grupos:
+            if grupo not in usuarios_por_grupo:
+                usuarios_por_grupo[grupo] = []
+            usuarios_por_grupo[grupo].append({
+                "username": usuario.user.username,
+                "nombre_completo": usuario.user.get_full_name() or usuario.user.username
+            })
+
+    return JsonResponse({"usuarios_por_grupo": usuarios_por_grupo})
+
+
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+def custom_logout(request):
+    """
+    Cierra la sesión del usuario y actualiza su estado `is_online` a False.
+    """
+    if request.user.is_authenticated:
+        # Actualiza el estado de conexión del usuario
+        personal_profile = request.user.personal_profile
+        personal_profile.is_online = False
+        personal_profile.save()
+
+    # Cierra la sesión del usuario
+    logout(request)
+    return redirect('login')  # Redirige a la página de inicio de sesión o donde deseesdef custom_logout(request):
+    """
+    Cierra la sesión del usuario y actualiza su estado `is_online` a False.
+    """
+    if request.user.is_authenticated:
+        # Actualiza el estado de conexión del usuario
+        personal_profile = request.user.personal_profile
+        personal_profile.is_online = False
+        personal_profile.save()
+
+    # Cierra la sesión del usuario
+    logout(request)
+    return redirect('login')  # Redirige a la página de inicio de sesión o donde desees
+
 @csrf_exempt
 @login_required
 def cambiar_contrasena(request):

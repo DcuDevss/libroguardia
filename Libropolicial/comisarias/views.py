@@ -23,6 +23,7 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView, CreateView, UpdateView,DetailView, TemplateView
+from compartido.models import Personal
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4

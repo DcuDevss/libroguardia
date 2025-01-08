@@ -1,0 +1,27 @@
+<div class="me-nu flex flex-wrap justify-center gap-4">
+    {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias or librero %}
+    <a href="{% url create_url %}" class="btn bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Iniciar Código</a>
+    {% endif %}
+
+    {% if is_jefessuperiores or can_access_comisarias %}
+    <a href="{% url 'comisarias_completa_list' %}" class="btn bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-700">Libro general códigos</a>
+    {% endif %}
+
+    {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias %}
+    <a href="{% url download_url %}?signature=true" 
+       class="download-pdf btn bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-700">Ver y Descargar PDF</a>
+    {% endif %}
+
+    {% if user.is_authenticated and user.is_superuser %}
+    <a href="{% url download_previous_url %}" target="_blank" 
+       class="btn bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700">Descargar PDF del Día Anterior</a>
+    {% endif %}
+
+    {% if is_oficialesservicios or is_jefessuperiores %}
+    <a href="{% url 'subir_pdf' %}" class="btn bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700">Subir PDF</a>
+    {% endif %}
+
+    {% if user.is_authenticated and user.is_superuser %}
+    <a href="{% url 'ver_pdfs' %}" class="btn bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-700">Ver PDF Libro</a>
+    {% endif %}
+</div>
