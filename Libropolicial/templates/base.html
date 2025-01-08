@@ -552,14 +552,18 @@
                 // Coordenadas para Ushuaia
                 initialLat = -54.8019;
                 initialLng = -68.3029;
+                var zoomLevel = 12;
             } else if (url.includes("/comisariasriogrande/")) {
                 // Coordenadas para Río Grande
                 initialLat = -53.7769;
                 initialLng = -67.7076;
+                var zoomLevel = 12;
             } else if (url.includes("/comisariastolhuin/")) {
-                // Coordenadas para Río Grande
+                // Coordenadas para Tolhuin
                 initialLat = -54.510539136774526;
                 initialLng = -67.19172620825704;
+                var zoomLevel = 12; 
+
             } else {
                 // Coordenadas por defecto tolhuin
                 initialLat = -54.8019;
@@ -567,7 +571,7 @@
             }
 
             // Inicializa el mapa en las coordenadas asignadas
-            var map = L.map("map").setView([initialLat, initialLng], 10);
+            var map = L.map("map").setView([initialLat, initialLng], zoomLevel);
 
             // Define capas de mapa
             var lightLayer = L.tileLayer(

@@ -156,15 +156,15 @@
     <!-- SUB MENU -->
     <div class="me-nu flex flex-wrap justify-center gap-4">
          <!-- Botón para 'oficialesservicios' y 'jefessuperiores' -->
-         {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias or librero %}
+         {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias or is_libreros %}
         <a href="{% url 'comisaria_tolhuin_create' %}" class="btn bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Iniciar Codigo</a>
         {% endif %}
         
         <!-- Botón para 'jefessuperiores' -->
-        <!-- {% if is_jefessuperiores or can_access_comisarias%}
+         {% if is_jefessuperiores or can_access_comisarias%}
         <a href="{% url 'comisarias_completa_list' %}" class="btn bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-700">Libro general codigos</a>
         {% endif %}
-     -->
+     
         <!-- Botón para 'oficialesservicios' y 'jefessuperiores' -->
         {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias %}
         <a href="{% url 'generate_comisaria_tolhuin_pdf_download' %}?signature=true" target="_blank" class="btn bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-700">Ver y Descargar PDF</a>
@@ -243,7 +243,7 @@
                        
                        <!-- Botón para firmar -->
                     {% if not request.user.get_full_name in record.firmas %}
-                    {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias %}
+                    {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias or is_libreros%}
                         <button @click.prevent="recordIdToSign = {{ record.pk }}; showConfirmModal = true"
                             class="bg-teal-500 text-black px-4 w-full rounded block text-center my-1">
                             FIRMAR
@@ -253,7 +253,7 @@
 
                     <!-- Botón para editar -->
                     {% if record.estado or record.fecha_hora.date == today %}
-                    {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias %}
+                    {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias or is_libreros %}
                         <a href="{% url 'comisaria_tolhuin_edit' record.pk %}"
                             class="bg-yellow-500 text-black px-4 w-full rounded block text-center my-1">
                             EDITAR

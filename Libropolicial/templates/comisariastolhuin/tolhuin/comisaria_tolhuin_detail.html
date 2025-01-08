@@ -127,8 +127,7 @@ Tolhuin{% endblock %} {% block content %}
       <ul class="flex gap-x-2">
         {% for codigo in record.codigos_secundariosTOL.all %}
         <li>
-          {{ codigo.codigoTOL|default:"S/N" }}{% if not forloop.last %},{% endif
-          %}
+          {{ codigo.codigoTOL|default:"S/N" }}{% if not forloop.last %},{% endif%}
         </li>
         {% endfor %}
       </ul>
