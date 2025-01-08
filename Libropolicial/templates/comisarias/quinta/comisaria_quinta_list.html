@@ -17,7 +17,7 @@
 
     <h1 class="text-2xl font-bold text-center mb-4">Lista de Códigos en Comisaría Quinta</h1>
 
-    <div class="me-nu flex flex-wrap justify-center gap-4">
+    <div class="me-nu flex flex-wrap justify-center mb-4 gap-4">
         {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias %}
         <a href="{% url 'comisaria_quinta_create' %}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Iniciar Codigo</a>
         {% endif %}
@@ -48,31 +48,47 @@
 
 
     <!-- Formulario de búsqueda y selección de elementos por página -->
-    <div class="mb-4 flex justify-between items-center">
-        <!-- Formulario de búsqueda -->
-        <form method="get" class="flex items-center">
-            <input type="text" name="q" value="{{ query }}" placeholder="Buscar..." class="border rounded px-4 py-2 w-full max-w-xs">
-            <button type="submit" class="ml-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-                Buscar
-            </button>
-            <button type="button" onclick="clearSearch()" class="ml-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-2.707-5.707a1 1 0 010-1.414L8.586 10 7.293 8.707a1 1 0 011.414-1.414L10 8.586l1.293-1.293a1 1 0 011.414 1.414L11.414 10l1.293 1.293a1 1 0 01-1.414 1.414L10 11.414l-1.293 1.293a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                </svg>
-            </button>
-        </form>
+<div class="mb-4 flex justify-between items-center">
+    <!-- Formulario de búsqueda -->
+    <form method="get" class="flex items-center">
+        <input 
+            type="text" 
+            name="q" 
+            value="{{ query }}" 
+            placeholder="Buscar..." 
+            class="border rounded px-4 py-2 w-full max-w-xs bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+        >
+        <button 
+            type="submit" 
+            class="ml-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+            Buscar
+        </button>
+        <button 
+            type="button" 
+            onclick="clearSearch()" 
+            class="ml-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-2.707-5.707a1 1 0 010-1.414L8.586 10 7.293 8.707a1 1 0 011.414-1.414L10 8.586l1.293-1.293a1 1 0 011.414 1.414L11.414 10l1.293 1.293a1 1 0 01-1.414 1.414L10 11.414l-1.293 1.293a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+            </svg>
+        </button>
+    </form>
 
-        <!-- Formulario para selección de elementos por página -->
-        <form method="get">
-            <select name="items_per_page" onchange="this.form.submit()" class="border rounded px-4 py-2">
-                <option value="10" {% if items_per_page == 10 %}selected{% endif %}>10</option>
-                <option value="20" {% if items_per_page == 20 %}selected{% endif %}>20</option>
-                <option value="30" {% if items_per_page == 30 %}selected{% endif %}>30</option>
-                <option value="40" {% if items_per_page == 40 %}selected{% endif %}>40</option>
-            </select>
-            <input type="hidden" name="q" value="{{ query }}">
-        </form>
-    </div>
+    <!-- Formulario para selección de elementos por página -->
+    <form method="get">
+        <select 
+            name="items_per_page" 
+            onchange="this.form.submit()" 
+            class="border rounded px-4 py-2 bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+        >
+            <option value="10" {% if items_per_page == 10 %}selected{% endif %}>10</option>
+            <option value="20" {% if items_per_page == 20 %}selected{% endif %}>20</option>
+            <option value="30" {% if items_per_page == 30 %}selected{% endif %}>30</option>
+            <option value="40" {% if items_per_page == 40 %}selected{% endif %}>40</option>
+        </select>
+        <input type="hidden" name="q" value="{{ query }}">
+    </form>
+</div>
+
 
     <!-- Tabla -->
     <div class="overflow-x-auto rounded-lg mt-4">

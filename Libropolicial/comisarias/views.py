@@ -1,7 +1,7 @@
 import os
 import json
 import mimetypes
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta # Se utiliza para trabajar con fechas y horas en Python.
 from io import BytesIO
 
 from django.conf import settings
@@ -14,7 +14,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.core.serializers import serialize
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q  # Permite crear filtros complejos utilizando operadores lógicos (AND, OR).
 from django.http import JsonResponse, HttpResponse, HttpRequest, FileResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template.loader import render_to_string, get_template
@@ -124,81 +124,102 @@ def sign_comisaria_quinta(request, pk):
 # views.py
 
 class ComisariaPrimeraListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
-    # Especifica el modelo de datos que se va a listar.
-    model = ComisariaPrimera
-    
-    # Define la plantilla que se utilizará para renderizar la lista.
-    template_name = 'comisarias/primera/comisaria_primera_list.html'
-    
-    # Define el nombre del contexto que contendrá la lista de registros.
-    context_object_name = 'records'
+    # Vista basada en clases para listar los registros de la Comisaría Primera.
+    # Incluye restricciones de acceso y paginación.
 
-    # Método que determina si el usuario tiene permiso para acceder a esta vista.
+    model = ComisariaPrimera  # Especifica el modelo `ComisariaPrimera` como la fuente de datos.
+    template_name = 'comisarias/primera/comisaria_primera_list.html'  # Plantilla HTML que se usará para renderizar la vista.
+    context_object_name = 'page_obj'  # Nombre del objeto de contexto que contiene los registros paginados.
+
     def test_func(self):
         # Verifica si el usuario pertenece al grupo 'comisariaprimera'.
         return user_is_in_group(self.request.user, 'comisariaprimera')
 
-    # Método que maneja el caso en el que el usuario no tiene permiso para acceder a la vista.
     def handle_no_permission(self):
-        # Redirige al usuario a la página de 'no_permission' si no tiene permiso.
+        # Redirige al usuario a una página de error si no tiene los permisos necesarios.
         return redirect('no_permission')
 
-    # Método que personaliza el conjunto de datos que se listará en la vista.
+    def get_paginate_by(self, queryset):
+        # Determina cuántos elementos se mostrarán por página, según un parámetro GET.
+
+        items_per_page = self.request.GET.get('items_per_page', 10)  # Obtiene el valor de `items_per_page` (o 10 por defecto).
+        try:
+            return int(items_per_page)  # Intenta convertir el valor a entero.
+        except ValueError:
+            return 10  # Si ocurre un error, devuelve el valor por defecto (10).
+
     def get_queryset(self):
-        # Obtiene el queryset predeterminado y lo ordena por la fecha y hora en orden descendente.
-        #queryset = super().get_queryset().order_by('-fecha_hora')
-        queryset = super().get_queryset().filter(activo=True).order_by('-fecha_hora')
-        # Obtiene el parámetro de búsqueda de la solicitud GET, si existe.
-        search_query = self.request.GET.get('q', '')
-        
-        # Si hay una consulta de búsqueda, filtra el queryset por coincidencias en el campo 'cuarto'.
-        if search_query:
-            queryset = queryset.filter(cuarto__cuarto__icontains=search_query)
-        
-        # Ajusta la fecha y hora de cada registro en el queryset para asegurarse de que estén en la zona horaria local.
-        for comisaria in queryset:
-            if timezone.is_naive(comisaria.fecha_hora):
-                # Si la fecha y hora son ingenuas (sin zona horaria), se convierten a la zona horaria actual.
-                comisaria.fecha_hora = timezone.make_aware(comisaria.fecha_hora, timezone.get_current_timezone())
-            
-            # Convierte la fecha y hora a la hora local.
-            comisaria.fecha_hora = timezone.localtime(comisaria.fecha_hora)
-        
-        # Devuelve el queryset final, posiblemente filtrado y ajustado.
-        return queryset
+        # Obtiene los datos que se mostrarán en la tabla, incluyendo filtrado y ordenación.
 
-    # Método que proporciona datos adicionales al contexto de la plantilla.
+        queryset = super().get_queryset().filter(activo=True).order_by('-fecha_hora')  
+        # Filtra registros donde `activo=True` y los ordena por `fecha_hora` en orden descendente.
+
+        search_query = self.request.GET.get('q', '').strip()  
+        # Obtiene la consulta de búsqueda ingresada por el usuario desde los parámetros GET.
+
+        if search_query:  # Verifica si se ingresó un término de búsqueda.
+            try:
+                search_date = datetime.strptime(search_query, "%d/%m/%Y").date()  
+                # Intenta convertir la consulta a una fecha (sin hora) usando el formato 'dd/mm/yyyy'.
+                queryset = queryset.filter(fecha_hora__date=search_date)  
+                # Filtra los registros donde solo la fecha (sin hora) coincide.
+            except (ValueError, TypeError):  
+                # Si la consulta no es una fecha válida, realiza el filtrado en otros campos.
+                queryset = queryset.filter(
+                    Q(cuarto__cuarto__icontains=search_query) |  # Busca coincidencias parciales en el nombre del cuarto.
+                    Q(codigo__nombre_codigo__icontains=search_query) |  # Busca coincidencias parciales en el nombre del código.
+                    Q(lugar_codigo__icontains=search_query) |  # Busca coincidencias parciales en el lugar del código.
+                    Q(descripcion__icontains=search_query) |  # Busca coincidencias parciales en la descripción.
+                    Q(estado__icontains=search_query) |  # Busca coincidencias parciales en el estado del registro.
+                    Q(created_by__first_name__icontains=search_query) |  # Busca coincidencias parciales en el nombre del creador.
+                    Q(created_by__last_name__icontains=search_query) |  # Busca coincidencias parciales en el apellido del creador.
+                    Q(updated_by__first_name__icontains=search_query) |  # Busca coincidencias parciales en el nombre del editor.
+                    Q(updated_by__last_name__icontains=search_query)  # Busca coincidencias parciales en el apellido del editor.
+                )
+
+        return queryset  # Devuelve el conjunto de registros filtrados.
+
     def get_context_data(self, **kwargs):
-        # Llama al método original para obtener el contexto predeterminado.
-        context = super().get_context_data(**kwargs)
-
-        user = self.request.user
+        # Agrega datos adicionales al contexto que se pasará a la plantilla.
         
-        # Agrega al contexto un booleano que indica si el usuario pertenece al grupo 'jefessuperiores'.
-       # context['is_jefessuperiores'] = self.request.user.groups.filter(name='jefessuperiores').exists()
+        context = super().get_context_data(**kwargs)  # Obtiene el contexto predeterminado.
+        user = self.request.user  # Obtiene el usuario actual.
 
-          # Verificar la pertenencia a los grupos
-          
-        
-        #context['is_encargados_guardias_primera'] = user.groups.filter(name='encargados_guardias_primera').exists()
-        #context['is_jefessuperiores'] = user.groups.filter(name='jefessuperiores').exists()
-        #context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
-        #context['is_comisariaprimera'] = user.groups.filter(name='comisariaprimera').exists()
-
-        context['is_jefessuperiores'] = user.groups.filter(name='jefessuperiores').exists()
+        # Añade información sobre los permisos del usuario, según sus grupos.
+        context['is_jefessuperiores'] = user.groups.filter(name='jefessuperiores').exists()  
         context['is_libreros'] = user.groups.filter(name='libreros').exists()
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariaprimera'] = user.groups.filter(name='comisariaprimera').exists()
-        
-        # Agrega la fecha actual al contexto.
-        context['today'] = timezone.now().date()
-        
-        # Inicializa resolveId en None y lo agrega al contexto.
-        context['resolveId'] = None  # Inicializa resolveId en None
-        
-        # Devuelve el contexto completo.
-        return context
+
+        context['today'] = timezone.now().date()  # Agrega la fecha actual al contexto.
+        context['resolveId'] = None  # Define una variable para resolver registros (actualmente no utilizada).
+
+        queryset = self.get_queryset()  # Obtiene el conjunto de datos filtrado.
+        paginate_by = self.get_paginate_by(queryset)  # Determina el número de registros por página.
+        paginator = Paginator(queryset, paginate_by)  # Crea el objeto de paginación con el conjunto de datos.
+        page = self.request.GET.get('page')  # Obtiene el número de la página actual desde los parámetros GET.
+
+        try:
+            page_obj = paginator.page(page)  # Obtiene los registros correspondientes a la página actual.
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)  # Si el número de página no es válido, muestra la primera página.
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)  # Si el número de página está fuera de rango, muestra la última página.
+
+        current_page = page_obj.number  # Obtiene el número de la página actual.
+        total_pages = page_obj.paginator.num_pages  # Calcula el número total de páginas.
+        range_start = max(current_page - 5, 1)  # Calcula el inicio del rango dinámico de paginación.
+        range_end = min(current_page + 5, total_pages) + 1  # Calcula el final del rango dinámico de paginación.
+
+        context['page_obj'] = page_obj  # Añade el objeto de paginación al contexto.
+        context['query'] = self.request.GET.get('q', '')  # Añade la consulta de búsqueda al contexto.
+        context['items_per_page'] = paginate_by  # Añade el número de elementos por página al contexto.
+        context['page_range'] = range(range_start, range_end)  # Añade el rango dinámico de páginas al contexto.
+
+        return context  # Devuelve el contexto completo.
+
+    
 
 #---------------------------clase para el create del formulario------------------------------------------------------------------------------------
    
@@ -619,45 +640,102 @@ def eliminar_comisaria_primera(request, pk):
 
 
 class ComisariaSegundaListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
-    model = ComisariaSegunda
-    template_name = 'comisarias/segunda/comisaria_segunda_list.html'
-    context_object_name = 'records'
+    # Vista basada en clases para listar los registros de la Comisaría Segunda.
+    # Incluye restricciones de acceso y paginación.
+
+    model = ComisariaSegunda  # Especifica el modelo `ComisariaSegunda` como la fuente de datos.
+    template_name = 'comisarias/segunda/comisaria_segunda_list.html'  # Plantilla HTML que se usará para renderizar la vista.
+    context_object_name = 'page_obj'  # Nombre del objeto de contexto que contiene los registros paginados.
 
     def test_func(self):
+        # Verifica si el usuario pertenece al grupo 'comisariasegunda'.
         return user_is_in_group(self.request.user, 'comisariasegunda')
 
     def handle_no_permission(self):
+        # Redirige al usuario a una página de error si no tiene los permisos necesarios.
         return redirect('no_permission')
-    
+
+    def get_paginate_by(self, queryset):
+        # Determina cuántos elementos se mostrarán por página, según un parámetro GET.
+
+        items_per_page = self.request.GET.get('items_per_page', 10)  # Obtiene el valor de `items_per_page` (o 10 por defecto).
+        try:
+            return int(items_per_page)  # Intenta convertir el valor a entero.
+        except ValueError:
+            return 10  # Si ocurre un error, devuelve el valor por defecto (10).
 
     def get_queryset(self):
-        #queryset = super().get_queryset().order_by('-fecha_hora')
-        queryset = super().get_queryset().filter(activo=True).order_by('-fecha_hora')
-        search_query = self.request.GET.get('q', '')
-        if search_query:
-            queryset = queryset.filter(cuarto__cuarto__icontains=search_query)
-        for comisaria in queryset:
-            if timezone.is_naive(comisaria.fecha_hora):
-                comisaria.fecha_hora = timezone.make_aware(comisaria.fecha_hora, timezone.get_current_timezone())
-            comisaria.fecha_hora = timezone.localtime(comisaria.fecha_hora)
-        return queryset
+        # Obtiene los datos que se mostrarán en la tabla, incluyendo filtrado y ordenación.
+
+        queryset = super().get_queryset().filter(activo=True).order_by('-fecha_hora')  
+        # Filtra registros donde `activo=True` y los ordena por `fecha_hora` en orden descendente.
+
+        search_query = self.request.GET.get('q', '').strip()  
+        # Obtiene la consulta de búsqueda ingresada por el usuario desde los parámetros GET.
+
+        if search_query:  # Verifica si se ingresó un término de búsqueda.
+            try:
+                search_date = datetime.strptime(search_query, "%d/%m/%Y").date()  
+                # Intenta convertir la consulta a una fecha (sin hora) usando el formato 'dd/mm/yyyy'.
+                queryset = queryset.filter(fecha_hora__date=search_date)  
+                # Filtra los registros donde solo la fecha (sin hora) coincide.
+            except (ValueError, TypeError):  
+                # Si la consulta no es una fecha válida, realiza el filtrado en otros campos.
+                queryset = queryset.filter(
+                    Q(cuarto__cuarto__icontains=search_query) |  # Busca coincidencias parciales en el nombre del cuarto.
+                    Q(codigo__nombre_codigo__icontains=search_query) |  # Busca coincidencias parciales en el nombre del código.
+                    Q(lugar_codigo__icontains=search_query) |  # Busca coincidencias parciales en el lugar del código.
+                    Q(descripcion__icontains=search_query) |  # Busca coincidencias parciales en la descripción.
+                    Q(estado__icontains=search_query) |  # Busca coincidencias parciales en el estado del registro.
+                    Q(created_by__first_name__icontains=search_query) |  # Busca coincidencias parciales en el nombre del creador.
+                    Q(created_by__last_name__icontains=search_query) |  # Busca coincidencias parciales en el apellido del creador.
+                    Q(updated_by__first_name__icontains=search_query) |  # Busca coincidencias parciales en el nombre del editor.
+                    Q(updated_by__last_name__icontains=search_query)  # Busca coincidencias parciales en el apellido del editor.
+                )
+
+        return queryset  # Devuelve el conjunto de registros filtrados.
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
+        # Agrega datos adicionales al contexto que se pasará a la plantilla.
+        
+        context = super().get_context_data(**kwargs)  # Obtiene el contexto predeterminado.
+        user = self.request.user  # Obtiene el usuario actual.
 
-        #context['is_jefessuperiores'] = self.request.user.groups.filter(name='jefessuperiores').exists()
-        #context['is_encargados_guardias_segunda'] = user.groups.filter(name='encargados_guardias_segunda').exists()
-        context['is_jefessuperiores'] = user.groups.filter(name='jefessuperiores').exists()
+        # Añade información sobre los permisos del usuario, según sus grupos.
+        context['is_jefessuperiores'] = user.groups.filter(name='jefessuperiores').exists()  
         context['is_libreros'] = user.groups.filter(name='libreros').exists()
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariasegunda'] = user.groups.filter(name='comisariasegunda').exists()
 
+        context['today'] = timezone.now().date()  # Agrega la fecha actual al contexto.
+        context['resolveId'] = None  # Define una variable para resolver registros (actualmente no utilizada).
 
-        context['today'] = timezone.now().date()
-        context['resolveId'] = None
-        return context
+        queryset = self.get_queryset()  # Obtiene el conjunto de datos filtrado.
+        paginate_by = self.get_paginate_by(queryset)  # Determina el número de registros por página.
+        paginator = Paginator(queryset, paginate_by)  # Crea el objeto de paginación con el conjunto de datos.
+        page = self.request.GET.get('page')  # Obtiene el número de la página actual desde los parámetros GET.
+
+        try:
+            page_obj = paginator.page(page)  # Obtiene los registros correspondientes a la página actual.
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)  # Si el número de página no es válido, muestra la primera página.
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)  # Si el número de página está fuera de rango, muestra la última página.
+
+        current_page = page_obj.number  # Obtiene el número de la página actual.
+        total_pages = page_obj.paginator.num_pages  # Calcula el número total de páginas.
+        range_start = max(current_page - 5, 1)  # Calcula el inicio del rango dinámico de paginación.
+        range_end = min(current_page + 5, total_pages) + 1  # Calcula el final del rango dinámico de paginación.
+
+        context['page_obj'] = page_obj  # Añade el objeto de paginación al contexto.
+        context['query'] = self.request.GET.get('q', '')  # Añade la consulta de búsqueda al contexto.
+        context['items_per_page'] = paginate_by  # Añade el número de elementos por página al contexto.
+        context['page_range'] = range(range_start, range_end)  # Añade el rango dinámico de páginas al contexto.
+
+        return context  # Devuelve el contexto completo.
+
+    
 
 #-----------------------------------------------------------------------------------------------------------------   
     
@@ -1000,41 +1078,102 @@ def eliminar_comisaria_segunda(request, pk):
 
 
 class ComisariaTerceraListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
-    model = ComisariaTercera
-    template_name = 'comisarias/tercera/comisaria_tercera_list.html'
-    context_object_name = 'records'
+    # Vista basada en clases para listar los registros de la Comisaría Cuarta.
+    # Incluye restricciones de acceso y paginación.
+
+    model = ComisariaTercera  # Especifica el modelo `ComisariaTercera` como la fuente de datos.
+    template_name = 'comisarias/tercera/comisaria_tercera_list.html'  # Plantilla HTML que se usará para renderizar la vista.
+    context_object_name = 'page_obj'  # Nombre del objeto de contexto que contiene los registros paginados.
 
     def test_func(self):
+        # Verifica si el usuario pertenece al grupo 'comisariatercera'.
         return user_is_in_group(self.request.user, 'comisariatercera')
 
     def handle_no_permission(self):
+        # Redirige al usuario a una página de error si no tiene los permisos necesarios.
         return redirect('no_permission')
 
+    def get_paginate_by(self, queryset):
+        # Determina cuántos elementos se mostrarán por página, según un parámetro GET.
+
+        items_per_page = self.request.GET.get('items_per_page', 10)  # Obtiene el valor de `items_per_page` (o 10 por defecto).
+        try:
+            return int(items_per_page)  # Intenta convertir el valor a entero.
+        except ValueError:
+            return 10  # Si ocurre un error, devuelve el valor por defecto (10).
+
     def get_queryset(self):
-        #queryset = super().get_queryset().order_by('-fecha_hora')
-        queryset = super().get_queryset().filter(activo=True).order_by('-fecha_hora')
-        search_query = self.request.GET.get('q', '')
-        if search_query:
-            queryset = queryset.filter(cuarto__cuarto__icontains=search_query)
-        for comisaria in queryset:
-            if timezone.is_naive(comisaria.fecha_hora):
-                comisaria.fecha_hora = timezone.make_aware(comisaria.fecha_hora, timezone.get_current_timezone())
-            comisaria.fecha_hora = timezone.localtime(comisaria.fecha_hora)
-        return queryset
+        # Obtiene los datos que se mostrarán en la tabla, incluyendo filtrado y ordenación.
+
+        queryset = super().get_queryset().filter(activo=True).order_by('-fecha_hora')  
+        # Filtra registros donde `activo=True` y los ordena por `fecha_hora` en orden descendente.
+
+        search_query = self.request.GET.get('q', '').strip()  
+        # Obtiene la consulta de búsqueda ingresada por el usuario desde los parámetros GET.
+
+        if search_query:  # Verifica si se ingresó un término de búsqueda.
+            try:
+                search_date = datetime.strptime(search_query, "%d/%m/%Y").date()  
+                # Intenta convertir la consulta a una fecha (sin hora) usando el formato 'dd/mm/yyyy'.
+                queryset = queryset.filter(fecha_hora__date=search_date)  
+                # Filtra los registros donde solo la fecha (sin hora) coincide.
+            except (ValueError, TypeError):  
+                # Si la consulta no es una fecha válida, realiza el filtrado en otros campos.
+                queryset = queryset.filter(
+                    Q(cuarto__cuarto__icontains=search_query) |  # Busca coincidencias parciales en el nombre del cuarto.
+                    Q(codigo__nombre_codigo__icontains=search_query) |  # Busca coincidencias parciales en el nombre del código.
+                    Q(lugar_codigo__icontains=search_query) |  # Busca coincidencias parciales en el lugar del código.
+                    Q(descripcion__icontains=search_query) |  # Busca coincidencias parciales en la descripción.
+                    Q(estado__icontains=search_query) |  # Busca coincidencias parciales en el estado del registro.
+                    Q(created_by__first_name__icontains=search_query) |  # Busca coincidencias parciales en el nombre del creador.
+                    Q(created_by__last_name__icontains=search_query) |  # Busca coincidencias parciales en el apellido del creador.
+                    Q(updated_by__first_name__icontains=search_query) |  # Busca coincidencias parciales en el nombre del editor.
+                    Q(updated_by__last_name__icontains=search_query)  # Busca coincidencias parciales en el apellido del editor.
+                )
+
+        return queryset  # Devuelve el conjunto de registros filtrados.
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
+        # Agrega datos adicionales al contexto que se pasará a la plantilla.
+        
+        context = super().get_context_data(**kwargs)  # Obtiene el contexto predeterminado.
+        user = self.request.user  # Obtiene el usuario actual.
 
-        context['is_jefessuperiores'] = user.groups.filter(name='jefessuperiores').exists()
+        # Añade información sobre los permisos del usuario, según sus grupos.
+        context['is_jefessuperiores'] = user.groups.filter(name='jefessuperiores').exists()  
         context['is_libreros'] = user.groups.filter(name='libreros').exists()
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariatercera'] = user.groups.filter(name='comisariatercera').exists()
 
-        context['today'] = timezone.now().date()
-        context['resolveId'] = None
-        return context
+        context['today'] = timezone.now().date()  # Agrega la fecha actual al contexto.
+        context['resolveId'] = None  # Define una variable para resolver registros (actualmente no utilizada).
+
+        queryset = self.get_queryset()  # Obtiene el conjunto de datos filtrado.
+        paginate_by = self.get_paginate_by(queryset)  # Determina el número de registros por página.
+        paginator = Paginator(queryset, paginate_by)  # Crea el objeto de paginación con el conjunto de datos.
+        page = self.request.GET.get('page')  # Obtiene el número de la página actual desde los parámetros GET.
+
+        try:
+            page_obj = paginator.page(page)  # Obtiene los registros correspondientes a la página actual.
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)  # Si el número de página no es válido, muestra la primera página.
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)  # Si el número de página está fuera de rango, muestra la última página.
+
+        current_page = page_obj.number  # Obtiene el número de la página actual.
+        total_pages = page_obj.paginator.num_pages  # Calcula el número total de páginas.
+        range_start = max(current_page - 5, 1)  # Calcula el inicio del rango dinámico de paginación.
+        range_end = min(current_page + 5, total_pages) + 1  # Calcula el final del rango dinámico de paginación.
+
+        context['page_obj'] = page_obj  # Añade el objeto de paginación al contexto.
+        context['query'] = self.request.GET.get('q', '')  # Añade la consulta de búsqueda al contexto.
+        context['items_per_page'] = paginate_by  # Añade el número de elementos por página al contexto.
+        context['page_range'] = range(range_start, range_end)  # Añade el rango dinámico de páginas al contexto.
+
+        return context  # Devuelve el contexto completo.
+
+    
 
 
 #----------------------------CREACION DE COMISARIA TERCERA----------------------------------------
@@ -1361,43 +1500,102 @@ def eliminar_comisaria_tercera(request, pk):
 #--------------------------vista para para la comisria cuarta------------------------------------------------------
 
 
-
 class ComisariaCuartaListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
-    model = ComisariaCuarta
-    template_name = 'comisarias/cuarta/comisaria_cuarta_list.html'
-    context_object_name = 'records'
+    # Vista basada en clases para listar los registros de la Comisaría Cuarta.
+    # Incluye restricciones de acceso y paginación.
+
+    model = ComisariaCuarta  # Especifica el modelo `ComisariaCuarta` como la fuente de datos.
+    template_name = 'comisarias/cuarta/comisaria_cuarta_list.html'  # Plantilla HTML que se usará para renderizar la vista.
+    context_object_name = 'page_obj'  # Nombre del objeto de contexto que contiene los registros paginados.
 
     def test_func(self):
+        # Verifica si el usuario pertenece al grupo 'comisariacuarta'.
         return user_is_in_group(self.request.user, 'comisariacuarta')
 
     def handle_no_permission(self):
+        # Redirige al usuario a una página de error si no tiene los permisos necesarios.
         return redirect('no_permission')
 
+    def get_paginate_by(self, queryset):
+        # Determina cuántos elementos se mostrarán por página, según un parámetro GET.
+
+        items_per_page = self.request.GET.get('items_per_page', 10)  # Obtiene el valor de `items_per_page` (o 10 por defecto).
+        try:
+            return int(items_per_page)  # Intenta convertir el valor a entero.
+        except ValueError:
+            return 10  # Si ocurre un error, devuelve el valor por defecto (10).
+
     def get_queryset(self):
-        queryset = super().get_queryset().filter(activo=True).order_by('-fecha_hora')
-        #queryset = super().get_queryset().order_by('-fecha_hora')
-        search_query = self.request.GET.get('q', '')
-        if search_query:
-            queryset = queryset.filter(cuarto__cuarto__icontains=search_query)
-        for comisaria in queryset:
-            if timezone.is_naive(comisaria.fecha_hora):
-                comisaria.fecha_hora = timezone.make_aware(comisaria.fecha_hora, timezone.get_current_timezone())
-            comisaria.fecha_hora = timezone.localtime(comisaria.fecha_hora)
-        return queryset
+        # Obtiene los datos que se mostrarán en la tabla, incluyendo filtrado y ordenación.
+
+        queryset = super().get_queryset().filter(activo=True).order_by('-fecha_hora')  
+        # Filtra registros donde `activo=True` y los ordena por `fecha_hora` en orden descendente.
+
+        search_query = self.request.GET.get('q', '').strip()  
+        # Obtiene la consulta de búsqueda ingresada por el usuario desde los parámetros GET.
+
+        if search_query:  # Verifica si se ingresó un término de búsqueda.
+            try:
+                search_date = datetime.strptime(search_query, "%d/%m/%Y").date()  
+                # Intenta convertir la consulta a una fecha (sin hora) usando el formato 'dd/mm/yyyy'.
+                queryset = queryset.filter(fecha_hora__date=search_date)  
+                # Filtra los registros donde solo la fecha (sin hora) coincide.
+            except (ValueError, TypeError):  
+                # Si la consulta no es una fecha válida, realiza el filtrado en otros campos.
+                queryset = queryset.filter(
+                    Q(cuarto__cuarto__icontains=search_query) |  # Busca coincidencias parciales en el nombre del cuarto.
+                    Q(codigo__nombre_codigo__icontains=search_query) |  # Busca coincidencias parciales en el nombre del código.
+                    Q(lugar_codigo__icontains=search_query) |  # Busca coincidencias parciales en el lugar del código.
+                    Q(descripcion__icontains=search_query) |  # Busca coincidencias parciales en la descripción.
+                    Q(estado__icontains=search_query) |  # Busca coincidencias parciales en el estado del registro.
+                    Q(created_by__first_name__icontains=search_query) |  # Busca coincidencias parciales en el nombre del creador.
+                    Q(created_by__last_name__icontains=search_query) |  # Busca coincidencias parciales en el apellido del creador.
+                    Q(updated_by__first_name__icontains=search_query) |  # Busca coincidencias parciales en el nombre del editor.
+                    Q(updated_by__last_name__icontains=search_query)  # Busca coincidencias parciales en el apellido del editor.
+                )
+
+        return queryset  # Devuelve el conjunto de registros filtrados.
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
+        # Agrega datos adicionales al contexto que se pasará a la plantilla.
+        
+        context = super().get_context_data(**kwargs)  # Obtiene el contexto predeterminado.
+        user = self.request.user  # Obtiene el usuario actual.
 
-        context['is_jefessuperiores'] = user.groups.filter(name='jefessuperiores').exists()
+        # Añade información sobre los permisos del usuario, según sus grupos.
+        context['is_jefessuperiores'] = user.groups.filter(name='jefessuperiores').exists()  
         context['is_libreros'] = user.groups.filter(name='libreros').exists()
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariacuarta'] = user.groups.filter(name='comisariacuarta').exists()
 
-        context['today'] = timezone.now().date()
-        context['resolveId'] = None
-        return context
+        context['today'] = timezone.now().date()  # Agrega la fecha actual al contexto.
+        context['resolveId'] = None  # Define una variable para resolver registros (actualmente no utilizada).
+
+        queryset = self.get_queryset()  # Obtiene el conjunto de datos filtrado.
+        paginate_by = self.get_paginate_by(queryset)  # Determina el número de registros por página.
+        paginator = Paginator(queryset, paginate_by)  # Crea el objeto de paginación con el conjunto de datos.
+        page = self.request.GET.get('page')  # Obtiene el número de la página actual desde los parámetros GET.
+
+        try:
+            page_obj = paginator.page(page)  # Obtiene los registros correspondientes a la página actual.
+        except PageNotAnInteger:
+            page_obj = paginator.page(1)  # Si el número de página no es válido, muestra la primera página.
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)  # Si el número de página está fuera de rango, muestra la última página.
+
+        current_page = page_obj.number  # Obtiene el número de la página actual.
+        total_pages = page_obj.paginator.num_pages  # Calcula el número total de páginas.
+        range_start = max(current_page - 5, 1)  # Calcula el inicio del rango dinámico de paginación.
+        range_end = min(current_page + 5, total_pages) + 1  # Calcula el final del rango dinámico de paginación.
+
+        context['page_obj'] = page_obj  # Añade el objeto de paginación al contexto.
+        context['query'] = self.request.GET.get('q', '')  # Añade la consulta de búsqueda al contexto.
+        context['items_per_page'] = paginate_by  # Añade el número de elementos por página al contexto.
+        context['page_range'] = range(range_start, range_end)  # Añade el rango dinámico de páginas al contexto.
+
+        return context  # Devuelve el contexto completo.
+
     
 
 #----------------------Creacion de comisaria cuarta------------------------------------------------------------
@@ -1724,75 +1922,101 @@ def eliminar_comisaria_cuarta(request, pk):
 #---------------------comisaria quinta para ver ---------------------
 
 
-
 class ComisariaQuintaListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
-    model = ComisariaQuinta
-    template_name = 'comisarias/quinta/comisaria_quinta_list.html'
-    context_object_name = 'page_obj'
+    # Vista basada en clases para listar los registros de la Comisaría Quinta.
+    # Incluye restricciones de acceso y paginación.
+
+    model = ComisariaQuinta  # Especifica el modelo `ComisariaQuinta` como la fuente de datos.
+    template_name = 'comisarias/quinta/comisaria_quinta_list.html'  # Plantilla HTML que se usará para renderizar la vista.
+    context_object_name = 'page_obj'  # Nombre del objeto de contexto que contiene los registros paginados.
 
     def test_func(self):
+        # Verifica si el usuario pertenece al grupo 'comisariaquinta'.
         return user_is_in_group(self.request.user, 'comisariaquinta')
 
     def handle_no_permission(self):
+        # Redirige al usuario a una página de error si no tiene los permisos necesarios.
         return redirect('no_permission')
 
     def get_paginate_by(self, queryset):
-        """Define el número de registros por página dinámicamente."""
-        items_per_page = self.request.GET.get('items_per_page', 10)
+        # Determina cuántos elementos se mostrarán por página, según un parámetro GET.
+
+        items_per_page = self.request.GET.get('items_per_page', 10)  # Obtiene el valor de `items_per_page` (o 10 por defecto).
         try:
-            return int(items_per_page)
+            return int(items_per_page)  # Intenta convertir el valor a entero.
         except ValueError:
-            return 10  # Valor por defecto si no es válido
+            return 10  # Si ocurre un error, devuelve el valor por defecto (10).
 
     def get_queryset(self):
-        queryset = super().get_queryset().filter(activo=True).order_by('-fecha_hora')
-        search_query = self.request.GET.get('q', '')
-        if search_query:
-            queryset = queryset.filter(cuarto__cuarto__icontains=search_query)
-        for comisaria in queryset:
-            if timezone.is_naive(comisaria.fecha_hora):
-                comisaria.fecha_hora = timezone.make_aware(comisaria.fecha_hora, timezone.get_current_timezone())
-            comisaria.fecha_hora = timezone.localtime(comisaria.fecha_hora)
-        return queryset
+        # Obtiene los datos que se mostrarán en la tabla, incluyendo filtrado y ordenación.
+
+        queryset = super().get_queryset().filter(activo=True).order_by('-fecha_hora')  
+        # Filtra registros donde `activo=True` y los ordena por `fecha_hora` en orden descendente.
+
+        search_query = self.request.GET.get('q', '').strip()  
+        # Obtiene la consulta de búsqueda ingresada por el usuario desde los parámetros GET.
+
+        if search_query:  # Verifica si se ingresó un término de búsqueda.
+            try:
+                search_date = datetime.strptime(search_query, "%d/%m/%Y").date()  
+                # Intenta convertir la consulta a una fecha (sin hora) usando el formato 'dd/mm/yyyy'.
+                queryset = queryset.filter(fecha_hora__date=search_date)  
+                # Filtra los registros donde solo la fecha (sin hora) coincide.
+            except (ValueError, TypeError):  
+                # Si la consulta no es una fecha válida, realiza el filtrado en otros campos.
+                queryset = queryset.filter(
+                    Q(cuarto__cuarto__icontains=search_query) |  # Busca coincidencias parciales en el nombre del cuarto.
+                    Q(codigo__nombre_codigo__icontains=search_query) |  # Busca coincidencias parciales en el nombre del código.
+                    Q(lugar_codigo__icontains=search_query) |  # Busca coincidencias parciales en el lugar del código.
+                    Q(descripcion__icontains=search_query) |  # Busca coincidencias parciales en la descripción.
+                    Q(estado__icontains=search_query) |  # Busca coincidencias parciales en el estado del registro.
+                    Q(created_by__first_name__icontains=search_query) |  # Busca coincidencias parciales en el nombre del creador.
+                    Q(created_by__last_name__icontains=search_query) |  # Busca coincidencias parciales en el apellido del creador.
+                    Q(updated_by__first_name__icontains=search_query) |  # Busca coincidencias parciales en el nombre del editor.
+                    Q(updated_by__last_name__icontains=search_query)  # Busca coincidencias parciales en el apellido del editor.
+                )
+
+        return queryset  # Devuelve el conjunto de registros filtrados.
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user = self.request.user
+        # Agrega datos adicionales al contexto que se pasará a la plantilla.
+        
+        context = super().get_context_data(**kwargs)  # Obtiene el contexto predeterminado.
+        user = self.request.user  # Obtiene el usuario actual.
 
-        context['is_jefessuperiores'] = user.groups.filter(name='jefessuperiores').exists()
+        # Añade información sobre los permisos del usuario, según sus grupos.
+        context['is_jefessuperiores'] = user.groups.filter(name='jefessuperiores').exists()  
         context['is_libreros'] = user.groups.filter(name='libreros').exists()
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariaquinta'] = user.groups.filter(name='comisariaquinta').exists()
 
-        context['today'] = timezone.now().date()
-        context['resolveId'] = None
-        
-        # Paginación
-        queryset = self.get_queryset()
-        paginate_by = self.get_paginate_by(queryset)
-        paginator = Paginator(queryset, paginate_by)
-        page = self.request.GET.get('page')
+        context['today'] = timezone.now().date()  # Agrega la fecha actual al contexto.
+        context['resolveId'] = None  # Define una variable para resolver registros (actualmente no utilizada).
+
+        queryset = self.get_queryset()  # Obtiene el conjunto de datos filtrado.
+        paginate_by = self.get_paginate_by(queryset)  # Determina el número de registros por página.
+        paginator = Paginator(queryset, paginate_by)  # Crea el objeto de paginación con el conjunto de datos.
+        page = self.request.GET.get('page')  # Obtiene el número de la página actual desde los parámetros GET.
 
         try:
-            page_obj = paginator.page(page)
+            page_obj = paginator.page(page)  # Obtiene los registros correspondientes a la página actual.
         except PageNotAnInteger:
-            page_obj = paginator.page(1)
+            page_obj = paginator.page(1)  # Si el número de página no es válido, muestra la primera página.
         except EmptyPage:
-            page_obj = paginator.page(paginator.num_pages)
+            page_obj = paginator.page(paginator.num_pages)  # Si el número de página está fuera de rango, muestra la última página.
 
-        # Calcular el rango dinámico de páginas
-        current_page = page_obj.number
-        total_pages = page_obj.paginator.num_pages
-        range_start = max(current_page - 5, 1)
-        range_end = min(current_page + 5, total_pages) + 1  # Incluye la última página
+        current_page = page_obj.number  # Obtiene el número de la página actual.
+        total_pages = page_obj.paginator.num_pages  # Calcula el número total de páginas.
+        range_start = max(current_page - 5, 1)  # Calcula el inicio del rango dinámico de paginación.
+        range_end = min(current_page + 5, total_pages) + 1  # Calcula el final del rango dinámico de paginación.
 
-        context['page_obj'] = page_obj
-        context['query'] = self.request.GET.get('q', '')
-        context['items_per_page'] = paginate_by
-        context['page_range'] = range(range_start, range_end)
-        
-        return context
+        context['page_obj'] = page_obj  # Añade el objeto de paginación al contexto.
+        context['query'] = self.request.GET.get('q', '')  # Añade la consulta de búsqueda al contexto.
+        context['items_per_page'] = paginate_by  # Añade el número de elementos por página al contexto.
+        context['page_range'] = range(range_start, range_end)  # Añade el rango dinámico de páginas al contexto.
+
+        return context  # Devuelve el contexto completo.
 
 
 
