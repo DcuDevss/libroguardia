@@ -198,34 +198,21 @@ def obtener_usuarios_conectados(request):
     return JsonResponse({"usuarios_por_grupo": usuarios_por_grupo})
 
 
-from django.contrib.auth import logout
 from django.shortcuts import redirect
+from django.contrib.auth.views import LogoutView
+from django.contrib.auth import logout
 def custom_logout(request):
     """
-    Cierra la sesión del usuario y actualiza su estado `is_online` a False.
+    Función para cerrar sesión y actualizar el estado `is_online`.
     """
     if request.user.is_authenticated:
-        # Actualiza el estado de conexión del usuario
-        personal_profile = request.user.personal_profile
-        personal_profile.is_online = False
-        personal_profile.save()
-
-    # Cierra la sesión del usuario
+        user_profile = getattr(request.user, 'personal_profile', None)
+        if user_profile:
+            user_profile.is_online = False
+            user_profile.save()
     logout(request)
-    return redirect('login')  # Redirige a la página de inicio de sesión o donde deseesdef custom_logout(request):
-    """
-    Cierra la sesión del usuario y actualiza su estado `is_online` a False.
-    """
-    if request.user.is_authenticated:
-        # Actualiza el estado de conexión del usuario
-        personal_profile = request.user.personal_profile
-        personal_profile.is_online = False
-        personal_profile.save()
-
-    # Cierra la sesión del usuario
-    logout(request)
-    return redirect('login')  # Redirige a la página de inicio de sesión o donde desees
-
+    return redirect('login')
+   
 @csrf_exempt
 @login_required
 def cambiar_contrasena(request):

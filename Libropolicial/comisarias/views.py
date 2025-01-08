@@ -218,12 +218,15 @@ class ComisariaPrimeraListView(LoginRequiredMixin, UserPassesTestMixin, ListView
         context['items_per_page'] = paginate_by  # Añade el número de elementos por página al contexto.
         context['page_range'] = range(range_start, range_end)  # Añade el rango dinámico de páginas al contexto.
 
-        # Obtener usuarios conectados pertenecientes al grupo 'comisariaprimera'
+       # Obtener usuarios conectados pertenecientes al grupo 'comisariaprimera', excluyendo administradores
         usuarios_conectados = Personal.objects.filter(
             user__groups__name='comisariaprimera',
             is_online=True  # Este campo debe estar implementado en el modelo `Personal`
+        ).exclude(
+            user__is_superuser=True  # Excluye superadministradores
         ).select_related('user')
         context['usuarios_conectados'] = usuarios_conectados
+
 
         return context  # Devuelve el contexto completo.
 
@@ -733,10 +736,12 @@ class ComisariaSegundaListView(LoginRequiredMixin, UserPassesTestMixin, ListView
         context['items_per_page'] = paginate_by  # Añade el número de elementos por página al contexto.
         context['page_range'] = range(range_start, range_end)  # Añade el rango dinámico de páginas al contexto.
 
-        # Obtener usuarios conectados pertenecientes al grupo 'comisariaprimera'
+        # Obtener usuarios conectados pertenecientes al grupo 'comisariaprimera', excluyendo administradores
         usuarios_conectados = Personal.objects.filter(
             user__groups__name='comisariasegunda',
             is_online=True  # Este campo debe estar implementado en el modelo `Personal`
+        ).exclude(
+            user__is_superuser=True  # Excluye superadministradores
         ).select_related('user')
         context['usuarios_conectados'] = usuarios_conectados
 
@@ -1179,13 +1184,14 @@ class ComisariaTerceraListView(LoginRequiredMixin, UserPassesTestMixin, ListView
         context['items_per_page'] = paginate_by  # Añade el número de elementos por página al contexto.
         context['page_range'] = range(range_start, range_end)  # Añade el rango dinámico de páginas al contexto.
 
-        # Obtener usuarios conectados pertenecientes al grupo 'comisariaprimera'
+       # Obtener usuarios conectados pertenecientes al grupo 'comisariaprimera', excluyendo administradores
         usuarios_conectados = Personal.objects.filter(
             user__groups__name='comisariatercera',
             is_online=True  # Este campo debe estar implementado en el modelo `Personal`
+        ).exclude(
+            user__is_superuser=True  # Excluye superadministradores
         ).select_related('user')
         context['usuarios_conectados'] = usuarios_conectados
-
         return context  # Devuelve el contexto completo.
 
     
@@ -1609,10 +1615,12 @@ class ComisariaCuartaListView(LoginRequiredMixin, UserPassesTestMixin, ListView)
         context['items_per_page'] = paginate_by  # Añade el número de elementos por página al contexto.
         context['page_range'] = range(range_start, range_end)  # Añade el rango dinámico de páginas al contexto.
 
-        # Obtener usuarios conectados pertenecientes al grupo 'comisariaprimera'
+        # Obtener usuarios conectados pertenecientes al grupo 'comisariaprimera', excluyendo administradores
         usuarios_conectados = Personal.objects.filter(
             user__groups__name='comisariacuarta',
             is_online=True  # Este campo debe estar implementado en el modelo `Personal`
+        ).exclude(
+            user__is_superuser=True  # Excluye superadministradores
         ).select_related('user')
         context['usuarios_conectados'] = usuarios_conectados
 
@@ -2038,10 +2046,12 @@ class ComisariaQuintaListView(LoginRequiredMixin, UserPassesTestMixin, ListView)
         context['items_per_page'] = paginate_by  # Añade el número de elementos por página al contexto.
         context['page_range'] = range(range_start, range_end)  # Añade el rango dinámico de páginas al contexto.
 
-        # Obtener usuarios conectados pertenecientes al grupo 'comisariaprimera'
+        # Obtener usuarios conectados pertenecientes al grupo 'comisariaprimera', excluyendo administradores
         usuarios_conectados = Personal.objects.filter(
             user__groups__name='comisariaquinta',
             is_online=True  # Este campo debe estar implementado en el modelo `Personal`
+        ).exclude(
+            user__is_superuser=True  # Excluye superadministradores
         ).select_related('user')
         context['usuarios_conectados'] = usuarios_conectados
 
@@ -2476,12 +2486,6 @@ class ComisariasCompletaListView(LoginRequiredMixin, ListView):
         context['items_per_page'] = paginate_by
         context['page_range'] = range(range_start, range_end)
         return context
-
-
-
-
-        
-
 
 
 #-------------------------------genera pdf para firma y descarga------------------------------------------------------
