@@ -218,6 +218,13 @@ class ComisariaPrimeraListView(LoginRequiredMixin, UserPassesTestMixin, ListView
         context['items_per_page'] = paginate_by  # Añade el número de elementos por página al contexto.
         context['page_range'] = range(range_start, range_end)  # Añade el rango dinámico de páginas al contexto.
 
+        # Obtener usuarios conectados pertenecientes al grupo 'comisariaprimera'
+        usuarios_conectados = Personal.objects.filter(
+            user__groups__name='comisariaprimera',
+            is_online=True  # Este campo debe estar implementado en el modelo `Personal`
+        ).select_related('user')
+        context['usuarios_conectados'] = usuarios_conectados
+
         return context  # Devuelve el contexto completo.
 
     
@@ -603,15 +610,10 @@ class ComisariaPrimeraUpdateView(LoginRequiredMixin, UserPassesTestMixin, Update
 
 #--------------------------viesta para ver todos completo cada regitro--------------------------------------------------
 
-
-
 class ComisariaPrimeraDetailView(DetailView):
     model = ComisariaPrimera
     template_name = 'comisarias/primera/comisaria_primera_detail.html'
     context_object_name = 'record'
-
-
-
 
 #----------------------------softdelete-------------------------------------------------------------
 
@@ -630,9 +632,6 @@ def eliminar_comisaria_primera(request, pk):
     
     # Redirige de vuelta a la lista
     return redirect('comisaria_primera_list')
-
-
-
 
 #---------------------------------------------------------------------------------------------------------------------------------------
 
@@ -733,6 +732,14 @@ class ComisariaSegundaListView(LoginRequiredMixin, UserPassesTestMixin, ListView
         context['query'] = self.request.GET.get('q', '')  # Añade la consulta de búsqueda al contexto.
         context['items_per_page'] = paginate_by  # Añade el número de elementos por página al contexto.
         context['page_range'] = range(range_start, range_end)  # Añade el rango dinámico de páginas al contexto.
+
+        # Obtener usuarios conectados pertenecientes al grupo 'comisariaprimera'
+        usuarios_conectados = Personal.objects.filter(
+            user__groups__name='comisariasegunda',
+            is_online=True  # Este campo debe estar implementado en el modelo `Personal`
+        ).select_related('user')
+        context['usuarios_conectados'] = usuarios_conectados
+
 
         return context  # Devuelve el contexto completo.
 
@@ -1172,6 +1179,13 @@ class ComisariaTerceraListView(LoginRequiredMixin, UserPassesTestMixin, ListView
         context['items_per_page'] = paginate_by  # Añade el número de elementos por página al contexto.
         context['page_range'] = range(range_start, range_end)  # Añade el rango dinámico de páginas al contexto.
 
+        # Obtener usuarios conectados pertenecientes al grupo 'comisariaprimera'
+        usuarios_conectados = Personal.objects.filter(
+            user__groups__name='comisariatercera',
+            is_online=True  # Este campo debe estar implementado en el modelo `Personal`
+        ).select_related('user')
+        context['usuarios_conectados'] = usuarios_conectados
+
         return context  # Devuelve el contexto completo.
 
     
@@ -1595,6 +1609,13 @@ class ComisariaCuartaListView(LoginRequiredMixin, UserPassesTestMixin, ListView)
         context['items_per_page'] = paginate_by  # Añade el número de elementos por página al contexto.
         context['page_range'] = range(range_start, range_end)  # Añade el rango dinámico de páginas al contexto.
 
+        # Obtener usuarios conectados pertenecientes al grupo 'comisariaprimera'
+        usuarios_conectados = Personal.objects.filter(
+            user__groups__name='comisariacuarta',
+            is_online=True  # Este campo debe estar implementado en el modelo `Personal`
+        ).select_related('user')
+        context['usuarios_conectados'] = usuarios_conectados
+
         return context  # Devuelve el contexto completo.
 
     
@@ -2016,6 +2037,13 @@ class ComisariaQuintaListView(LoginRequiredMixin, UserPassesTestMixin, ListView)
         context['query'] = self.request.GET.get('q', '')  # Añade la consulta de búsqueda al contexto.
         context['items_per_page'] = paginate_by  # Añade el número de elementos por página al contexto.
         context['page_range'] = range(range_start, range_end)  # Añade el rango dinámico de páginas al contexto.
+
+        # Obtener usuarios conectados pertenecientes al grupo 'comisariaprimera'
+        usuarios_conectados = Personal.objects.filter(
+            user__groups__name='comisariaquinta',
+            is_online=True  # Este campo debe estar implementado en el modelo `Personal`
+        ).select_related('user')
+        context['usuarios_conectados'] = usuarios_conectados
 
         return context  # Devuelve el contexto completo.
 
