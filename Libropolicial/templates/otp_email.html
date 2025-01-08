@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Código de Verificación</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px; color: #333;">
+    <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <h2 style="color: #007bff; text-align: center;">Código de Verificación</h2>
+        <p>Hola {{ user.first_name }},</p>
+        <p>Hemos recibido una solicitud para restablecer tu contraseña.</p>
+        <p>Por favor, utiliza el siguiente código para completar el proceso:</p>
+        <div style="text-align: center; margin: 20px 0;">
+            <span style="font-size: 24px; font-weight: bold; color: #007bff;">{{ otp }}</span>
+        </div>
+        <p>Este código es válido por un tiempo limitado. Si no solicitaste este cambio, puedes ignorar este correo.</p>
+        <p style="margin: 0; font-size: 0.9rem; color: #555;text-align: center; ">Gracias ,<br>El equipo de soporte</p>
+        <p style="margin: 5px 0 0; font-weight: bold; font-size: 1rem; color: #114b72;text-align: center; ">División Comunicaciones Ushuaia</p>
+        <p style="margin: 0; font-size: 0.9rem; color: #333;text-align: center; ">Policía de la Provincia de Tierra del Fuego A.e.I.A.S</p>
+    
+    </div>
+</body>
+</html>
