@@ -49,7 +49,11 @@ class CustomLoginView(LoginView):
             'comisaria_terceraRG': 'comisariaterceraRG_list',
             'comisaria_cuartaRG': 'comisariacuartaRG_list',
             'comisaria_quintaRG': 'comisariaquintaRG_list',
+<<<<<<< HEAD
             'comisariastolhuin': 'comisaria_tolhuin_list',
+=======
+            'comisaria_tolhuin': 'comisaria_tolhuin_list',
+>>>>>>> 266e31aedeb95c7a08be47a499d429e5a3f54b00
             'divisioncomunicaciones': 'divisioncomunicaciones_list'
         }
         for group, url in user_group_redirects.items():
