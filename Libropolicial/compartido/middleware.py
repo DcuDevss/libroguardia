@@ -7,6 +7,23 @@ from django.utils import timezone
 # Importa timedelta para trabajar con diferencias de tiempo
 from datetime import timedelta
 
+from django.contrib.sessions.models import Session
+from django.utils.timezone import now
+from django.contrib.auth import logout
+
+# Midelware solo una sesion activa nueva actualizacion----09/01/25-----comentado
+'''
+class SingleSessionMiddleware(MiddlewareMixin):
+    def process_request(self, request):
+        if request.user.is_authenticated:
+            # Obtiene todas las sesiones activas
+            sessions = Session.objects.filter(expire_date__gte=now())
+            for session in sessions:
+                data = session.get_decoded()
+                # Si el usuario ya tiene otra sesión activa, la cierra
+                if data.get('_auth_user_id') == str(request.user.id) and session.session_key != request.session.session_key:
+                    session.delete()'''
+#---cierre-09/01/25----
 
 class NoCacheMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
