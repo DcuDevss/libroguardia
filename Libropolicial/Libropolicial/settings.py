@@ -58,7 +58,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',  # Middleware de protección contra clickjacking
     'compartido.middleware.NoCacheMiddleware',  # Middleware personalizado para no caché
     'compartido.middleware.RedirectAuthenticatedUserMiddleware',  # Middleware personalizado para redirigir usuarios autenticados
-    'compartido.middleware.InactivityLogoutMiddleware',  # Middleware personalizado para cerrar sesión por inactividad
+    'compartido.middleware.InactivityLogoutMiddleware', # Middleware personalizado para cerrar sesión por inactividad
+    #'compartido.middleware.SingleSessionMiddleware' # Midelware solo una sesion activa
     # 'comisarias.middleware.NoCacheMiddleware',  # Añadir este middleware si es necesario
     # 'comisarias.middleware.RedirectAuthenticatedUserMiddleware',  # Añadir este middleware si es necesario
     # 'comisarias.middleware.InactivityLogoutMiddleware',  # Añadir este middleware si es necesario
