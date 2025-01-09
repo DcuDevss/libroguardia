@@ -103,7 +103,7 @@ class ComisariaTolhuinListView(LoginRequiredMixin, UserPassesTestMixin, ListView
     def handle_no_permission(self):
         # Redirige al usuario a la página de 'no_permission' si no tiene permiso.
         return redirect('no_permission')
-    
+    #funcion paginado--9/01/25
     def get_paginate_by(self, queryset):
             # Determina cuántos elementos se mostrarán por página, según un parámetro GET.
 
@@ -112,7 +112,7 @@ class ComisariaTolhuinListView(LoginRequiredMixin, UserPassesTestMixin, ListView
                 return int(items_per_page)  # Intenta convertir el valor a entero.
             except ValueError:
                 return 10  # Si ocurre un error, devuelve el valor por defecto (10).
-            
+    #--cierre----09/01/25     
 
     # Método que personaliza el conjunto de datos que se listará en la vista.
     def get_queryset(self):
@@ -122,7 +122,7 @@ class ComisariaTolhuinListView(LoginRequiredMixin, UserPassesTestMixin, ListView
         # Obtiene el parámetro de búsqueda de la solicitud GET, si existe.
         search_query = self.request.GET.get('q', '')
         
-        # Si hay una consulta de búsqueda, filtra el queryset por coincidencias en el campo 'cuarto'.
+        # Si hay una consulta de búsqueda, filtra el queryset por coincidencias en el campo 'cuarto'--9/01/25.
         if search_query:  # Verifica si se ingresó un término de búsqueda.
             try:
                 search_date = datetime.strptime(search_query, "%d/%m/%Y").date()  
@@ -145,7 +145,7 @@ class ComisariaTolhuinListView(LoginRequiredMixin, UserPassesTestMixin, ListView
         
         # Devuelve el queryset final, posiblemente filtrado y ajustado.
         return queryset
-
+    #--cierre----09/01/25
     # Método que proporciona datos adicionales al contexto de la plantilla.
     def get_context_data(self, **kwargs):
         # Llama al método original para obtener el contexto predeterminado.
@@ -164,7 +164,7 @@ class ComisariaTolhuinListView(LoginRequiredMixin, UserPassesTestMixin, ListView
         
         # Inicializa resolveId en None y lo agrega al contexto.
         context['resolveId'] = None  # Inicializa resolveId en None
-
+        #paginado--9/01/25
         queryset = self.get_queryset()  # Obtiene el conjunto de datos filtrado.
         paginate_by = self.get_paginate_by(queryset)  # Determina el número de registros por página.
         paginator = Paginator(queryset, paginate_by)  # Crea el objeto de paginación con el conjunto de datos.
@@ -190,7 +190,7 @@ class ComisariaTolhuinListView(LoginRequiredMixin, UserPassesTestMixin, ListView
         
         # Devuelve el contexto completo.
         return context
-    
+    #--cierre----09/01/25
     #---------------------------clase para el create del formulario------------------------------------------------------------------------------------
    
 

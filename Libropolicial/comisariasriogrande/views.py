@@ -143,7 +143,7 @@ class ComisariaPrimeraRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
     def handle_no_permission(self):
         # Redirige al usuario a la página de 'no_permission' si no tiene permiso.
         return redirect('no_permission')
-    
+    #funcion paginado----09/01/25
     def get_paginate_by(self, queryset):
         # Determina cuántos elementos se mostrarán por página, según un parámetro GET.
 
@@ -152,8 +152,8 @@ class ComisariaPrimeraRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
             return int(items_per_page)  # Intenta convertir el valor a entero.
         except ValueError:
             return 10  # Si ocurre un error, devuelve el valor por defecto (10).
-
-    # Método que personaliza el conjunto de datos que se listará en la vista.
+    #cierre----09/01/25
+    # Método que personaliza el conjunto de datos que se listará en la vista--09/01/25.
     def get_queryset(self):
         # Obtiene el queryset predeterminado y lo ordena por la fecha y hora en orden descendente.
         #queryset = super().get_queryset().order_by('-fecha_hora')
@@ -184,6 +184,7 @@ class ComisariaPrimeraRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
         
         # Devuelve el queryset final, posiblemente filtrado y ajustado.
         return queryset
+    #cierre----09/01/25
 
     # Método que proporciona datos adicionales al contexto de la plantilla.
     def get_context_data(self, **kwargs):
@@ -203,7 +204,7 @@ class ComisariaPrimeraRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
         
         # Inicializa resolveId en None y lo agrega al contexto.
         context['resolveId'] = None  # Inicializa resolveId en None
-
+    #paginado----09/01/25
         queryset = self.get_queryset()  # Obtiene el conjunto de datos filtrado.
         paginate_by = self.get_paginate_by(queryset)  # Determina el número de registros por página.
         paginator = Paginator(queryset, paginate_by)  # Crea el objeto de paginación con el conjunto de datos.
@@ -226,7 +227,7 @@ class ComisariaPrimeraRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
         context['items_per_page'] = paginate_by  # Añade el número de elementos por página al contexto.
         context['page_range'] = range(range_start, range_end)  # Añade el rango dinámico de páginas al contexto.
 
-        
+        #cierre----09/01/25
         # Devuelve el contexto completo.
         return context
 
@@ -727,7 +728,7 @@ class ComisariaSegundaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
 
     def handle_no_permission(self):
         return redirect('no_permission')
-    
+    #funcion paginado----09/01/25
     def get_paginate_by(self, queryset):
         # Determina cuántos elementos se mostrarán por página, según un parámetro GET.
 
@@ -736,12 +737,12 @@ class ComisariaSegundaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
             return int(items_per_page)  # Intenta convertir el valor a entero.
         except ValueError:
             return 10  # Si ocurre un error, devuelve el valor por defecto (10).
-
+    #cierre----09/01/25
     def get_queryset(self):
         #queryset = super().get_queryset().order_by('-fecha_hora')
         queryset = super().get_queryset().filter(activo=True).order_by('-fecha_hora')
         search_query = self.request.GET.get('q', '')
-       # Si hay una consulta de búsqueda, filtra el queryset por coincidencias en el campo 'cuarto'.
+       # Si hay una consulta de búsqueda, filtra el queryset por coincidencias en el campo 'cuarto'----09/01/25.
         if search_query:  # Verifica si se ingresó un término de búsqueda.
             try:
                 search_date = datetime.strptime(search_query, "%d/%m/%Y").date()  
@@ -763,6 +764,7 @@ class ComisariaSegundaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
                     )
 
         return queryset
+    #cierre----09/01/25
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -779,7 +781,7 @@ class ComisariaSegundaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
 
         context['today'] = timezone.now().date()
         context['resolveId'] = None
-
+    #--paginado----09/01/25
         queryset = self.get_queryset()  # Obtiene el conjunto de datos filtrado.
         paginate_by = self.get_paginate_by(queryset)  # Determina el número de registros por página.
         paginator = Paginator(queryset, paginate_by)  # Crea el objeto de paginación con el conjunto de datos.
@@ -803,6 +805,7 @@ class ComisariaSegundaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
         context['page_range'] = range(range_start, range_end)  # Añade el rango dinámico de páginas al contexto.
 
         return context
+    #cierre----09/01/25
 
 #-----------------------------------------------------------------------------------------------------------------   
     
@@ -1170,7 +1173,7 @@ class ComisariaTerceraRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
         queryset = super().get_queryset().filter(activo=True).order_by('-fecha_hora')
         search_query = self.request.GET.get('q', '')
         
- # Si hay una consulta de búsqueda, filtra el queryset por coincidencias en el campo 'cuarto'.
+ # Si hay una consulta de búsqueda, filtra el queryset por coincidencias en el campo 'cuarto'----09/01/25.
         if search_query:  # Verifica si se ingresó un término de búsqueda.
             try:
                 search_date = datetime.strptime(search_query, "%d/%m/%Y").date()  
@@ -1192,7 +1195,7 @@ class ComisariaTerceraRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
                     )
 
         return queryset
-
+    #cierre --09/01/25
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
@@ -1205,7 +1208,7 @@ class ComisariaTerceraRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
 
         context['today'] = timezone.now().date()
         context['resolveId'] = None
-
+    #--paginado--9/01/25
         queryset = self.get_queryset()  # Obtiene el conjunto de datos filtrado.
         paginate_by = self.get_paginate_by(queryset)  # Determina el número de registros por página.
         paginator = Paginator(queryset, paginate_by)  # Crea el objeto de paginación con el conjunto de datos.
@@ -1229,7 +1232,7 @@ class ComisariaTerceraRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
         context['page_range'] = range(range_start, range_end)  # Añade el rango dinámico de páginas al contexto.
 
         return context
-
+    #--cierre----09/01/25
 
 #----------------------------CREACION DE COMISARIA TERCERARG----------------------------------------
 
@@ -1566,7 +1569,7 @@ class ComisariaCuartaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
 
     def handle_no_permission(self):
         return redirect('no_permission')
-    
+    #funcion paginado--9/01/25
     def get_paginate_by(self, queryset):
         # Determina cuántos elementos se mostrarán por página, según un parámetro GET.
 
@@ -1575,13 +1578,13 @@ class ComisariaCuartaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
             return int(items_per_page)  # Intenta convertir el valor a entero.
         except ValueError:
             return 10  # Si ocurre un error, devuelve el valor por defecto (10).
-
+    #--cierre----09/01/25
 
     def get_queryset(self):
         queryset = super().get_queryset().filter(activo=True).order_by('-fecha_hora')
         #queryset = super().get_queryset().order_by('-fecha_hora')
         search_query = self.request.GET.get('q', '')
-      # Si hay una consulta de búsqueda, filtra el queryset por coincidencias en el campo 'cuarto'.
+      # Si hay una consulta de búsqueda, filtra el queryset por coincidencias en el campo 'cuarto'--9/01/25.
         if search_query:  # Verifica si se ingresó un término de búsqueda.
             try:
                 search_date = datetime.strptime(search_query, "%d/%m/%Y").date()  
@@ -1603,7 +1606,7 @@ class ComisariaCuartaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
                     )
             
         return queryset
-
+    #--cierre----09/01/25
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
@@ -1617,7 +1620,7 @@ class ComisariaCuartaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
         context['today'] = timezone.now().date()
         context['resolveId'] = None
 
-       
+       #paginado--9/01/25
         queryset = self.get_queryset()  # Obtiene el conjunto de datos filtrado.
         paginate_by = self.get_paginate_by(queryset)  # Determina el número de registros por página.
         paginator = Paginator(queryset, paginate_by)  # Crea el objeto de paginación con el conjunto de datos.
@@ -1642,6 +1645,7 @@ class ComisariaCuartaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
 
 
         return context
+    #--cierre----09/01/25
     
 
 #----------------------Creacion de comisaria cuartaRG------------------------------------------------------------
@@ -2053,7 +2057,7 @@ class ComisariaQuintaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
 
     def handle_no_permission(self):
         return redirect('no_permission')
-
+    #funcion paginado -9/01/25
     def get_paginate_by(self, queryset):
             # Determina cuántos elementos se mostrarán por página, según un parámetro GET.
 
@@ -2062,12 +2066,12 @@ class ComisariaQuintaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
                 return int(items_per_page)  # Intenta convertir el valor a entero.
             except ValueError:
                 return 10  # Si ocurre un error, devuelve el valor por defecto (10).
-            
+    #--cierre----09/01/25            
     def get_queryset(self):
         queryset = super().get_queryset().filter(activo=True).order_by('-fecha_hora')
         #queryset = super().get_queryset().order_by('-fecha_hora')
         search_query = self.request.GET.get('q', '')
-       # Si hay una consulta de búsqueda, filtra el queryset por coincidencias en el campo 'cuarto'.
+       # Si hay una consulta de búsqueda, filtra el queryset por coincidencias en el campo 'cuarto'--9/01/25.
         if search_query:  # Verifica si se ingresó un término de búsqueda.
             try:
                 search_date = datetime.strptime(search_query, "%d/%m/%Y").date()  
@@ -2089,6 +2093,7 @@ class ComisariaQuintaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
                     )
 
         return queryset
+    #--cierre----09/01/25
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -2102,7 +2107,7 @@ class ComisariaQuintaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
 
         context['today'] = timezone.now().date()
         context['resolveId'] = None
-
+    #paginado 9/01/25
         queryset = self.get_queryset()  # Obtiene el conjunto de datos filtrado.
         paginate_by = self.get_paginate_by(queryset)  # Determina el número de registros por página.
         paginator = Paginator(queryset, paginate_by)  # Crea el objeto de paginación con el conjunto de datos.
@@ -2126,7 +2131,7 @@ class ComisariaQuintaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
         context['page_range'] = range(range_start, range_end)  # Añade el rango dinámico de páginas al contexto.
 
         return context
-
+    #--cierre----09/01/25
 
 #-----------------------creacion de comisaria quintaRG---------------
 
