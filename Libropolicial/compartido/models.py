@@ -14,7 +14,7 @@ import random
 from django.utils.timezone import now
 from datetime import timedelta,datetime
 
-# Create your models here.
+# Create your models here. cambios bien relaizados
 
 class CuartoGuardiaUSH(models.Model):
     cuarto = models.CharField(max_length=1)
