@@ -48,7 +48,8 @@ Tolhuin{% endblock %} {% block content %}
     <div class="first">
       <h2 class="text-lg font-semibold">Código:</h2>
       <p style="max-height: 40px; line-height: 20px" class="overflow-auto">
-        {{ record.codigoTOL.codigoTOL|default:"S/N" }} - {{record.codigoTOL.nombre_codigo|default:"S/N" }}
+        {{ record.codigoTOL.codigoTOL|default:"S/N" }} -
+        {{record.codigoTOL.nombre_codigo|default:"S/N" }}
       </p>
     </div>
     <!-- CUARTO -->
@@ -104,7 +105,8 @@ Tolhuin{% endblock %} {% block content %}
   </div>
   <!-- DEPENDENCIAS Y CODIGOS SEC., ESTADO --->
   <div
-    class="cont grid grid-cols-3 gap-x-4 py-4 my-2 bg-gray-200 rounded-md px-2">
+    class="cont grid grid-cols-3 gap-x-4 py-4 my-2 bg-gray-200 rounded-md px-2"
+  >
     <div class="">
       <!-- Detalles de relaciones ManyToMany -->
       <h2 class="text-lg font-semibold">Dependencias Secundarias:</h2>
@@ -125,7 +127,7 @@ Tolhuin{% endblock %} {% block content %}
       <ul class="flex gap-x-2">
         {% for codigo in record.codigos_secundariosTOL.all %}
         <li>
-          {{ codigo.codigoTOL|default:"S/N" }}{% if not forloop.last %},{% endif %}
+          {{ codigo.codigoTOL|default:"S/N" }}{% if not forloop.last %},{% endif%}
         </li>
         {% endfor %}
       </ul>
@@ -188,13 +190,16 @@ Tolhuin{% endblock %} {% block content %}
           {% for detalle in record.detalles_institucion_hospitalariaTOL.all %}
           <div class="">
             <li>
-              <span class="font-semibold">Institución: </span>{{detalle.institucion_hospitalariaTOL.nombre|default:"S/N" }}
+              <span class="font-semibold">Institución: </span
+              >{{detalle.institucion_hospitalariaTOL.nombre|default:"S/N" }}
             </li>
             <li>
-              <span class="font-semibold">Móvil: </span>{{detalle.numero_movil_hospitalTOL|default:"S/N" }}
+              <span class="font-semibold">Móvil: </span
+              >{{detalle.numero_movil_hospitalTOL|default:"S/N" }}
             </li>
             <li>
-              <span class="font-semibold">A Cargo: </span>{{detalle.nombre_a_cargo_hospitalTOL|default:"S/N" }}
+              <span class="font-semibold">A Cargo: </span
+              >{{detalle.nombre_a_cargo_hospitalTOL|default:"S/N" }}
             </li>
           </div>
           {% endfor %}
@@ -218,13 +223,16 @@ Tolhuin{% endblock %} {% block content %}
           {% for detalle in record.detalles_dependencia_municipalTOL.all %}
           <div class="">
             <li>
-              <span class="font-semibold">Dependencia: </span>{{detalle.dependencia_municipalTOL.nombre|default:"S/N" }}
+              <span class="font-semibold">Dependencia: </span
+              >{{detalle.dependencia_municipalTOL.nombre|default:"S/N" }}
             </li>
             <li>
-              <span class="font-semibold">Móvil: </span>{{detalle.numero_movil_municipalTOL|default:"S/N" }}
+              <span class="font-semibold">Móvil: </span
+              >{{detalle.numero_movil_municipalTOL|default:"S/N" }}
             </li>
             <li>
-              <span class="font-semibold">A Cargo: </span>{{detalle.nombre_a_cargo_municipalTOL|default:"S/N" }}
+              <span class="font-semibold">A Cargo: </span
+              >{{detalle.nombre_a_cargo_municipalTOL|default:"S/N" }}
             </li>
           </div>
           {% endfor %}
@@ -243,13 +251,16 @@ Tolhuin{% endblock %} {% block content %}
           {% for detalle in record.detalles_dependencia_provincialTOL.all %}
           <div class="">
             <li>
-              <span class="font-semibold">Dependencia: </span>{{detalle.dependencia_provincialTOL.nombre|default:"S/N" }}
+              <span class="font-semibold">Dependencia: </span
+              >{{detalle.dependencia_provincialTOL.nombre|default:"S/N" }}
             </li>
             <li>
-              <span class="font-semibold">Móvil: </span>{{detalle.numero_movil_provincialTOL|default:"S/N" }}
+              <span class="font-semibold">Móvil: </span
+              >{{detalle.numero_movil_provincialTOL|default:"S/N" }}
             </li>
             <li>
-              <span class="font-semibold">A Cargo: </span>{{detalle.nombre_a_cargo_provincialTOL|default:"S/N" }}
+              <span class="font-semibold">A Cargo: </span
+              >{{detalle.nombre_a_cargo_provincialTOL|default:"S/N" }}
             </li>
           </div>
           {% endfor %}
@@ -276,13 +287,17 @@ Tolhuin{% endblock %} {% block content %}
           {% for detalle in record.detalles_dependencia_secundariaTOL.all %}
           <div class="">
             <li>
-              <span class="font-semibold">Dependencia: </span>{{detalle.dependencia_secundariaTOL.dependenciaTOL|default:"S/N" }}
+              <span class="font-semibold">Dependencia: </span
+              >{{detalle.dependencia_secundariaTOL.dependenciaTOL|default:"S/N"
+              }}
             </li>
             <li>
-              <span class="font-semibold">Móvil: </span>{{detalle.numero_movil_secundariaTOL|default:"S/N" }}
+              <span class="font-semibold">Móvil: </span
+              >{{detalle.numero_movil_secundariaTOL|default:"S/N" }}
             </li>
             <li>
-              <span class="font-semibold">A Cargo: </span>{{detalle.nombre_a_cargo_secundariaTOL|default:"S/N" }}
+              <span class="font-semibold">A Cargo: </span
+              >{{detalle.nombre_a_cargo_secundariaTOL|default:"S/N" }}
             </li>
           </div>
           {% endfor %}
@@ -304,13 +319,16 @@ Tolhuin{% endblock %} {% block content %}
           {% for detalle in record.detalles_institucion_federal.all %}
           <div class="">
             <li>
-              <span class="font-semibold">Institución: </span>{{detalle.institucion_federal.nombre|default:"S/N" }}
+              <span class="font-semibold">Institución: </span
+              >{{detalle.institucion_federal.nombre|default:"S/N" }}
             </li>
             <li>
-              <span class="font-semibold">Móvil: </span>{{detalle.numero_movil_federal|default:"S/N" }}
+              <span class="font-semibold">Móvil: </span
+              >{{detalle.numero_movil_federal|default:"S/N" }}
             </li>
             <li>
-              <span class="font-semibold">A Cargo: </span>{{detalle.nombre_a_cargo_federal|default:"S/N" }}
+              <span class="font-semibold">A Cargo: </span
+              >{{detalle.nombre_a_cargo_federal|default:"S/N" }}
             </li>
           </div>
           {% endfor %}
@@ -326,25 +344,38 @@ Tolhuin{% endblock %} {% block content %}
   <div class="py-4 my-2 bg-gray-200 rounded-md px-2 text-center">
     <div class="col-span-2">
       <h2 class="text-lg font-semibold">Tareas Judiciales:</h2>
-      <p style="max-height: 80px; line-height: 20px"class="overflow-auto leading-10">{{ record.tareas_judiciales|default:"S/N" }}</p>
+      <p
+        style="max-height: 80px; line-height: 20px"
+        class="overflow-auto leading-10"
+      >
+        {{ record.tareas_judiciales|default:"S/N" }}
+      </p>
     </div>
   </div>
 
   <div class="py-4 my-2 bg-gray-200 rounded-md px-2">
     <!-- FECHA -->
     <div class="flex gap-x-2">
-      <h2 class="text-lg font-semibold pb-1 break-words" style="line-height: 20px">Fecha de Creación del Primer registro:</h2>
+      <h2
+        class="text-lg font-semibold pb-1 break-words"
+        style="line-height: 20px"
+      >
+        Fecha de Creación del Primer registro:
+      </h2>
       <p>{{ record.created_at|date:"d/m/Y H:i:s"|default:"S/N" }}</p>
     </div>
     <!-- CREADO Y EDITADO POR.. -->
     <div class="cont grid grid-cols-2 gap-x-4 mt-1">
       <div class="">
         <h2 class="text-lg font-semibold">
-          Personal que realizo el primer Registro:</h2>
+          Personal que realizo el primer Registro:
+        </h2>
         <p>{{ record.created_by.get_full_name|default:"S/N" }}</p>
       </div>
       <div class="">
-        <h2 class="text-lg font-semibold">Personal que realizo la ultima edicion:</h2>
+        <h2 class="text-lg font-semibold">
+          Personal que realizo la ultima edicion:
+        </h2>
         <p>{{ record.updated_by.get_full_name|default:"S/N" }}</p>
       </div>
     </div>
@@ -356,8 +387,10 @@ Tolhuin{% endblock %} {% block content %}
   </div>
   <!-- VOLVER -->
   <div class="mt-4 text-center">
-    <a href="{% url 'comisaria_tolhuin_list' %}"
-      class="inline-block font-semibold px-6 py-2 rounded-md text-center border-2 border-white bg-gray-700 hover:bg-gray-600 dark:bg-white text-white dark:text-black">
+    <a
+      href="{% url 'comisaria_tolhuin_list' %}"
+      class="inline-block font-semibold px-6 py-2 rounded-md text-center border-2 border-white bg-gray-700 hover:bg-gray-600 dark:bg-white text-white dark:text-black"
+    >
       Volver a la Lista
     </a>
   </div>

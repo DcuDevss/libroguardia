@@ -29,7 +29,7 @@ ALLOWED_HOSTS = []
 #el setting esta para desarrollo nuevos cambios
 #ALLOWED_HOSTS = ['10.0.200.73', 'localhost', '127.0.0.1']
 
-# Definición de la aplicación
+# Definición de la aplicación mas cambios
 
 INSTALLED_APPS = [
     'django.contrib.admin',  # Admin de Django
@@ -58,7 +58,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',  # Middleware de protección contra clickjacking
     'compartido.middleware.NoCacheMiddleware',  # Middleware personalizado para no caché
     'compartido.middleware.RedirectAuthenticatedUserMiddleware',  # Middleware personalizado para redirigir usuarios autenticados
-    'compartido.middleware.InactivityLogoutMiddleware',  # Middleware personalizado para cerrar sesión por inactividad
+    'compartido.middleware.InactivityLogoutMiddleware', # Middleware personalizado para cerrar sesión por inactividad
+    #'compartido.middleware.SingleSessionMiddleware' # Midelware solo una sesion activa
     # 'comisarias.middleware.NoCacheMiddleware',  # Añadir este middleware si es necesario
     # 'comisarias.middleware.RedirectAuthenticatedUserMiddleware',  # Añadir este middleware si es necesario
     # 'comisarias.middleware.InactivityLogoutMiddleware',  # Añadir este middleware si es necesario
@@ -123,7 +124,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # Utiliza el backend MySQL
         'NAME': 'libro',  # Nombre de la base de datos
-        'USER': 'root',  # Usuario de la base de datos vamos
+        'USER': 'root',  # Usuario de la base de datos
         'PASSWORD': '',  # Contraseña de la base de datos
         'HOST': 'localhost',  # Host de la base de datos
         'PORT': '3306',  # Puerto de la base de datos
@@ -215,3 +216,15 @@ CKEDITOR_CONFIGS = {
         'font_names': 'Arial/Arial, Helvetica, sans-serif; Times New Roman/Times New Roman, Times, serif; Verdana/Verdana, Geneva, sans-serif; Courier New/Courier New, Courier, monospace',
     },
 }
+
+# Configuración de correo electrónico para Django
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+DEFAULT_FROM_EMAIL = 'Libro de Guardia <libroguardia@dcu.sistemas.com>'
+PASSWORD_RESET_TIMEOUT = 3600  # Opcional: Tiempo de expiración en segundos (1 hora)
+EMAIL_HOST = 'smtp.gmail.com'  # Servidor SMTP de Gmail
+EMAIL_PORT = 587               # Puerto para TLS
+EMAIL_USE_TLS = True           # Habilitar TLS
+EMAIL_HOST_USER = 'gabrielmolinalp@gmail.com'  # Tu correo electrónico
+EMAIL_HOST_PASSWORD = 'xuoceirxnhgpwkta'       # Contraseña generada de la app de Gmail
+DEFAULT_FROM_EMAIL = 'libroguardia@dcu.sistemas.com'  # Dirección del remitente
+

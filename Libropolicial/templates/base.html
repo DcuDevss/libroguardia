@@ -34,6 +34,9 @@
     <script src="https://kit.fontawesome.com/b929cb1411.js" crossorigin="anonymous"></script>
     <!-- fuente roboto -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet" />
+    
+    
+    
     <!-- SweetAlert2 -->
 
     <!--  -->
@@ -171,6 +174,7 @@
         </div>
         <nav class="flex items-center">
             <!-- BOTON MODO OSCURO-->
+            
             <div class="">
                 <button id="theme-toggle" class="luz focus:outline-none"> 
                     <svg id="sun-icon" class="w-6 h-6 hidden" fill="none"
@@ -187,6 +191,7 @@
                     </svg> 
                 </button>
             </div> 
+
             <!--Partes-->
             {% if can_access_comisarias %}
             <!-- Dropdown para Partes PDF -->
@@ -306,12 +311,15 @@
 </div>
                 {% endif %}
             </div>
+            
             <!-- Puedes agregar aquí el nombre del usuario autenticado -->
             {% if user.is_authenticated %}
             <div class="">
                 <ul class="user-session flex space-x-4 items-center">
                     <li class="text-white font-semibold">
-                        {{ user.get_full_name|default:user.username }}
+                        <a href="{% url 'perfil_usuario' %}" class="hover:underline">
+                            {{ user.get_full_name|default:user.username }}
+                        </a>
                     </li>
                     <form method="post" action="{% url 'logout' %}">
                         {% csrf_token %}
@@ -323,7 +331,9 @@
                 </ul>
             </div>
             {% endif %}
+            
         </nav>
+
         <!-- Dropdown solo visible para superusuarios -->
         {% if user.is_authenticated and user.is_superuser %}
         <!-- 
@@ -542,14 +552,18 @@
                 // Coordenadas para Ushuaia
                 initialLat = -54.8019;
                 initialLng = -68.3029;
+                var zoomLevel = 12;
             } else if (url.includes("/comisariasriogrande/")) {
                 // Coordenadas para Río Grande
                 initialLat = -53.7769;
                 initialLng = -67.7076;
+                var zoomLevel = 12;
             } else if (url.includes("/comisariastolhuin/")) {
-                // Coordenadas para Río Grande
+                // Coordenadas para Tolhuin
                 initialLat = -54.510539136774526;
                 initialLng = -67.19172620825704;
+                var zoomLevel = 12; 
+
             } else {
                 // Coordenadas por defecto tolhuin
                 initialLat = -54.8019;
@@ -557,7 +571,7 @@
             }
 
             // Inicializa el mapa en las coordenadas asignadas
-            var map = L.map("map").setView([initialLat, initialLng], 10);
+            var map = L.map("map").setView([initialLat, initialLng], zoomLevel);
 
             // Define capas de mapa
             var lightLayer = L.tileLayer(
@@ -864,6 +878,63 @@
             });
         });
     </script>
+
+<script>
+   document.addEventListener('DOMContentLoaded', () => {
+    // Seleccionar todos los botones con la clase 'download-pdf'
+    const downloadButtons = document.querySelectorAll('.download-pdf');
+
+    // Iterar sobre cada botón y agregar un manejador de eventos
+    downloadButtons.forEach(button => {
+        button.addEventListener('click', function (event) {
+            event.preventDefault(); // Evita la acción por defecto (navegar al enlace)
+
+            // Obtener el URL del botón
+            const url = button.href;
+
+            // Realizar una petición AJAX para verificar si hay registros activos
+            fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(response => {
+                    const contentType = response.headers.get('Content-Type');
+                    if (contentType && contentType.includes('application/json')) {
+                        return response.json();
+                    } else {
+                        return {};
+                    }
+                })
+                .then(data => {
+                    if (data.warning) {
+                        Swal.fire({
+                            title: 'Advertencia',
+                            text: data.warning,
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonText: 'Sí, continuar',
+                            cancelButtonText: 'Cancelar',
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                const forceUrl = url + (url.includes('?') ? '&' : '?') + 'force=true';
+                                window.open(forceUrl, '_blank');
+                            } else {
+                                Swal.fire('Cancelado', 'La descarga del PDF fue cancelada.', 'info');
+                            }
+                        });
+                    } else {
+                        window.open(url, '_blank');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire('Error', 'Ocurrió un problema inesperado al procesar la solicitud.', 'error');
+                });
+        });
+    });
+});
+
+
+</script>
+
+
 </body>
 
 </html>
