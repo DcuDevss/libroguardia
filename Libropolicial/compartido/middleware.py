@@ -11,7 +11,7 @@ from django.contrib.sessions.models import Session
 from django.utils.timezone import now
 from django.contrib.auth import logout
 
-# Midelware solo una sesion activa nueva actualizacion----09/01/25-----comentado
+# Midelware solo una sesion activa nueva actualizacion ----09/01/25----- comentado
 '''
 class SingleSessionMiddleware(MiddlewareMixin):
     def process_request(self, request):
@@ -22,8 +22,9 @@ class SingleSessionMiddleware(MiddlewareMixin):
                 data = session.get_decoded()
                 # Si el usuario ya tiene otra sesión activa, la cierra
                 if data.get('_auth_user_id') == str(request.user.id) and session.session_key != request.session.session_key:
-                    session.delete()'''
-#---cierre-09/01/25----
+                    session.delete()
+                    '''
+#------cierre-09/01/25--------
 
 class NoCacheMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
@@ -91,5 +92,5 @@ class InactivityLogoutMiddleware(MiddlewareMixin):
                     logout(request)
                     # Redirige al usuario a la página de inicio de sesión
                     return redirect('login')
-            # Actualiza la última actividad del usuario en la sesión con la hora actual
+            # Actualiza la última actividad del usuario en la sesión con la hora actual si
             request.session['last_activity'] = timezone.now().isoformat()
