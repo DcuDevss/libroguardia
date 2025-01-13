@@ -110,7 +110,7 @@ class UploadedPDFRG(models.Model):
     
 
 class CuartoGuardiaTOL(models.Model):
-    cuartoTOL = models.CharField(max_length=1)
+    cuartoTOL = models.CharField(max_length=1, null=True, blank=True)
     activo = models.BooleanField(default=True)
 
     def __str__(self):
@@ -120,9 +120,9 @@ class CuartoGuardiaTOL(models.Model):
         self.activo = False
         self.save()
 
-# Clase para manejar códigos policiales de Ushuaia.
+# Clase para manejar códigos policiales de tolhuin.
 class CodigoPolicialTOL(models.Model):
-    codigoTOL = models.CharField(max_length=10)  # Campo para almacenar un código, con un máximo de 10 caracteres.
+    codigoTOL = models.CharField(max_length=10, null=True, blank=True)  # Campo para almacenar un código, con un máximo de 10 caracteres.
     nombre_codigo = models.CharField(max_length=255, null=True, blank=True)  # Nuevo campo agregado que acepta nulos
     activo = models.BooleanField(default=True)  # Soft delete
     
@@ -135,7 +135,7 @@ class CodigoPolicialTOL(models.Model):
 
 # Clase para manejar códigos secundarios.
 class CodigosSecundariosTOL(models.Model):
-    codigoTOL = models.CharField(max_length=10)  # Campo para almacenar un código secundario, con un máximo de 10 caracteres.
+    codigoTOL = models.CharField(max_length=10, null=True, blank=True)  # Campo para almacenar un código secundario, con un máximo de 10 caracteres.
     activo = models.BooleanField(default=True)  # Soft delete
 
     def __str__(self):
