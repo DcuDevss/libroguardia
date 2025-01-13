@@ -26,7 +26,7 @@ urlpatterns = [
     #path('divisioncomunicaciones/', include('divisioncomunicaciones.urls')),  
 
 
-    # Puedes incluir otras aplicaciones de la misma manera
+    # Puedes incluir otras aplicaciones de la misma manera hola loco
 ]
 
 # Configuración para servir archivos cargados por los usuarios
