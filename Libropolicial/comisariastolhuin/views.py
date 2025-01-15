@@ -133,14 +133,17 @@ class ComisariaTolhuinListView(LoginRequiredMixin, UserPassesTestMixin, ListView
                 # Si la consulta no es una fecha válida, realiza el filtrado en otros campos.
                 queryset = queryset.filter(
                         Q(codigoTOL__codigoTOL__icontains=search_query) |
-                        Q(codigoTOL__nombre_codigo__icontains=search_query) |
+                        Q(codigoTOL__nombre_codigo__icontains=search_query) |                        
                         Q(movil_patrulla__icontains=search_query) |
                         Q(a_cargo__icontains=search_query) |
                         Q(secundante__icontains=search_query) |
                         Q(lugar_codigo__icontains=search_query) |
                         Q(tareas_judiciales__icontains=search_query) |
                         Q(descripcion__icontains=search_query) |
-                        Q(fecha_hora__icontains=search_query)
+                        Q(fecha_hora__icontains=search_query) |
+                        Q(created_by__username__icontains=search_query) |  # Busca por nombre de usuario
+                        Q(created_by__first_name__icontains=search_query) |  # Busca por nombre
+                        Q(created_by__last_name__icontains=search_query)  # Busca por apellido
                     )
         
         # Devuelve el queryset final, posiblemente filtrado y ajustado.
