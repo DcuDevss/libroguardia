@@ -171,15 +171,15 @@ class ComisariaPrimeraRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
             except (ValueError, TypeError):  
                 # Si la consulta no es una fecha válida, realiza el filtrado en otros campos.
                 queryset = queryset.filter(
-                        Q(codigoRG__codigoRG__icontains=query) |
-                        Q(codigoRG__nombre_codigoRG__icontains=query) |
-                        Q(movil_patrulla__icontains=query) |
-                        Q(a_cargo__icontains=query) |
-                        Q(secundante__icontains=query) |
-                        Q(lugar_codigo__icontains=query) |
-                        Q(tareas_judiciales__icontains=query) |
-                        Q(descripcion__icontains=query) |
-                        Q(fecha_hora__icontains=query)
+                       Q(codigoRG__codigoRG__icontains=search_query) |
+                        Q(codigoRG__nombre_codigo__icontains=search_query) |
+                        Q(movil_patrulla__icontains=search_query) |
+                        Q(a_cargo__icontains=search_query) |
+                        Q(secundante__icontains=search_query) |
+                        Q(lugar_codigo__icontains=search_query) |
+                        Q(tareas_judiciales__icontains=search_query) |
+                        Q(descripcion__icontains=search_query) |
+                        Q(fecha_hora__icontains=search_query)
                     )
         
         # Devuelve el queryset final, posiblemente filtrado y ajustado.
@@ -223,7 +223,7 @@ class ComisariaPrimeraRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
         range_end = min(current_page + 5, total_pages) + 1  # Calcula el final del rango dinámico de paginación.
 
         context['page_obj'] = page_obj  # Añade el objeto de paginación al contexto.
-        context['query'] = self.request.GET.get('q', '')  # Añade la consulta de búsqueda al contexto.
+        context['search_query'] = self.request.GET.get('q', '')  # Añade la consulta de búsqueda al contexto.
         context['items_per_page'] = paginate_by  # Añade el número de elementos por página al contexto.
         context['page_range'] = range(range_start, range_end)  # Añade el rango dinámico de páginas al contexto.
 
@@ -254,7 +254,7 @@ class ComisariasPrimeraRGListView(LoginRequiredMixin, ListView):
         search_filter = (
             Q(cuartoRG__cuartoRG__icontains=query) |
             Q(codigoRG__codigoRG__icontains=query) |
-            Q(codigoRG__nombre_codigoRG__icontains=query) |
+            Q(codigoRG__nombre_codigo__icontains=query) |
             Q(movil_patrulla__icontains=query) |
             Q(a_cargo__icontains=query) |
             Q(secundante__icontains=query) |
@@ -752,15 +752,15 @@ class ComisariaSegundaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
             except (ValueError, TypeError):  
                 # Si la consulta no es una fecha válida, realiza el filtrado en otros campos.
                 queryset = queryset.filter(
-                        Q(codigoRG__codigoRG__icontains=query) |
-                        Q(codigoRG__nombre_codigoRG__icontains=query) |
-                        Q(movil_patrulla__icontains=query) |
-                        Q(a_cargo__icontains=query) |
-                        Q(secundante__icontains=query) |
-                        Q(lugar_codigo__icontains=query) |
-                        Q(tareas_judiciales__icontains=query) |
-                        Q(descripcion__icontains=query) |
-                        Q(fecha_hora__icontains=query)
+                        Q(codigoRG__codigoRG__icontains=search_query) |
+                        Q(codigoRG__nombre_codigo__icontains=search_query) |
+                        Q(movil_patrulla__icontains=search_query) |
+                        Q(a_cargo__icontains=search_query) |
+                        Q(secundante__icontains=search_query) |
+                        Q(lugar_codigo__icontains=search_query) |
+                        Q(tareas_judiciales__icontains=search_query) |
+                        Q(descripcion__icontains=search_query) |
+                        Q(fecha_hora__icontains=search_query)
                     )
 
         return queryset
@@ -1183,15 +1183,15 @@ class ComisariaTerceraRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
             except (ValueError, TypeError):  
                 # Si la consulta no es una fecha válida, realiza el filtrado en otros campos.
                 queryset = queryset.filter(
-                        Q(codigoRG__codigoRG__icontains=query) |
-                        Q(codigoRG__nombre_codigoRG__icontains=query) |
-                        Q(movil_patrulla__icontains=query) |
-                        Q(a_cargo__icontains=query) |
-                        Q(secundante__icontains=query) |
-                        Q(lugar_codigo__icontains=query) |
-                        Q(tareas_judiciales__icontains=query) |
-                        Q(descripcion__icontains=query) |
-                        Q(fecha_hora__icontains=query)
+                       Q(codigoRG__codigoRG__icontains=search_query) |
+                        Q(codigoRG__nombre_codigo__icontains=search_query) |
+                        Q(movil_patrulla__icontains=search_query) |
+                        Q(a_cargo__icontains=search_query) |
+                        Q(secundante__icontains=search_query) |
+                        Q(lugar_codigo__icontains=search_query) |
+                        Q(tareas_judiciales__icontains=search_query) |
+                        Q(descripcion__icontains=search_query) |
+                        Q(fecha_hora__icontains=search_query)
                     )
 
         return queryset
@@ -1594,15 +1594,15 @@ class ComisariaCuartaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
             except (ValueError, TypeError):  
                 # Si la consulta no es una fecha válida, realiza el filtrado en otros campos.
                 queryset = queryset.filter(
-                        Q(codigoRG__codigoRG__icontains=query) |
-                        Q(codigoRG__nombre_codigoRG__icontains=query) |
-                        Q(movil_patrulla__icontains=query) |
-                        Q(a_cargo__icontains=query) |
-                        Q(secundante__icontains=query) |
-                        Q(lugar_codigo__icontains=query) |
-                        Q(tareas_judiciales__icontains=query) |
-                        Q(descripcion__icontains=query) |
-                        Q(fecha_hora__icontains=query)
+                       Q(codigoRG__codigoRG__icontains=search_query) |
+                        Q(codigoRG__nombre_codigo__icontains=search_query) |
+                        Q(movil_patrulla__icontains=search_query) |
+                        Q(a_cargo__icontains=search_query) |
+                        Q(secundante__icontains=search_query) |
+                        Q(lugar_codigo__icontains=search_query) |
+                        Q(tareas_judiciales__icontains=search_query) |
+                        Q(descripcion__icontains=search_query) |
+                        Q(fecha_hora__icontains=search_query)
                     )
             
         return queryset
@@ -1975,7 +1975,7 @@ class ComisariasCuartaRGListView(LoginRequiredMixin, ListView):
         search_filter = (
             Q(cuartoRG__cuartoRG__icontains=query) |
             Q(codigoRG__codigoRG__icontains=query) |
-            Q(codigoRG__nombre_codigoRG__icontains=query) |
+            Q(codigoRG__nombre_codigo__icontains=query) |
             Q(movil_patrulla__icontains=query) |
             Q(a_cargo__icontains=query) |
             Q(secundante__icontains=query) |
@@ -2081,15 +2081,15 @@ class ComisariaQuintaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
             except (ValueError, TypeError):  
                 # Si la consulta no es una fecha válida, realiza el filtrado en otros campos.
                 queryset = queryset.filter(
-                        Q(codigoRG__codigoRG__icontains=query) |
-                        Q(codigoRG__nombre_codigoRG__icontains=query) |
-                        Q(movil_patrulla__icontains=query) |
-                        Q(a_cargo__icontains=query) |
-                        Q(secundante__icontains=query) |
-                        Q(lugar_codigo__icontains=query) |
-                        Q(tareas_judiciales__icontains=query) |
-                        Q(descripcion__icontains=query) |
-                        Q(fecha_hora__icontains=query)
+                       Q(codigoRG__codigoRG__icontains=search_query) |
+                       Q(codigoRG__nombre_codigo__icontains=search_query) |
+                       Q(movil_patrulla__icontains=search_query) |
+                       Q(a_cargo__icontains=search_query) |
+                       Q(secundante__icontains=search_query) |
+                       Q(lugar_codigo__icontains=search_query) |
+                       Q(tareas_judiciales__icontains=search_query) |
+                       Q(descripcion__icontains=search_query) |
+                       Q(fecha_hora__icontains=search_query)
                     )
 
         return queryset
