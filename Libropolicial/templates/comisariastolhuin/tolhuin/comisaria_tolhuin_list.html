@@ -1,135 +1,140 @@
-{% extends "base.html" %}
+{% extends "base.html" %} 
+{% block title %}Comisaría Tolhuin{% endblock %} 
+{%block content %}
+<link
+  rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.dataTables.css"/>
 
-{% block title %}Comisaría Tolhuin{% endblock %}
-
-{% block content %}
-<link rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.dataTables.css" />
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.datatables.net/2.1.3/js/dataTables.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet"
+/>
 <!-- estilos varios -->
 <style>
-    /* ::-webkit-scrollbar {
+  /* ::-webkit-scrollbar {
         display: none;
     } */
-    h1{
-        font-family: 'Roboto Slab', serif;
-    }
-    .dt-layout-row{
-        font-size: 13px;
-    }
-    #dt-search-0{
-        border-radius: 6px;
-        min-width: 300px;
-    }
-    #dt-length-0{
-        border-radius: 6px;
-    }
-    /* cambio de posicion buscador y selector de registros */
-    .dt-layout-row {
-        display: flex;
-    }
-    div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {
-        order: 1;
-        justify-content: flex-start;
-        margin-left: 0;
-    }
-    div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-start {
-        order: 2;
-        justify-content: flex-end;
-        margin-right: 0;
-    }
-    /* Estilos para el modo oscuro */
-    .dark .dataTables_wrapper {
-        background-color: #2d2d2d;
-        color: #e0e0e0;
-    }
+  h1 {
+    font-family: "Roboto Slab", serif;
+  }
+  .dt-layout-row {
+    font-size: 13px;
+  }
+  #dt-search-0 {
+    border-radius: 6px;
+    min-width: 300px;
+  }
+  #dt-length-0 {
+    border-radius: 6px;
+  }
+  /* cambio de posicion buscador y selector de registros */
+  .dt-layout-row {
+    display: flex;
+  }
+  div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {
+    order: 1;
+    justify-content: flex-start;
+    margin-left: 0;
+  }
+  div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-start {
+    order: 2;
+    justify-content: flex-end;
+    margin-right: 0;
+  }
+  /* Estilos para el modo oscuro */
+  .dark .dataTables_wrapper {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+  }
 
-    .dark .dataTables_wrapper .dataTables_paginate .paginate_button {
-        background-color: #444;
-        color: #e0e0e0;
-    }
+  .dark .dataTables_wrapper .dataTables_paginate .paginate_button {
+    background-color: #444;
+    color: #e0e0e0;
+  }
 
-    .dark .dataTables_wrapper .dataTables_filter input {
-        background-color: #333;
-        color: #e0e0e0;
-        border: 1px solid #555;
-    }
+  .dark .dataTables_wrapper .dataTables_filter input {
+    background-color: #333;
+    color: #e0e0e0;
+    border: 1px solid #555;
+  }
 
-    .dark .dataTables_wrapper .dataTables_info {
-        color: #e0e0e0;
-    }
+  .dark .dataTables_wrapper .dataTables_info {
+    color: #e0e0e0;
+  }
 
-    .dark .dataTables_wrapper .dataTables_header {
-        background-color: #333;
-        color: #e0e0e0;
-    }
+  .dark .dataTables_wrapper .dataTables_header {
+    background-color: #333;
+    color: #e0e0e0;
+  }
 
-    .dark .dataTables_wrapper .dataTables_body {
-        background-color: #2d2d2d;
-    }
-    #myTable tbody tr:hover {
-        background-color: transparent; /* Elimina el color de fondo en hover */
-    }
-    /*  */
-    .carajo {
-        border: 1px solid #555 !important;
-    }
-    /*  */
-    /* .dark .dataTables_wrapper tbody tr:hover {
+  .dark .dataTables_wrapper .dataTables_body {
+    background-color: #2d2d2d;
+  }
+  #myTable tbody tr:hover {
+    background-color: transparent; /* Elimina el color de fondo en hover */
+  }
+  /*  */
+  .carajo {
+    border: 1px solid #555 !important;
+  }
+  /*  */
+  /* .dark .dataTables_wrapper tbody tr:hover {
         background-color: #3b82f6;
     } */
-    #myTable thead{
-        background: #29313d;
-    }
-    html.dark #myTable thead {
-        background: black;
-    }
-    #myTable th{
-        text-align: center;
-        font-size: 14px;
-    }
-    .tede td{
-        border-right: .5px solid rgba(0, 0, 0, 0.15);
-    }
-    /* Ajuste para modo oscuro */
-    html.dark .tede td {
-        border-right: 0.5px solid rgba(255, 255, 255, 0.15); /* Borde gris claro para modo oscuro */
-    }
-    .td-codigo p{
-        margin: auto;
-        min-width: 200px;
-    }
-    .td-nombres{
-        min-width: 138px;
-    }
-    .td-qth{
-        min-width: 170px;
-    }
-    /* BOTONES ACCIONES */
-    .td-acciones{
-        row-gap: 6px;
-    }
-    .td-acciones a , .td-acciones button {
-        font-size: 9px; 
-        font-weight: 700;
-        padding-top: 2px;
-        padding-bottom: 2px;
-        transition: transform 0.3s ease, filter 0.3s ease;
-    }
-    .td-acciones a:hover, .td-acciones button:hover{
-        transform: scale(1.1);
-        filter: brightness(1.2);
-    }
-    /* modal */
-    html.dark .modal-desc, html.dark .btn-desc{
-        background: #11192a;
-        color: white;
-    }
-    html.dark .modal-desc p, html.dark .modal-desc span{
-        color: rgba(255, 255, 255, 0.911);
-    }
-    /* table.dataTable > tbody > tr.selected > * {
+  #myTable thead {
+    background: #29313d;
+  }
+  html.dark #myTable thead {
+    background: black;
+  }
+  #myTable th {
+    text-align: center;
+    font-size: 14px;
+  }
+  .tede td {
+    border-right: 0.5px solid rgba(0, 0, 0, 0.15);
+  }
+  /* Ajuste para modo oscuro */
+  html.dark .tede td {
+    border-right: 0.5px solid rgba(255, 255, 255, 0.15); /* Borde gris claro para modo oscuro */
+  }
+  .td-codigo p {
+    margin: auto;
+    min-width: 200px;
+  }
+  .td-nombres {
+    min-width: 138px;
+  }
+  .td-qth {
+    min-width: 170px;
+  }
+  /* BOTONES ACCIONES */
+  .td-acciones {
+    row-gap: 6px;
+  }
+  .td-acciones a,
+  .td-acciones button {
+    font-size: 9px;
+    font-weight: 700;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    transition: transform 0.3s ease, filter 0.3s ease;
+  }
+  .td-acciones a:hover,
+  .td-acciones button:hover {
+    transform: scale(1.1);
+    filter: brightness(1.2);
+  }
+  /* modal */
+  html.dark .modal-desc,
+  html.dark .btn-desc {
+    background: #11192a;
+    color: white;
+  }
+  html.dark .modal-desc p,
+  html.dark .modal-desc span {
+    color: rgba(255, 255, 255, 0.911);
+  }
+  /* table.dataTable > tbody > tr.selected > * {
         box-shadow: inset 0 0 0 9999px rgb(4, 4, 107) !important; 
         color: white !important; 
     }
@@ -141,8 +146,9 @@
     } */
 </style>
 
-<div class="w-full max-w-7xl mx-auto px-4 pb-4 pt-2 rounded-lg dark:text-white"
-     x-data="{showModal: false, descripcion: '', 
+<div
+  class="w-full max-w-7xl mx-auto px-4 pb-4 pt-2 rounded-lg dark:text-white"
+  x-data="{showModal: false, descripcion: '', 
         showResolveModal: false, resolveId: null, 
         resolveData: {}, showConfirmModal: false, 
         recordIdToSign: null, confirmSign() {
@@ -150,213 +156,359 @@
                     window.location.href = '/comisariastolhuin/tolhuin/firmar/' + this.recordIdToSign;
                 }
             } 
-        }">
-    <!-- TITULO -->
-    <h1 class="text-2xl font-bold text-center mb-4">Lista de Codigos en Comisaría Tolhuin</h1>
-    <!-- SUB MENU -->
-    <div class="me-nu flex flex-wrap justify-center gap-4">
-         <!-- Botón para 'oficialesservicios' y 'jefessuperiores' -->
-         {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias or is_libreros %}
-        <a href="{% url 'comisaria_tolhuin_create' %}" class="btn bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Iniciar Codigo</a>
-        {% endif %}
-        
-        <!-- Botón para 'jefessuperiores' -->
-         {% if is_jefessuperiores or can_access_comisarias%}
-        <a href="{% url 'comisarias_completa_list' %}" class="btn bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-700">Libro general codigos</a>
-        {% endif %}
-     
-        <!-- Botón para 'oficialesservicios' y 'jefessuperiores' -->
-        {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias %}
-        <a href="{% url 'generate_comisaria_tolhuin_pdf_download' %}?signature=true" target="_blank" class="btn bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-700">Ver y Descargar PDF</a>
-        {% endif %}
-    
-        {% if user.is_authenticated and user.is_superuser %}
-        <a href="{% url 'generate_comisaria_tolhuin_pdf_download_previous_day' %}" target="_blank" class="btn bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700">Descargar PDF del Día Anterior</a>
-        {% endif %}
-    
-        <!-- Botón para subir y ver PDFs -->
-        {% if is_oficialesservicios or is_jefessuperiores %}
-        <a href="{% url 'subir_pdfTOL' %}" class="btn bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700">Subir PDF</a>
-        {% endif %}
-    
-        {% if user.is_authenticated and user.is_superuser %}
-        <a href="{% url 'ver_pdfsTOL' %}" class="btn bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-700">Ver PDF Libro</a>
-        {% endif %}
-    </div>
-    <!-- cambios en el template para que agilizar la vista de los codigos--9/01/25 -->
-       <!--Tabla-->
-       <div class="overflow-x-auto rounded-lg mt-4">
-        <table class="table-auto w-full text-sm border-collapse border border-gray-200 dark:border-gray-700">
-            <thead class="bg-gray-800 dark:bg-gray-900 text-gray-300">
-                <tr>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Cuarto</th>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Fecha y Hora</th>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Código</th>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Lugar</th>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Descripción</th>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Estado</th>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Creado por</th>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">1er Registro</th>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Editado por</th>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Última Modificación</th>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Acciones</th>
-                </tr>
-            </thead>
+        }"
+>
+  <!-- TITULO -->
+  <h1 class="text-2xl font-bold text-center mb-4">
+    Lista de Codigos en Comisaría Tolhuin
+  </h1>
+  <!-- SUB MENU -->
+  <div class="me-nu flex flex-wrap justify-center gap-4">
+    <!-- Botón para 'oficialesservicios' y 'jefessuperiores' -->
+    {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias or is_libreros %}
+    <a href="{% url 'comisaria_tolhuin_create' %}" class="btn bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Iniciar Codigo</a>
+    {% endif %}
 
-            <tbody class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-300">
-                {% for record in page_obj %}
-                <tr>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ record.cuartoTOL.cuartoTOL }}</td>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ record.fecha_hora|date:"d/m/Y H:i:s" }}</td>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ record.codigoTOL|default_if_none:'' }}</td>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ record.lugar_codigo|default_if_none:'' }}</td>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">                   
-                       <button type="button" onclick="showModal('{{ record.descripcion|escapejs|safe }}')"class="bg-blue-600 text-white px-2 py-1 rounded">Ver</button>                       
-                    </td>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600 {% if record.estado %}animate-blink{% endif %}">
-                        {{ record.estado|yesno:"Activo,Finalizado" }}
-                    </td>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ record.created_by.get_full_name|default_if_none:'' }}</td>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ record.created_at|date:"d/m/Y H:i:s" }}</td>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ record.updated_by.get_full_name|default:'' }}</td>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ record.updated_at|date:"d/m/Y H:i:s" }}</td>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">
+    <!-- Botón para 'jefessuperiores' -->
+    {% if is_jefessuperiores or can_access_comisarias%}
+    <a href="{% url 'comisarias_completa_list' %}"
+      class="btn bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-700">Libro general codigos</a>
+    {% endif %}
 
-                        <a href="{% url 'comisaria_tolhuin_detail' record.pk %}" 
-                            class="bg-blue-600 text-white  px-4 w-full rounded  block text-center my-1">
-                            FULL
-                        </a>
+    <!-- Botón para 'oficialesservicios' y 'jefessuperiores' -->
+    {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias%}
+    <a href="{% url 'generate_comisaria_tolhuin_pdf_download' %}?signature=true" target="_blank" class="btn bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-700">Ver y Descargar PDF</a>
+    {% endif %} 
+    {% if user.is_authenticated and user.is_superuser %}
+    <a href="{% url 'generate_comisaria_tolhuin_pdf_download_previous_day' %}" target="_blank" class="btn bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700" >Descargar PDF del Día Anterior</a>
+    {% endif %}
 
-                        {% if not request.user.get_full_name in record.firmas %}
-                        {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias %}
-                        <button @click="recordIdToSign = {{ record.pk }}; showConfirmModal = true" class="bg-teal-500 text-white  px-4 w-full rounded  block text-center my-1 hover:bg-teal-600">FIRMAR</button>
-                        {% endif %}
-                        {% endif %}
+    <!-- Botón para subir y ver PDFs -->
+    {% if is_oficialesservicios or is_jefessuperiores %}
+    <a
+      href="{% url 'subir_pdfTOL' %}"
+      class="btn bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-700"
+      >Subir PDF</a
+    >
+    {% endif %} {% if user.is_authenticated and user.is_superuser %}
+    <a
+      href="{% url 'ver_pdfsTOL' %}"
+      class="btn bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-700"
+      >Ver PDF Libro</a
+    >
+    {% endif %}
+  </div>
+  <!-- cambios en el template para que agilizar la vista de los codigos--9/01/25 -->
+  <!--Tabla-->
+  <div class="overflow-x-auto rounded-lg mt-4">
+    <table
+      class="table-auto w-full text-sm border-collapse border border-gray-200 dark:border-gray-700"
+    >
+      <thead class="bg-gray-800 dark:bg-gray-900 text-gray-300">
+        <tr>
+          <th
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
+          >
+            Cuarto
+          </th>
+          <th
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
+          >
+            Fecha y Hora
+          </th>
+          <th
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
+          >
+            Código
+          </th>
+          <th
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
+          >
+            Lugar
+          </th>
+          <th
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
+          >
+            Descripción
+          </th>
+          <th
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
+          >
+            Estado
+          </th>
+          <th
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
+          >
+            Creado por
+          </th>
+          <th
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
+          >
+            1er Registro
+          </th>
+          <th
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
+          >
+            Editado por
+          </th>
+          <th
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
+          >
+            Última Modificación
+          </th>
+          <th
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
+          >
+            Acciones
+          </th>
+        </tr>
+      </thead>
 
-                        {% if record.estado or record.fecha_hora.date == today %}
-                        {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias %}
-                        <a href="{% url 'comisaria_tolhuin_edit' record.pk %}" 
-                            class="bg-yellow-500 text-white  px-4 w-full rounded  block  text-center my-1">
-                            EDITAR
-                        </a>
-                        {% endif %}
-                        {% endif %}
-
-                        {% if is_jefessuperiores or user.is_superuser %}
-                        <!-- Botón Eliminar (Soft Delete) con confirmación -->
-                        <button @click.prevent="if (confirm('¿Estás seguro/a de que deseas eliminar este registro?')) { window.location.href = '{% url 'comisaria_tolhuin_eliminar' record.pk %}' }"
-                        class="bg-red-600 text-white  px-4 w-full rounded  block text-center my-1">
-                        ELIMINAR
-                        </button>
-                        {% endif %}
-
-                        
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Paginación -->
-    <div class="flex justify-between items-center mt-4">
-        <span>Mostrando registros del {{ page_obj.start_index }} al {{ page_obj.end_index }} de un total de {{ page_obj.paginator.count }}</span>
-        <div>
-            {% if page_obj.has_previous %}
-            <a href="?page=1&items_per_page={{ items_per_page }}" class="px-2 py-1 border rounded">Primero</a>
-            <a href="?page={{ page_obj.previous_page_number }}&items_per_page={{ items_per_page }}" class="px-2 py-1 border rounded">Anterior</a>
-            {% endif %}
-            {% for num in page_range %}
-            {% if num == page_obj.number %}
-            <span class="px-2 py-1 border rounded bg-blue-500 text-white">{{ num }}</span>
-            {% else %}
-            <a href="?page={{ num }}&items_per_page={{ items_per_page }}" class="px-2 py-1 border rounded">{{ num }}</a>
-            {% endif %}
-            {% endfor %}
-            {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}&items_per_page={{ items_per_page }}" class="px-2 py-1 border rounded">Siguiente</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}&items_per_page={{ items_per_page }}" class="px-2 py-1 border rounded">Último</a>
-            {% endif %}
-        </div>
-    </div>
-
-
-    <!-- Modal -->
-<div id="modal" class="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75 hidden">
-    <div class="bg-white rounded-lg shadow-xl transform transition-all sm:max-w-lg sm:w-full p-6">
-        <!-- Título del Modal -->
-        <h3 class="text-lg font-medium text-gray-900 mb-4">Descripción</h3>
-        
-        <!-- Contenido HTML del Modal -->
-        <div id="modal-content" class="text-sm text-gray-700 overflow-y-auto max-h-80"></div>
-        
-        <!-- Botón de Cerrar -->
-        <div class="mt-4 flex justify-end">
-            <button onclick="closeModal()" 
-                class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
-                Cerrar
+      <tbody class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-300">
+        {% for record in page_obj %}
+        <tr>
+          <td
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
+          >
+            {{ record.cuartoTOL.cuartoTOL }}
+          </td>
+          <td
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
+          >
+            {{ record.fecha_hora|date:"d/m/Y H:i:s" }}
+          </td>
+          <td
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
+          >
+            {{ record.codigoTOL|default_if_none:'' }}
+          </td>
+          <td
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
+          >
+            {{ record.lugar_codigo|default_if_none:'' }}
+          </td>
+          <td
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
+          >
+            <button
+              type="button"
+              onclick="showModal('{{ record.descripcion|escapejs|safe }}')"
+              class="bg-blue-600 text-white px-2 py-1 rounded"
+            >
+              Ver
             </button>
-        </div>
-    </div>
-</div>
+          </td>
+          <td
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600 {% if record.estado %}animate-blink{% endif %}"
+          >
+            {{ record.estado|yesno:"Activo,Finalizado" }}
+          </td>
+          <td
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
+          >
+            {{ record.created_by.get_full_name|default_if_none:'' }}
+          </td>
+          <td
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
+          >
+            {{ record.created_at|date:"d/m/Y H:i:s" }}
+          </td>
+          <td
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
+          >
+            {{ record.updated_by.get_full_name|default:'' }}
+          </td>
+          <td
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
+          >
+            {{ record.updated_at|date:"d/m/Y H:i:s" }}
+          </td>
+          <td
+            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
+          >
+            <a
+              href="{% url 'comisaria_tolhuin_detail' record.pk %}"
+              class="bg-blue-600 text-white px-4 w-full rounded block text-center my-1"
+            >
+              FULL
+            </a>
 
-    <!-- Modal de Confirmación para Firmar -->
-    <div x-show="showConfirmModal" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-        <div class="bg-white dark:bg-gray-800 rounded-lg p-4 w-1/3">
-            <h2 class="text-lg font-bold dark:text-white">Confirmar Firma</h2>
-            <p class="mt-2 text-gray-800 dark:text-gray-300">¿Está seguro de que desea firmar este registro?</p>
-            <div class="mt-4 flex justify-end gap-4">
-                <button @click="showConfirmModal = false" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancelar</button>
-                <button @click="confirmSign()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Confirmar</button>
-            </div>
-        </div>
+            {% if not request.user.get_full_name in record.firmas %} 
+            {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias%}
+            <button
+              @click="recordIdToSign = {{ record.pk }}; showConfirmModal = true"
+              class="bg-teal-500 text-white px-4 w-full rounded block text-center my-1 hover:bg-teal-600">
+              FIRMAR
+            </button>
+            {% endif %} 
+            {% endif %} 
+            {% if record.estado or record.fecha_hora.date == today %} {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias %}
+            <a
+              href="{% url 'comisaria_tolhuin_edit' record.pk %}"
+              class="bg-yellow-500 text-white px-4 w-full rounded block text-center my-1"
+            >
+              EDITAR
+            </a>
+            {% endif %} 
+            {% endif %} 
+            {% if is_jefessuperiores or user.is_superuser %}
+            <!-- Botón Eliminar (Soft Delete) con confirmación -->
+            <button
+              @click.prevent="if (confirm('¿Estás seguro/a de que deseas eliminar este registro?')) { window.location.href = '{% url 'comisaria_tolhuin_eliminar' record.pk %}' }"
+              class="bg-red-600 text-white px-4 w-full rounded block text-center my-1"
+            >
+              ELIMINAR
+            </button>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginación -->
+  <div class="flex justify-between items-center mt-4">
+    <span>Mostrando registros del {{ page_obj.start_index }} al {{page_obj.end_index }} de un total de {{ page_obj.paginator.count }}</span>
+    <div>
+      {% if page_obj.has_previous %}
+      <a
+        href="?page=1&items_per_page={{ items_per_page }}"
+        class="px-2 py-1 border rounded"
+        >Primero</a
+      >
+      <a
+        href="?page={{ page_obj.previous_page_number }}&items_per_page={{ items_per_page }}"
+        class="px-2 py-1 border rounded"
+        >Anterior</a
+      >
+      {% endif %} {% for num in page_range %} {% if num == page_obj.number %}
+      <span class="px-2 py-1 border rounded bg-blue-500 text-white"
+        >{{ num }}</span
+      >
+      {% else %}
+      <a
+        href="?page={{ num }}&items_per_page={{ items_per_page }}"
+        class="px-2 py-1 border rounded"
+        >{{ num }}</a
+      >
+      {% endif %} {% endfor %} {% if page_obj.has_next %}
+      <a
+        href="?page={{ page_obj.next_page_number }}&items_per_page={{ items_per_page }}"
+        class="px-2 py-1 border rounded"
+        >Siguiente</a
+      >
+      <a
+        href="?page={{ page_obj.paginator.num_pages }}&items_per_page={{ items_per_page }}"
+        class="px-2 py-1 border rounded"
+        >Último</a
+      >
+      {% endif %}
     </div>
+  </div>
+
+  <!-- Modal -->
+  <div
+    id="modal"
+    class="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75 hidden"
+  >
+    <div
+      class="bg-white rounded-lg shadow-xl transform transition-all sm:max-w-lg sm:w-full p-6"
+    >
+      <!-- Título del Modal -->
+      <h3 class="text-lg font-medium text-gray-900 mb-4">Descripción</h3>
+
+      <!-- Contenido HTML del Modal -->
+      <div
+        id="modal-content"
+        class="text-sm text-gray-700 overflow-y-auto max-h-80"
+      ></div>
+
+      <!-- Botón de Cerrar -->
+      <div class="mt-4 flex justify-end">
+        <button
+          onclick="closeModal()"
+          class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+        >
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmación para Firmar -->
+  <div
+    x-show="showConfirmModal"
+    x-cloak
+    class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+  >
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 w-1/3">
+      <h2 class="text-lg font-bold dark:text-white">Confirmar Firma</h2>
+      <p class="mt-2 text-gray-800 dark:text-gray-300">
+        ¿Está seguro de que desea firmar este registro?
+      </p>
+      <div class="mt-4 flex justify-end gap-4">
+        <button
+          @click="showConfirmModal = false"
+          class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+        >
+          Cancelar
+        </button>
+        <button
+          @click="confirmSign()"
+          class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <style>
-    @keyframes blink {
-        50% {
-            opacity: 0.5;
-        }
+  @keyframes blink {
+    50% {
+      opacity: 0.5;
     }
-    .animate-blink {
-        animation: blink 1.5s infinite;
-        background-color: #fef08a; /* Amarillo claro */
-    }
-    </style>
+  }
+  .animate-blink {
+    animation: blink 1.5s infinite;
+    background-color: #fef08a; /* Amarillo claro */
+  }
+</style>
 
-    <script>
-        function showModal(content) {
-            document.getElementById('modal-content').innerHTML = content; // Renderiza el contenido HTML
-            document.getElementById('modal').classList.remove('hidden');
-        }
-    
-        function closeModal() {
-            document.getElementById('modal').classList.add('hidden');
-        }
-    
-        function clearSearch() {
-            const url = new URL(window.location.href);
-            url.searchParams.delete('q');
-            url.searchParams.set('items_per_page', '{{ items_per_page }}');
-            window.location.href = url.toString();
-        }
-    </script>
+<script>
+  function showModal(content) {
+    document.getElementById("modal-content").innerHTML = content; // Renderiza el contenido HTML
+    document.getElementById("modal").classList.remove("hidden");
+  }
+
+  function closeModal() {
+    document.getElementById("modal").classList.add("hidden");
+  }
+
+  function clearSearch() {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("q");
+    url.searchParams.set("items_per_page", "{{ items_per_page }}");
+    window.location.href = url.toString();
+  }
+</script>
 <!-- cierre 09/01/25 -->
-    <!-- SweetAlert2 para mostrar el mensaje de éxito -->
+<!-- SweetAlert2 para mostrar el mensaje de éxito -->
 {% if messages %}
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        {% for message in messages %}
-            Swal.fire({
-                icon: 'success',  // Cambia el ícono según el tipo de mensaje (success, error, etc.)
-                title: '¡Éxito!',
-                text: '{{ message }}',
-                confirmButtonText: 'OK',
-                timer: 3000  // La alerta se cierra automáticamente después de 3 segundos
-            });
-        {% endfor %}
-    });
+  document.addEventListener('DOMContentLoaded', function () {
+      {% for message in messages %}
+          Swal.fire({
+              icon: 'success',  // Cambia el ícono según el tipo de mensaje (success, error, etc.)
+              title: '¡Éxito!',
+              text: '{{ message }}',
+              confirmButtonText: 'OK',
+              timer: 3000  // La alerta se cierra automáticamente después de 3 segundos
+          });
+      {% endfor %}
+  });
 </script>
-{% endif %}
+{% endif %} 
 {% endblock %}

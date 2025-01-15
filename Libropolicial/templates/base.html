@@ -542,6 +542,38 @@
     </script>
     <!-- MAPA -->
     <script>
+         //evita que ingresen datos que no sean numericos--14/1/25
+         document.addEventListener("DOMContentLoaded", function () {
+        // Resto de tu código...
+
+        // Obtén los campos de latitud y longitud
+        const latitudeInput = document.getElementById("id_latitude");
+        const longitudeInput = document.getElementById("id_longitude");
+
+        // Función para validar si un valor es numérico
+        function isNumeric(value) {
+            return !isNaN(value) && isFinite(value);
+        }
+
+        // Añade eventos de validación a los campos
+        latitudeInput.addEventListener("input", function () {
+            if (!isNumeric(this.value)) {
+                this.value = ""; // Limpia el campo si el valor no es numérico
+                alert("Por favor, ingresa un valor numérico válido para la latitud y la longitud.");
+            }
+        });
+        //fin 14/1/25
+
+    longitudeInput.addEventListener("input", function () {
+        if (!isNumeric(this.value)) {
+            this.value = ""; // Limpia el campo si el valor no es numérico
+            alert("Por favor, ingresa un valor numérico válido para la longitud.");
+        }
+    });
+
+    // Resto de tu código...
+});
+
         document.addEventListener("DOMContentLoaded", function () {
             // Obtén la URL actual
             var url = window.location.href;
