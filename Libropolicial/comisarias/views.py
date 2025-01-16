@@ -191,6 +191,7 @@ class ComisariaPrimeraListView(LoginRequiredMixin, UserPassesTestMixin, ListView
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariaprimera'] = user.groups.filter(name='comisariaprimera').exists()
+        context['is_suboficialesSuperiores'] = user.groups.filter(name='suboficialesSuperiores').exists()
 
         context['today'] = timezone.now().date()  # Agrega la fecha actual al contexto.
         context['resolveId'] = None  # Define una variable para resolver registros (actualmente no utilizada).
@@ -707,6 +708,7 @@ class ComisariaSegundaListView(LoginRequiredMixin, UserPassesTestMixin, ListView
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariasegunda'] = user.groups.filter(name='comisariasegunda').exists()
+        context['is_suboficialesSuperiores'] = user.groups.filter(name='suboficialesSuperiores').exists()
 
         context['today'] = timezone.now().date()  # Agrega la fecha actual al contexto.
         context['resolveId'] = None  # Define una variable para resolver registros (actualmente no utilizada).
@@ -1145,6 +1147,7 @@ class ComisariaTerceraListView(LoginRequiredMixin, UserPassesTestMixin, ListView
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariatercera'] = user.groups.filter(name='comisariatercera').exists()
+        context['is_suboficialesSuperiores'] = user.groups.filter(name='suboficialesSuperiores').exists()
 
         context['today'] = timezone.now().date()  # Agrega la fecha actual al contexto.
         context['resolveId'] = None  # Define una variable para resolver registros (actualmente no utilizada).
@@ -1568,6 +1571,7 @@ class ComisariaCuartaListView(LoginRequiredMixin, UserPassesTestMixin, ListView)
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariacuarta'] = user.groups.filter(name='comisariacuarta').exists()
+        context['is_suboficialesSuperiores'] = user.groups.filter(name='suboficialesSuperiores').exists()
 
         context['today'] = timezone.now().date()  # Agrega la fecha actual al contexto.
         context['resolveId'] = None  # Define una variable para resolver registros (actualmente no utilizada).
@@ -1990,6 +1994,7 @@ class ComisariaQuintaListView(LoginRequiredMixin, UserPassesTestMixin, ListView)
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariaquinta'] = user.groups.filter(name='comisariaquinta').exists()
+        context['is_suboficialesSuperiores'] = user.groups.filter(name='suboficialesSuperiores').exists()
 
         context['today'] = timezone.now().date()  # Agrega la fecha actual al contexto.
         context['resolveId'] = None  # Define una variable para resolver registros (actualmente no utilizada).

@@ -160,6 +160,7 @@ class ComisariaTolhuinListView(LoginRequiredMixin, UserPassesTestMixin, ListView
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariatolhuin'] = user.groups.filter(name='comisariatolhuin').exists()
+        context['is_suboficialesSuperiores'] = user.groups.filter(name='suboficialesSuperiores').exists()
         
         # Agrega la fecha actual al contexto.
         context['today'] = timezone.now().date()

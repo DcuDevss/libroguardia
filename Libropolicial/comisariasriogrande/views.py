@@ -198,6 +198,7 @@ class ComisariaPrimeraRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariaprimeraRG'] = user.groups.filter(name='comisariaprimeraRG').exists()
+        context['is_suboficialesSuperiores'] = user.groups.filter(name='suboficialesSuperiores').exists()
         
         # Agrega la fecha actual al contexto.
         context['today'] = timezone.now().date()
@@ -707,6 +708,7 @@ class ComisariaSegundaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariasegundaRG'] = user.groups.filter(name='comisariasegundaRG').exists()
+        context['is_suboficialesSuperiores'] = user.groups.filter(name='suboficialesSuperiores').exists()
 
 
         context['today'] = timezone.now().date()
@@ -1135,6 +1137,7 @@ class ComisariaTerceraRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariaterceraRG'] = user.groups.filter(name='comisariatercera').exists()
+        context['is_suboficialesSuperiores'] = user.groups.filter(name='suboficialesSuperiores').exists()
 
         context['today'] = timezone.now().date()
         context['resolveId'] = None
@@ -1546,6 +1549,7 @@ class ComisariaCuartaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariacuartaRG'] = user.groups.filter(name='comisariacuartaRG').exists()
+        context['is_suboficialesSuperiores'] = user.groups.filter(name='suboficialesSuperiores').exists()
 
         context['today'] = timezone.now().date()
         context['resolveId'] = None
@@ -2034,6 +2038,7 @@ class ComisariaQuintaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariaquintaRG'] = user.groups.filter(name='comisariaquintaRG').exists()
+        context['is_suboficialesSuperiores'] = user.groups.filter(name='suboficialesSuperiores').exists()
 
         context['today'] = timezone.now().date()
         context['resolveId'] = None

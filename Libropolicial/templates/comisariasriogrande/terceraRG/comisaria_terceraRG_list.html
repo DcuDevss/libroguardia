@@ -166,7 +166,7 @@
         {% endif %}
         
         <!-- Botón para 'jefessuperiores' -->
-        {% if is_jefessuperiores or can_access_comisarias %}
+        {% if is_jefessuperiores or can_access_comisarias or is_suboficialesSuperiores  %}
         <a href="{% url 'comisarias_completaRG_list' %}" class="btn bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-700">Libro general codigos</a>
         {% endif %}
     
