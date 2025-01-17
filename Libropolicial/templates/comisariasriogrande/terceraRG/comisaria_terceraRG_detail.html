@@ -18,6 +18,7 @@ Tercera Rio Grande{% endblock %} {% block content %}
       <h2 class="text-lg font-semibold">Código:</h2>
       <p style="max-height: 40px; line-height: 20px" class="overflow-auto">
         {{ record.codigoRG.codigoRG|default:"S/N" }} - {{record.codigoRG.nombre_codigo|default:"S/N" }}
+        {{ record.codigoRG.codigoRG|default:"S/N" }} - {{ record.codigoRG.nombre_codigo|default:"S/N" }}
       </p>
     </div>
     <!-- CUARTO -->
@@ -90,6 +91,10 @@ Tercera Rio Grande{% endblock %} {% block content %}
       <ul class="flex gap-x-2">
         {% for codigo in record.codigos_secundariosRG.all %}
               <li>{{ codigo.codigoRG|default:"S/N" }}{% if not forloop.last %},{%endif%}</li>
+        <li>
+          {{ codigo.codigoRG|default:"S/N" }}{% if not forloop.last %},
+          {% endif %}
+        </li>
         {% endfor %}
       </ul>
     {% else %}
