@@ -17,6 +17,7 @@ Tercera Rio Grande{% endblock %} {% block content %}
     <div class="">
       <h2 class="text-lg font-semibold">Código:</h2>
       <p style="max-height: 40px; line-height: 20px" class="overflow-auto">
+        {{ record.codigoRG.codigoRG|default:"S/N" }} - {{record.codigoRG.nombre_codigo|default:"S/N" }}
         {{ record.codigoRG.codigoRG|default:"S/N" }} - {{ record.codigoRG.nombre_codigo|default:"S/N" }}
       </p>
     </div>
@@ -83,22 +84,23 @@ Tercera Rio Grande{% endblock %} {% block content %}
       <p>S/N</p>
       {% endif %}
     </div>
-    <!-- CODIGOS SECUNDARIOS -->
-    <div class="">
-      <h2 class="text-lg font-semibold">Codigos Secundarios:</h2>
-      {% if record.codigos_secundariosRG.all %}
+  <!-- CODIGOS SECUNDARIOS -->
+  <div class="">
+    <h2 class="text-lg font-semibold">Codigos Secundarios:</h2>
+    {% if record.codigos_secundariosRG.all %}
       <ul class="flex gap-x-2">
         {% for codigo in record.codigos_secundariosRG.all %}
+              <li>{{ codigo.codigoRG|default:"S/N" }}{% if not forloop.last %},{%endif%}</li>
         <li>
           {{ codigo.codigoRG|default:"S/N" }}{% if not forloop.last %},
           {% endif %}
         </li>
         {% endfor %}
       </ul>
-      {% else %}
+    {% else %}
       <p>S/N</p>
-      {% endif %}
-    </div>
+    {% endif %}
+  </div>
     <!-- ESTADO -->
     <div>
       <h2 class="text-lg font-semibold">Estado del Código:</h2>
