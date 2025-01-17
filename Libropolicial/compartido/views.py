@@ -49,7 +49,7 @@ class CustomLoginView(LoginView):
             'comisaria_terceraRG': 'comisariaterceraRG_list',
             'comisaria_cuartaRG': 'comisariacuartaRG_list',
             'comisaria_quintaRG': 'comisariaquintaRG_list',
-            #'comisaria_tolhuin': 'comisaria_tolhuin_list',
+            #'comisaria_tolhuin': 'comisaria_tolhuin_list', esta comentado por el modemnto
             #'divisioncomunicaciones': 'divisioncomunicaciones_list'
         }
         for group, url in user_group_redirects.items():
