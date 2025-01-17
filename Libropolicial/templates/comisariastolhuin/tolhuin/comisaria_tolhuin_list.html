@@ -1,140 +1,133 @@
 {% extends "base.html" %} 
 {% block title %}Comisaría Tolhuin{% endblock %} 
 {%block content %}
-<link
-  rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.dataTables.css"/>
-
+<!-- <link rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.dataTables.css" /> -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdn.datatables.net/2.1.3/js/dataTables.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet"
-/>
+<!-- <script src="https://cdn.datatables.net/2.1.3/js/dataTables.js"></script> -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
 <!-- estilos varios -->
 <style>
-  /* ::-webkit-scrollbar {
+    /* ::-webkit-scrollbar {
         display: none;
     } */
-  h1 {
-    font-family: "Roboto Slab", serif;
-  }
-  .dt-layout-row {
-    font-size: 13px;
-  }
-  #dt-search-0 {
-    border-radius: 6px;
-    min-width: 300px;
-  }
-  #dt-length-0 {
-    border-radius: 6px;
-  }
-  /* cambio de posicion buscador y selector de registros */
-  .dt-layout-row {
-    display: flex;
-  }
-  div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {
-    order: 1;
-    justify-content: flex-start;
-    margin-left: 0;
-  }
-  div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-start {
-    order: 2;
-    justify-content: flex-end;
-    margin-right: 0;
-  }
-  /* Estilos para el modo oscuro */
-  .dark .dataTables_wrapper {
-    background-color: #2d2d2d;
-    color: #e0e0e0;
-  }
+    h1{
+        font-family: 'Roboto Slab', serif;
+    }
+    .dt-layout-row{
+        font-size: 13px;
+    }
+    #dt-search-0{
+        border-radius: 6px;
+        min-width: 300px;
+    }
+    #dt-length-0{
+        border-radius: 6px;
+    }
+    /* cambio de posicion buscador y selector de registros */
+    .dt-layout-row {
+        display: flex;
+    }
+    div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {
+        order: 1;
+        justify-content: flex-start;
+        margin-left: 0;
+    }
+    div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-start {
+        order: 2;
+        justify-content: flex-end;
+        margin-right: 0;
+    }
+    /* Estilos para el modo oscuro */
+    .dark .dataTables_wrapper {
+        background-color: #2d2d2d;
+        color: #e0e0e0;
+    }
 
-  .dark .dataTables_wrapper .dataTables_paginate .paginate_button {
-    background-color: #444;
-    color: #e0e0e0;
-  }
+    .dark .dataTables_wrapper .dataTables_paginate .paginate_button {
+        background-color: #444;
+        color: #e0e0e0;
+    }
 
-  .dark .dataTables_wrapper .dataTables_filter input {
-    background-color: #333;
-    color: #e0e0e0;
-    border: 1px solid #555;
-  }
+    .dark .dataTables_wrapper .dataTables_filter input {
+        background-color: #333;
+        color: #e0e0e0;
+    }
 
-  .dark .dataTables_wrapper .dataTables_info {
-    color: #e0e0e0;
-  }
+    .dark .dataTables_wrapper .dataTables_info {
+        color: #e0e0e0;
+    }
 
-  .dark .dataTables_wrapper .dataTables_header {
-    background-color: #333;
-    color: #e0e0e0;
-  }
+    .dark .dataTables_wrapper .dataTables_header {
+        background-color: #333;
+        color: #e0e0e0;
+        border: 1px solid #555;
+    }
 
-  .dark .dataTables_wrapper .dataTables_body {
-    background-color: #2d2d2d;
-  }
-  #myTable tbody tr:hover {
-    background-color: transparent; /* Elimina el color de fondo en hover */
-  }
-  /*  */
-  .carajo {
-    border: 1px solid #555 !important;
-  }
-  /*  */
-  /* .dark .dataTables_wrapper tbody tr:hover {
+    .dark .dataTables_wrapper .dataTables_body {
+        background-color: #2d2d2d;
+    }
+    #myTable tbody tr:hover {
+        background-color: transparent; /* Elimina el color de fondo en hover */
+    }
+    /*  */
+    .carajo {
+        border: 1px solid #555 !important;
+    }
+    /*  */
+    /* .dark .dataTables_wrapper tbody tr:hover {
         background-color: #3b82f6;
     } */
-  #myTable thead {
-    background: #29313d;
-  }
-  html.dark #myTable thead {
-    background: black;
-  }
-  #myTable th {
-    text-align: center;
-    font-size: 14px;
-  }
-  .tede td {
-    border-right: 0.5px solid rgba(0, 0, 0, 0.15);
-  }
-  /* Ajuste para modo oscuro */
-  html.dark .tede td {
-    border-right: 0.5px solid rgba(255, 255, 255, 0.15); /* Borde gris claro para modo oscuro */
-  }
-  .td-codigo p {
-    margin: auto;
-    min-width: 200px;
-  }
-  .td-nombres {
-    min-width: 138px;
-  }
-  .td-qth {
-    min-width: 170px;
-  }
-  /* BOTONES ACCIONES */
-  .td-acciones {
-    row-gap: 6px;
-  }
-  .td-acciones a,
-  .td-acciones button {
-    font-size: 9px;
-    font-weight: 700;
-    padding-top: 2px;
-    padding-bottom: 2px;
-    transition: transform 0.3s ease, filter 0.3s ease;
-  }
-  .td-acciones a:hover,
-  .td-acciones button:hover {
-    transform: scale(1.1);
-    filter: brightness(1.2);
-  }
-  /* modal */
-  html.dark .modal-desc,
-  html.dark .btn-desc {
-    background: #11192a;
-    color: white;
-  }
-  html.dark .modal-desc p,
-  html.dark .modal-desc span {
-    color: rgba(255, 255, 255, 0.911);
-  }
-  /* table.dataTable > tbody > tr.selected > * {
+    #myTable thead{
+        background: #29313d;
+    }
+    html.dark #myTable thead {
+        background: black;
+    }
+    #myTable th{
+        text-align: center;
+        font-size: 14px;
+    }
+    .tede td{
+        border-right: .5px solid rgba(0, 0, 0, 0.15);
+    }
+    /* Ajuste para modo oscuro */
+    html.dark .tede td {
+        border-right: 0.5px solid rgba(255, 255, 255, 0.15); /* Borde gris claro para modo oscuro */
+    }
+    .td-codigo p{
+        margin: auto;
+        min-width: 200px;
+    }
+    .td-nombres{
+        min-width: 138px;
+    }
+    .td-qth{
+        min-width: 170px;
+    }
+    /* BOTONES ACCIONES */
+    .td-acciones{
+        row-gap: 6px;
+    }
+    .td-acciones a , .td-acciones button {
+        font-size: 9px; 
+        font-weight: 700;
+        padding-top: 2px;
+        padding-bottom: 2px;
+        transition: transform 0.3s ease, filter 0.3s ease;
+    }
+    .td-acciones a:hover, .td-acciones button:hover{
+        transform: scale(1.1);
+        filter: brightness(1.2);
+    }
+    /* modal */
+    html.dark .modal-desc, html.dark .btn-desc{
+        background: #11192a;
+        color: white;
+    }
+    html.dark .modal-desc p, html.dark .modal-desc span{
+        color: rgba(255, 255, 255, 0.911);
+    }
+    /* table.dataTable > tbody > tr.selected > * {
         box-shadow: inset 0 0 0 9999px rgb(4, 4, 107) !important; 
         color: white !important; 
     }
@@ -170,7 +163,7 @@
     {% endif %}
 
     <!-- Botón para 'jefessuperiores' -->
-    {% if is_jefessuperiores or can_access_comisarias%}
+    {% if is_jefessuperiores or can_access_comisarias or is_suboficialesSuperiores %}
     <a href="{% url 'comisarias_completa_list' %}"
       class="btn bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-700">Libro general codigos</a>
     {% endif %}
@@ -242,64 +235,40 @@
       </div>
   <!--Tabla-->
   <div class="overflow-x-auto rounded-lg">
-    <table
-      id="myTable" class="display carajo w-full text-[13px] rounded-lg"
-    >
+    <table id="myTable" class="display carajo w-full text-[13px] rounded-lg">
       <thead class="text-white rounded-lg">
         <tr>
-          <th
-            class="px-4 py-4 text-center rounded-tl-lg"
-          >
+          <th class="px-4 py-4 text-center rounded-tl-lg">
             Cuarto
           </th>
-          <th
-            class="px-4 py-4 text-center"
-          >
+          <th class="px-4 py-4 text-center">
             Fecha y Hora
           </th>
-          <th
-            class="px-4 py-4 text-center"
-          >
+          <th class="px-4 py-4 text-center">
             Código
           </th>
-          <th
-            class="px-4 py-4 text-center"
-          >
+          <th class="px-4 py-4 text-center">
             Lugar
           </th>
-          <th
-            class="px-4 py-4 text-center"
-          >
+          <th class="px-4 py-4 text-center">
             Descripción
           </th>
-          <th
-            class="px-4 py-4 text-center"
-          >
+          <th class="px-4 py-4 text-center">
             Estado
           </th>
-          <th
-            class="px-4 py-4 text-center"
-          >
+          <th class="px-4 py-4 text-center">
             Creado por
           </th>
-          <th
-            class="px-4 py-4 text-center"
-          >
+          <th class="px-4 py-4 text-center">
             1er Registro
           </th>
-          <th
-            class="px-4 py-4 text-center"
-          >
+          <th class="px-4 py-4 text-center">
             Editado por
           </th>
-          <th
-            class="px-4 py-4 text-center"
-          >
+          <th class="px-4 py-4 text-center">
             Última Modificación
           </th>
-          <th
-            class="px-4 py-4 text-center"
-          >
+          <th class="px-4 py-4 text-center">
             Acciones
           </th>
         </tr>
@@ -307,99 +276,60 @@
 
       <tbody>
         {% for record in page_obj %}
-        <tr class="tede">
-          <td
-            class="py-1 px-2 font-bold text-center"
-          >
+        <tr class="tede border">
+          <td class="py-1 px-2 font-bold text-center">
             {{ record.cuartoTOL.cuartoTOL }}
           </td>
-          <td
-            class="py-1 px-2 text-center"
-          >
+          <td class="py-1 px-2 text-center">
             {{ record.fecha_hora|date:"d/m/Y H:i:s" }}
           </td>
-          <td
-            class="py-1 px-2 text-center"
-          >
+          <td class="py-1 px-2 text-center">
             {{ record.codigoTOL|default_if_none:'' }}
           </td>
-          <td
-            class="py-1 px-2 text-center"
-          >
+          <td class="py-1 px-2 text-center">
             {{ record.lugar_codigo|default_if_none:'' }}
           </td>
-          <td
-            class="py-1 px-2 font-bold text-center"
-          >
-            <button
-            @click="descripcion = '{{ record.descripcion|escapejs }}'; showModal = true" 
-            class="bg-blue-600 text-white px-3 py-2 rounded" 
-            style="font-size: 9px; font-weight: 600;"
-            onmouseover="this.style.backgroundColor='#3B82F6';"
-            onmouseout="this.style.backgroundColor='#2563eb';"
-            >
+          <td class="py-1 px-2 font-bold text-center">
+            <button @click="descripcion = '{{ record.descripcion|escapejs }}'; showModal = true"  class="bg-blue-600 text-white px-3 py-2 rounded"  style="font-size: 9px; font-weight: 600;" onmouseover="this.style.backgroundColor='#3B82F6';" onmouseout="this.style.backgroundColor='#2563eb';">
               VER
             </button>
           </td>
-          <td
-            class="py-1 px-2 text-center {% if record.estado %}animate-blink{% endif %}"
-          >
+          <td class="py-1 px-2 text-center {% if record.estado %}animate-blink{% endif %}">
             {{ record.estado|yesno:"Activo,Finalizado" }}
           </td>
-          <td
-            class="py-1 px-2 text-center"
-          >
+          <td class="py-1 px-2 text-center">
             {{ record.created_by.get_full_name|default_if_none:'' }}
           </td>
-          <td
-            class="py-1 px-2 text-center"
-          >
+          <td class="py-1 px-2 text-center">
             {{ record.created_at|date:"d/m/Y H:i:s" }}
           </td>
-          <td
-            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
-          >
+          <td class="py-1 px-2 text-center">
             {{ record.updated_by.get_full_name|default:'' }}
           </td>
-          <td
-            class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600"
-          >
+          <td class="py-1 px-2 text-center">
             {{ record.updated_at|date:"d/m/Y H:i:s" }}
           </td>
-          <td
-            class="td-acciones px-2 text-center"
-          >
-            <a
-              href="{% url 'comisaria_tolhuin_detail' record.pk %}"
-              class="bg-blue-600 text-white  px-4 w-full rounded  block text-center my-1"
-            >
+          <td class="td-acciones px-2 text-center">
+            <a href="{% url 'comisaria_tolhuin_detail' record.pk %}" class="bg-blue-600 text-white  px-4 w-full rounded  block text-center my-1">
               FULL
             </a>
 
             {% if not request.user.get_full_name in record.firmas %} 
             {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias%}
-            <button
-              @click="recordIdToSign = {{ record.pk }}; showConfirmModal = true"
-              class="bg-teal-500 text-white px-4 w-full rounded block text-center my-1 hover:bg-teal-600">
+            <button @click="recordIdToSign = {{ record.pk }}; showConfirmModal = true" class="bg-teal-500 text-white px-4 w-full rounded block text-center my-1 hover:bg-teal-600">
               FIRMAR
             </button>
             {% endif %} 
             {% endif %} 
             {% if record.estado or record.fecha_hora.date == today %} {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias %}
-            <a
-              href="{% url 'comisaria_tolhuin_edit' record.pk %}"
-              class="bg-yellow-500 text-black  px-4 w-full rounded  block  text-center my-1"
-            >
+            <a href="{% url 'comisaria_tolhuin_edit' record.pk %}" class="bg-yellow-500 text-black  px-4 w-full rounded  block  text-center my-1">
               EDITAR
             </a>
             {% endif %} 
             {% endif %} 
             {% if is_jefessuperiores or user.is_superuser %}
             <!-- Botón Eliminar (Soft Delete) con confirmación -->
-            <button
-              @click.prevent="if (confirm('¿Estás seguro/a de que deseas eliminar este registro?')) { window.location.href = '{% url 'comisaria_tolhuin_eliminar' record.pk %}' }"
-              class="bg-red-600 text-white px-4 w-full rounded block text-center my-1"
-            >
+            <button @click.prevent="if (confirm('¿Estás seguro/a de que deseas eliminar este registro?')) { window.location.href = '{% url 'comisaria_tolhuin_eliminar' record.pk %}' }" class="bg-red-600 text-white px-4 w-full rounded block text-center my-1">
               ELIMINAR
             </button>
             {% endif %}

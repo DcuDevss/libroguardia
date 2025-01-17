@@ -22,7 +22,7 @@
         <a href="{% url 'comisaria_tercera_create' %}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Iniciar Codigo</a>
         {% endif %}
         <!-- Botón para 'jefessuperiores' -->
-        {% if is_jefessuperiores or can_access_comisarias %}
+        {% if is_jefessuperiores or can_access_comisarias or is_suboficialesSuperiores %}
         <a href="{% url 'comisarias_completa_list' %}" class="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-700">Libro general codigos</a>
         {% endif %}
     
