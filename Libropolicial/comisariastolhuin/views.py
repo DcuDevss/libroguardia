@@ -132,15 +132,18 @@ class ComisariaTolhuinListView(LoginRequiredMixin, UserPassesTestMixin, ListView
             except (ValueError, TypeError):  
                 # Si la consulta no es una fecha válida, realiza el filtrado en otros campos.
                 queryset = queryset.filter(
-                        Q(codigoTOL__codigoTOL__icontains=query) |
-                        Q(codigoTOL__nombre_codigoTOL__icontains=query) |
-                        Q(movil_patrulla__icontains=query) |
-                        Q(a_cargo__icontains=query) |
-                        Q(secundante__icontains=query) |
-                        Q(lugar_codigo__icontains=query) |
-                        Q(tareas_judiciales__icontains=query) |
-                        Q(descripcion__icontains=query) |
-                        Q(fecha_hora__icontains=query)
+                        Q(codigoTOL__codigoTOL__icontains=search_query) |
+                        Q(codigoTOL__nombre_codigo__icontains=search_query) |                        
+                        Q(movil_patrulla__icontains=search_query) |
+                        Q(a_cargo__icontains=search_query) |
+                        Q(secundante__icontains=search_query) |
+                        Q(lugar_codigo__icontains=search_query) |
+                        Q(tareas_judiciales__icontains=search_query) |
+                        Q(descripcion__icontains=search_query) |
+                        Q(fecha_hora__icontains=search_query) |
+                        Q(created_by__username__icontains=search_query) |  # Busca por nombre de usuario
+                        Q(created_by__first_name__icontains=search_query) |  # Busca por nombre
+                        Q(created_by__last_name__icontains=search_query)  # Busca por apellido
                     )
         
         # Devuelve el queryset final, posiblemente filtrado y ajustado.
@@ -150,7 +153,6 @@ class ComisariaTolhuinListView(LoginRequiredMixin, UserPassesTestMixin, ListView
     def get_context_data(self, **kwargs):
         # Llama al método original para obtener el contexto predeterminado.
         context = super().get_context_data(**kwargs)
-
         user = self.request.user
        
         context['is_jefessuperiores'] = user.groups.filter(name='jefessuperiores').exists()
@@ -158,6 +160,7 @@ class ComisariaTolhuinListView(LoginRequiredMixin, UserPassesTestMixin, ListView
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariatolhuin'] = user.groups.filter(name='comisariatolhuin').exists()
+        context['is_suboficialesSuperiores'] = user.groups.filter(name='suboficialesSuperiores').exists()
         
         # Agrega la fecha actual al contexto.
         context['today'] = timezone.now().date()

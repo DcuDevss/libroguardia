@@ -171,15 +171,19 @@ class ComisariaPrimeraRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
             except (ValueError, TypeError):  
                 # Si la consulta no es una fecha válida, realiza el filtrado en otros campos.
                 queryset = queryset.filter(
-                        Q(codigoRG__codigoRG__icontains=query) |
-                        Q(codigoRG__nombre_codigoRG__icontains=query) |
-                        Q(movil_patrulla__icontains=query) |
-                        Q(a_cargo__icontains=query) |
-                        Q(secundante__icontains=query) |
-                        Q(lugar_codigo__icontains=query) |
-                        Q(tareas_judiciales__icontains=query) |
-                        Q(descripcion__icontains=query) |
-                        Q(fecha_hora__icontains=query)
+                       Q(codigoRG__codigoRG__icontains=search_query) |
+                        Q(codigoRG__nombre_codigo__icontains=search_query) |
+                        Q(movil_patrulla__icontains=search_query) |
+                        Q(a_cargo__icontains=search_query) |
+                        Q(secundante__icontains=search_query) |
+                        Q(lugar_codigo__icontains=search_query) |
+                        Q(tareas_judiciales__icontains=search_query) |
+                        Q(descripcion__icontains=search_query) |
+                        Q(fecha_hora__icontains=search_query) |
+                        Q(created_by__username__icontains=search_query) |  # Busca por nombre de usuario
+                        Q(created_by__first_name__icontains=search_query) |  # Busca por nombre
+                        Q(created_by__last_name__icontains=search_query)  # Busca por apellido
+                        
                     )
         
         # Devuelve el queryset final, posiblemente filtrado y ajustado.
@@ -198,6 +202,7 @@ class ComisariaPrimeraRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariaprimeraRG'] = user.groups.filter(name='comisariaprimeraRG').exists()
+        context['is_suboficialesSuperiores'] = user.groups.filter(name='suboficialesSuperiores').exists()
         
         # Agrega la fecha actual al contexto.
         context['today'] = timezone.now().date()
@@ -254,7 +259,7 @@ class ComisariasPrimeraRGListView(LoginRequiredMixin, ListView):
         search_filter = (
             Q(cuartoRG__cuartoRG__icontains=query) |
             Q(codigoRG__codigoRG__icontains=query) |
-            Q(codigoRG__nombre_codigoRG__icontains=query) |
+            Q(codigoRG__nombre_codigo__icontains=query) |
             Q(movil_patrulla__icontains=query) |
             Q(a_cargo__icontains=query) |
             Q(secundante__icontains=query) |
@@ -752,15 +757,18 @@ class ComisariaSegundaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
             except (ValueError, TypeError):  
                 # Si la consulta no es una fecha válida, realiza el filtrado en otros campos.
                 queryset = queryset.filter(
-                        Q(codigoRG__codigoRG__icontains=query) |
-                        Q(codigoRG__nombre_codigoRG__icontains=query) |
-                        Q(movil_patrulla__icontains=query) |
-                        Q(a_cargo__icontains=query) |
-                        Q(secundante__icontains=query) |
-                        Q(lugar_codigo__icontains=query) |
-                        Q(tareas_judiciales__icontains=query) |
-                        Q(descripcion__icontains=query) |
-                        Q(fecha_hora__icontains=query)
+                        Q(codigoRG__codigoRG__icontains=search_query) |
+                        Q(codigoRG__nombre_codigo__icontains=search_query) |
+                        Q(movil_patrulla__icontains=search_query) |
+                        Q(a_cargo__icontains=search_query) |
+                        Q(secundante__icontains=search_query) |
+                        Q(lugar_codigo__icontains=search_query) |
+                        Q(tareas_judiciales__icontains=search_query) |
+                        Q(descripcion__icontains=search_query) |
+                        Q(fecha_hora__icontains=search_query) |
+                        Q(created_by__username__icontains=search_query) |  # Busca por nombre de usuario
+                        Q(created_by__first_name__icontains=search_query) |  # Busca por nombre
+                        Q(created_by__last_name__icontains=search_query)  # Busca por apellido
                     )
 
         return queryset
@@ -777,6 +785,7 @@ class ComisariaSegundaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariasegundaRG'] = user.groups.filter(name='comisariasegundaRG').exists()
+        context['is_suboficialesSuperiores'] = user.groups.filter(name='suboficialesSuperiores').exists()
 
 
         context['today'] = timezone.now().date()
@@ -1183,15 +1192,19 @@ class ComisariaTerceraRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
             except (ValueError, TypeError):  
                 # Si la consulta no es una fecha válida, realiza el filtrado en otros campos.
                 queryset = queryset.filter(
-                        Q(codigoRG__codigoRG__icontains=query) |
-                        Q(codigoRG__nombre_codigoRG__icontains=query) |
-                        Q(movil_patrulla__icontains=query) |
-                        Q(a_cargo__icontains=query) |
-                        Q(secundante__icontains=query) |
-                        Q(lugar_codigo__icontains=query) |
-                        Q(tareas_judiciales__icontains=query) |
-                        Q(descripcion__icontains=query) |
-                        Q(fecha_hora__icontains=query)
+                       Q(codigoRG__codigoRG__icontains=search_query) |
+                        Q(codigoRG__nombre_codigo__icontains=search_query) |
+                        Q(movil_patrulla__icontains=search_query) |
+                        Q(a_cargo__icontains=search_query) |
+                        Q(secundante__icontains=search_query) |
+                        Q(lugar_codigo__icontains=search_query) |
+                        Q(tareas_judiciales__icontains=search_query) |
+                        Q(descripcion__icontains=search_query) |
+                        Q(fecha_hora__icontains=search_query) |
+                        Q(created_by__username__icontains=search_query) |  # Busca por nombre de usuario
+                        Q(created_by__first_name__icontains=search_query) |  # Busca por nombre
+                        Q(created_by__last_name__icontains=search_query)  # Busca por apellido
+
                     )
 
         return queryset
@@ -1205,6 +1218,7 @@ class ComisariaTerceraRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVi
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariaterceraRG'] = user.groups.filter(name='comisariatercera').exists()
+        context['is_suboficialesSuperiores'] = user.groups.filter(name='suboficialesSuperiores').exists()
 
         context['today'] = timezone.now().date()
         context['resolveId'] = None
@@ -1594,15 +1608,18 @@ class ComisariaCuartaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
             except (ValueError, TypeError):  
                 # Si la consulta no es una fecha válida, realiza el filtrado en otros campos.
                 queryset = queryset.filter(
-                        Q(codigoRG__codigoRG__icontains=query) |
-                        Q(codigoRG__nombre_codigoRG__icontains=query) |
-                        Q(movil_patrulla__icontains=query) |
-                        Q(a_cargo__icontains=query) |
-                        Q(secundante__icontains=query) |
-                        Q(lugar_codigo__icontains=query) |
-                        Q(tareas_judiciales__icontains=query) |
-                        Q(descripcion__icontains=query) |
-                        Q(fecha_hora__icontains=query)
+                       Q(codigoRG__codigoRG__icontains=search_query) |
+                        Q(codigoRG__nombre_codigo__icontains=search_query) |
+                        Q(movil_patrulla__icontains=search_query) |
+                        Q(a_cargo__icontains=search_query) |
+                        Q(secundante__icontains=search_query) |
+                        Q(lugar_codigo__icontains=search_query) |
+                        Q(tareas_judiciales__icontains=search_query) |
+                        Q(descripcion__icontains=search_query) |
+                        Q(fecha_hora__icontains=search_query) |
+                        Q(created_by__username__icontains=search_query) |  # Busca por nombre de usuario
+                        Q(created_by__first_name__icontains=search_query) |  # Busca por nombre
+                        Q(created_by__last_name__icontains=search_query)  # Busca por apellido
                     )
             
         return queryset
@@ -1616,6 +1633,7 @@ class ComisariaCuartaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariacuartaRG'] = user.groups.filter(name='comisariacuartaRG').exists()
+        context['is_suboficialesSuperiores'] = user.groups.filter(name='suboficialesSuperiores').exists()
 
         context['today'] = timezone.now().date()
         context['resolveId'] = None
@@ -1949,80 +1967,6 @@ class ComisariaCuartaRGDetailView(DetailView):
     context_object_name = 'record'
 
 
-
-#--------------------vista desde la base de datos para comisariacuartaRG-------------------------------------   
-
-
-from django.db.models import Value, Q, CharField
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-# Vista para listar todas las comisarías de  RG
-class ComisariasCuartaRGListView(LoginRequiredMixin, ListView):
-    template_name = 'comisariasriogrande/comisarias_completacuartaRG_list.html'
-    context_object_name = 'page_obj'
-
-    def get_paginate_by(self, queryset):
-        """Define el número de registros por página dinámicamente."""
-        items_per_page = self.request.GET.get('items_per_page', 10)
-        try:
-            return int(items_per_page)
-        except ValueError:
-            return 10  # Valor por defecto si no es válido
-
-    def get_queryset(self):
-        query = self.request.GET.get('q', '').strip()  # Obtiene y limpia la consulta
-
-        # Filtro de búsqueda
-        search_filter = (
-            Q(cuartoRG__cuartoRG__icontains=query) |
-            Q(codigoRG__codigoRG__icontains=query) |
-            Q(codigoRG__nombre_codigoRG__icontains=query) |
-            Q(movil_patrulla__icontains=query) |
-            Q(a_cargo__icontains=query) |
-            Q(secundante__icontains=query) |
-            Q(lugar_codigo__icontains=query) |
-            Q(tareas_judiciales__icontains=query) |
-            Q(descripcion__icontains=query) |
-            Q(fecha_hora__icontains=query)
-        ) if query else Q()  # Solo aplica el filtro si hay una consulta
-
-        # Obtiene los datos filtrados
-        queryset = ComisariaCuartaRG.objects.filter(
-            activo=True
-        ).select_related('cuartoRG').filter(search_filter)
-
-        # Ordenar por fecha de creación
-        return queryset.order_by('-created_at')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        queryset = self.get_queryset()
-
-        # Paginación
-        paginate_by = self.get_paginate_by(queryset)
-        paginator = Paginator(queryset, paginate_by)
-        page = self.request.GET.get('page')
-
-        try:
-            page_obj = paginator.page(page)
-        except PageNotAnInteger:
-            page_obj = paginator.page(1)
-        except EmptyPage:
-            page_obj = paginator.page(paginator.num_pages)
-
-        # Calcular el rango dinámico de páginas
-        current_page = page_obj.number
-        total_pages = page_obj.paginator.num_pages
-        range_start = max(current_page - 5, 1)
-        range_end = min(current_page + 5, total_pages) + 1  # Incluye la última página
-
-        context['page_obj'] = page_obj
-        context['query'] = self.request.GET.get('q', '')
-        context['items_per_page'] = paginate_by
-        context['page_range'] = range(range_start, range_end)
-        return context
-
-
-
 #----------------------------softdelete-------------------------------------------------------------
 
 # En views.py
@@ -2081,15 +2025,15 @@ class ComisariaQuintaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
             except (ValueError, TypeError):  
                 # Si la consulta no es una fecha válida, realiza el filtrado en otros campos.
                 queryset = queryset.filter(
-                        Q(codigoRG__codigoRG__icontains=query) |
-                        Q(codigoRG__nombre_codigoRG__icontains=query) |
-                        Q(movil_patrulla__icontains=query) |
-                        Q(a_cargo__icontains=query) |
-                        Q(secundante__icontains=query) |
-                        Q(lugar_codigo__icontains=query) |
-                        Q(tareas_judiciales__icontains=query) |
-                        Q(descripcion__icontains=query) |
-                        Q(fecha_hora__icontains=query)
+                       Q(codigoRG__codigoRG__icontains=search_query) |
+                       Q(codigoRG__nombre_codigo__icontains=search_query) |
+                       Q(movil_patrulla__icontains=search_query) |
+                       Q(a_cargo__icontains=search_query) |
+                       Q(secundante__icontains=search_query) |
+                       Q(lugar_codigo__icontains=search_query) |
+                       Q(tareas_judiciales__icontains=search_query) |
+                       Q(descripcion__icontains=search_query) |
+                       Q(fecha_hora__icontains=search_query)
                     )
 
         return queryset
@@ -2104,6 +2048,7 @@ class ComisariaQuintaRGListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
         context['is_encargadosguardias'] = user.groups.filter(name='encargadosguardias').exists()
         context['is_oficialesservicios'] = user.groups.filter(name='oficialesservicios').exists()
         context['is_comisariaquintaRG'] = user.groups.filter(name='comisariaquintaRG').exists()
+        context['is_suboficialesSuperiores'] = user.groups.filter(name='suboficialesSuperiores').exists()
 
         context['today'] = timezone.now().date()
         context['resolveId'] = None
@@ -2481,7 +2426,10 @@ class ComisariasCompletaRGListView(LoginRequiredMixin, ListView):
             Q(lugar_codigo__icontains=query) |
             Q(tareas_judiciales__icontains=query) |
             Q(descripcion__icontains=query) |
-            Q(fecha_hora__icontains=query)
+            Q(fecha_hora__icontains=query) |
+            Q(created_by__username__icontains=query) |  # Busca por nombre de usuario
+            Q(created_by__first_name__icontains=query) |  # Busca por nombre
+            Q(created_by__last_name__icontains=query)  # Busca por apellido
         ) if query else Q()  # Solo aplica el filtro si hay una consulta
 
         # Filtra y anota cada QuerySet individualmente
