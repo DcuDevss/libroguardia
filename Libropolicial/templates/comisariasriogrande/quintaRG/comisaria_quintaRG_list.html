@@ -3,9 +3,9 @@
 {% block title %}Lista de Codigos en Comisaría Quinta Rio Grande{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.dataTables.css" />
+<!-- <link rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.dataTables.css" /> -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdn.datatables.net/2.1.3/js/dataTables.js"></script>
+<!-- <script src="https://cdn.datatables.net/2.1.3/js/dataTables.js"></script> -->
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
 <!-- estilos varios -->
 <style>
@@ -53,7 +53,6 @@
     .dark .dataTables_wrapper .dataTables_filter input {
         background-color: #333;
         color: #e0e0e0;
-        border: 1px solid #555;
     }
 
     .dark .dataTables_wrapper .dataTables_info {
@@ -63,6 +62,7 @@
     .dark .dataTables_wrapper .dataTables_header {
         background-color: #333;
         color: #e0e0e0;
+        border: 1px solid #555;
     }
 
     .dark .dataTables_wrapper .dataTables_body {
@@ -159,14 +159,14 @@
     <!-- TITULO -->
     <h1 class="text-2xl font-bold text-center mb-4">Lista de Codigos en Comisaría Quinta Rio Grande</h1>
     <!-- SUB MENU -->
-    <div class="me-nu flex flex-wrap justify-center gap-4">
+    <div class="me-nu flex flex-wrap justify-center mb-4 gap-4">
          <!-- Botón para 'oficialesservicios' y 'jefessuperiores' -->
         {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias or librero %}
         <a href="{% url 'comisaria_quintaRG_create' %}" class="btn bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Iniciar Codigo</a>
         {% endif %}
         
         <!-- Botón para 'jefessuperiores' -->
-        {% if is_jefessuperiores or can_access_comisarias %}
+        {% if is_jefessuperiores or can_access_comisarias or is_suboficialesSuperiores  %}
         <a href="{% url 'comisarias_completaRG_list' %}" class="btn bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-700">Libro general codigos</a>
         {% endif %}
     
@@ -189,44 +189,90 @@
         {% endif %}
     </div>
     <!-- cambios en el template para que agilizar la vista de los codigos--9/01/25 -->
+      <!-- Formulario de búsqueda y selección de elementos por página 15/01/25-->
+    <div class="mb-4 flex justify-between items-center">
+        <!-- Formulario de búsqueda -->
+            <form method="get" class="flex items-center">
+                <input 
+                    type="text" 
+                    name="q" 
+                    value="{{ query }}" 
+                    placeholder="Buscar..." 
+                    class="border rounded px-4 py-2 w-full max-w-xs bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+                >
+                <button 
+                    type="submit" 
+                    class="ml-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                    Buscar
+                </button>
+                <button 
+                    type="button" 
+                    onclick="clearSearch()" 
+                    class="ml-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-2.707-5.707a1 1 0 010-1.414L8.586 10 7.293 8.707a1 1 0 011.414-1.414L10 8.586l1.293-1.293a1 1 0 011.414 1.414L11.414 10l1.293 1.293a1 1 0 01-1.414 1.414L10 11.414l-1.293 1.293a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </form>
+    
+        <!-- Formulario para selección de elementos por página -->
+            <form method="get">
+                <select 
+                    name="items_per_page" 
+                    onchange="this.form.submit()" 
+                    class="border rounded px-4 py-2 bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100"
+                >
+                    <option value="10" {% if items_per_page == 10 %}selected{% endif %}>10</option>
+                    <option value="20" {% if items_per_page == 20 %}selected{% endif %}>20</option>
+                    <option value="30" {% if items_per_page == 30 %}selected{% endif %}>30</option>
+                    <option value="40" {% if items_per_page == 40 %}selected{% endif %}>40</option>
+                </select>
+                <input type="hidden" name="q" value="{{ query }}">
+            </form>
+        </div>
     <!--Tabla-->
-    <div class="overflow-x-auto rounded-lg mt-4">
-        <table class="table-auto w-full text-sm border-collapse border border-gray-200 dark:border-gray-700">
-            <thead class="bg-gray-800 dark:bg-gray-900 text-gray-300">
+    <div class="overflow-x-auto rounded-lg">
+        <table id="myTable" class="display carajo w-full text-[13px] rounded-lg">
+            <thead class=" text-white rounded-lg ">
                 <tr>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Cuarto</th>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Fecha y Hora</th>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Código</th>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Lugar</th>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Descripción</th>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Estado</th>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Creado por</th>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">1er Registro</th>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Editado por</th>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Última Modificación</th>
-                    <th class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">Acciones</th>
+                    <th class="px-4 py-4 text-center rounded-tl-lg">Cuarto</th>
+                    <th class="px-4 py-4 text-center">Fecha y Hora</th>
+                    <th class="px-4 py-4 text-center">Código</th>
+                    <th class="px-4 py-4 text-center">Lugar</th>
+                    <th class="px-4 py-4 text-center">Descripción</th>
+                    <th class="px-4 py-4 text-center">Estado</th>
+                    <th class="px-4 py-4 text-center">Creado por</th>
+                    <th class="px-4 py-4 text-center">1er Registro</th>
+                    <th class="px-4 py-4 text-center">Editado por</th>
+                    <th class="px-4 py-4 text-center">Última Modificación</th>
+                    <th class="px-4 py-4 text-center">Acciones</th>
                 </tr>
             </thead>
 
-            <tbody class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-300">
+            <tbody>
                 {% for record in page_obj %}
-                <tr>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ record.cuartoRG.cuartoRG }}</td>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ record.fecha_hora|date:"d/m/Y H:i:s" }}</td>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ record.codigoRG|default_if_none:'' }}</td>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ record.lugar_codigo|default_if_none:'' }}</td>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">                   
-                       <button type="button" onclick="showModal('{{ record.descripcion|escapejs|safe }}')"class="bg-blue-600 text-white px-2 py-1 rounded">Ver</button>                       
+                <tr class="tede border">
+                    <td class="py-1 px-2 font-bold text-center">{{ record.cuartoRG.cuartoRG }}</td>
+                    <td class="py-1 px-2 text-center">{{ record.fecha_hora|date:"d/m/Y H:i:s" }}</td>
+                    <td class="td-codigo py-1 px-2 text-center">{{ record.codigoRG|default_if_none:'' }}</td>
+                    <td class="td-qth py-1 px-2 text-center">{{ record.lugar_codigo|default_if_none:'' }}</td>
+                    <td class="py-1 px-2 text-center">                   
+                        <button @click="descripcion = '{{ record.descripcion|escapejs }}'; showModal = true" 
+                            class="bg-blue-600 text-white px-3 py-2 rounded" 
+                            style="font-size: 9px; font-weight: 600;"
+                            onmouseover="this.style.backgroundColor='#3B82F6';"
+                            onmouseout="this.style.backgroundColor='#2563eb';">
+                            VER
+                        </button>                      
                     </td>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600 {% if record.estado %}animate-blink{% endif %}">
+                    <td class="py-1 px-2 text-center {% if record.estado %}blink-red{% endif %}">
                         {{ record.estado|yesno:"Activo,Finalizado" }}
                     </td>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ record.created_by.get_full_name|default_if_none:'' }}</td>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ record.created_at|date:"d/m/Y H:i:s" }}</td>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ record.updated_by.get_full_name|default:'' }}</td>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">{{ record.updated_at|date:"d/m/Y H:i:s" }}</td>
-                    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600">
-
+                    <td class="td-nombres py-1 px-2 text-center">{{ record.created_by.get_full_name|default_if_none:'' }}</td>
+                    <td class="py-1 px-2 text-center">{{ record.created_at|date:"d/m/Y H:i:s" }}</td>
+                    <td class="td-nombres py-1 px-2 text-center">{{ record.updated_by.get_full_name|default:'' }}</td>
+                    <td class="py-1 px-2 text-center">{{ record.updated_at|date:"d/m/Y H:i:s" }}</td>
+                    <td class="td-acciones px-2 text-center">
                         <a href="{% url 'comisaria_quintaRG_detail' record.pk %}" 
                             class="bg-blue-600 text-white  px-4 w-full rounded  block text-center my-1">
                             FULL
@@ -234,14 +280,14 @@
 
                         {% if not request.user.get_full_name in record.firmas %}
                         {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias %}
-                        <button @click="recordIdToSign = {{ record.pk }}; showConfirmModal = true" class="bg-teal-500 text-white  px-4 w-full rounded  block text-center my-1 hover:bg-teal-600">FIRMAR</button>
+                        <button @click="recordIdToSign = {{ record.pk }}; showConfirmModal = true" class="bg-teal-500 text-black  px-4 w-full rounded  block text-center my-1 hover:bg-teal-600">FIRMAR</button>
                         {% endif %}
                         {% endif %}
 
                         {% if record.estado or record.fecha_hora.date == today %}
                         {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias %}
                         <a href="{% url 'comisaria_quintaRG_edit' record.pk %}" 
-                            class="bg-yellow-500 text-white  px-4 w-full rounded  block  text-center my-1">
+                            class="bg-yellow-500 text-black  px-4 w-full rounded  block  text-center my-1">
                             EDITAR
                         </a>
                         {% endif %}
@@ -287,26 +333,37 @@
 
 
     <!-- Modal -->
-<div id="modal" class="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75 hidden">
-    <div class="bg-white rounded-lg shadow-xl transform transition-all sm:max-w-lg sm:w-full p-6">
-        <!-- Título del Modal -->
-        <h3 class="text-lg font-medium text-gray-900 mb-4">Descripción</h3>
-        
-        <!-- Contenido HTML del Modal -->
-        <div id="modal-content" class="text-sm text-gray-700 overflow-y-auto max-h-80"></div>
-        
-        <!-- Botón de Cerrar -->
-        <div class="mt-4 flex justify-end">
-            <button onclick="closeModal()" 
-                class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
-                Cerrar
-            </button>
+    <div x-show="showModal" x-cloak class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-2 px-4 pb-20 text-center sm:block sm:p-0">
+            <div x-show="showModal" 
+                class="fixed inset-0 bg-gray-700 bg-opacity-75 transition-opacity" aria-hidden="true">
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div x-show="showModal" 
+                class="inline-block align-bottom bg-white  rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="modal-desc bg-white  px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium dark:text-white text-gray-900" id="modal-title">Descripción</h3>
+                            <div class="mt-2">
+                                <!-- Usar x-html para renderizar el HTML en lugar de texto -->
+                                <div class="descripcion-container text-sm text-gray-500" x-html="descripcion"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="btn-desc bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button @click="showModal = false" type="button" 
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
-</div>
 
-    <!-- Modal de Confirmación para Firmar -->
-    <div x-show="showConfirmModal" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+     <!-- Modal de Confirmación para Firmar -->
+     <div x-show="showConfirmModal" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
         <div class="bg-white dark:bg-gray-800 rounded-lg p-4 w-1/3">
             <h2 class="text-lg font-bold dark:text-white">Confirmar Firma</h2>
             <p class="mt-2 text-gray-800 dark:text-gray-300">¿Está seguro de que desea firmar este registro?</p>
@@ -316,7 +373,6 @@
             </div>
         </div>
     </div>
-</div>
 
 <style>
     @keyframes blink {

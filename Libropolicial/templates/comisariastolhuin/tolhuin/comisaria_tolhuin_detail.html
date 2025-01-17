@@ -385,12 +385,11 @@ Tolhuin{% endblock %} {% block content %}
     <h2 class="text-lg pb-1 font-semibold">Última Actualización del Codigo:</h2>
     <p>{{ record.updated_at|date:"d/m/Y H:i:s"|default:"S/N" }}</p>
   </div>
+  <!-- se agrego el boton volver 14/01/25 -->
   <!-- VOLVER -->
   <div class="mt-4 text-center">
     <a
-      href="{% url 'comisaria_tolhuin_list' %}"
-      class="inline-block font-semibold px-6 py-2 rounded-md text-center border-2 border-white bg-gray-700 hover:bg-gray-600 dark:bg-white text-white dark:text-black"
-    >
+      href="{% url 'comisaria_tolhuin_list' %}" class="inline-block font-semibold px-6 py-2 rounded-md text-center border-2 border-white bg-gray-700 hover:bg-gray-600 dark:bg-white text-white dark:text-black">
       Volver a la Lista
     </a>
   </div>
