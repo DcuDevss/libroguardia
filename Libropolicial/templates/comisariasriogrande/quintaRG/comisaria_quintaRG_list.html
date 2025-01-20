@@ -248,7 +248,7 @@
                     <th class="px-4 py-4 text-center">Acciones</th>
                 </tr>
             </thead>
-
+ <!-- se agrego el resaltaado 20/01/25 -->
             <tbody>
                 {% for record in page_obj %}
                 <tr class="tede border">
@@ -272,6 +272,7 @@
                     <td class="py-1 px-2 text-center">{{ record.created_at|date:"d/m/Y H:i:s" }}</td>
                     <td class="td-nombres py-1 px-2 text-center">{{ record.updated_by.get_full_name|default:'' }}</td>
                     <td class="py-1 px-2 text-center">{{ record.updated_at|date:"d/m/Y H:i:s" }}</td>
+                     <!--fin 20/01/25 -->
                     <td class="td-acciones px-2 text-center">
                         <a href="{% url 'comisaria_quintaRG_detail' record.pk %}" 
                             class="bg-blue-600 text-white  px-4 w-full rounded  block text-center my-1">
