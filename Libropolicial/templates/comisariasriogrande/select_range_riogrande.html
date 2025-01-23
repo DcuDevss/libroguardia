@@ -135,14 +135,14 @@
 </style>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center dark">
     <div style="width: 400px; margin-top: 50px; margin-left: auto; margin-right: auto;" 
-         class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+         class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-lg">
         <h1 class="text-lg font-bold mb-4 text-center text-gray-700 dark:text-gray-300">Generar PDF por Rango de Fecha y Hora</h1>
         <form method="get" action="{% url 'generate_pdf_custom_range_view_rg' %}" target="_blank">
             <div class="bloques grid grid-cols-1 gap-y-4">
                 <!-- Seleccionar Comisaría -->
                 <div class="w-full">
                     <label for="comisaria" class="py-1 block text-gray-700 dark:text-gray-300">Comisaría</label>
-                    <select id="comisaria" name="comisaria" required class="bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-gray-200 border rounded-lg p-3 w-full">
+                    <select id="comisaria" name="comisaria" required class=" border rounded-lg p-3 w-full">
                         <option value="" disabled selected>Seleccione una comisaría</option>
                         <option value="primera">Primera</option>
                         <option value="segunda">Segunda</option>
@@ -154,24 +154,20 @@
                 <!-- Fecha y Hora de Inicio -->
                 <div class="w-full">
                     <label for="start_date" class="py-1 block text-gray-700 dark:text-gray-300">Fecha de Inicio</label>
-                    <input type="date" id="start_date" name="start_date" required  class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600
-                    text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3">
+                    <input type="date" id="start_date" name="start_date" required  class="text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3">
                 </div>
                 <div class="w-full">
                     <label for="start_time" class="py-1 block text-gray-700 dark:text-gray-300">Hora de Inicio</label>
-                    <input type="time" id="start_time" name="start_time" required  class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600
-                    text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3">
+                    <input type="time" id="start_time" name="start_time" required  class="text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3">
                 </div>
                 <!-- Fecha y Hora de Fin -->
                 <div class="w-full">
                     <label for="end_date" class="py-1 block text-gray-700 dark:text-gray-300">Fecha de Fin</label>
-                    <input type="date" id="end_date" name="end_date" required  class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600
-                    text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3">
+                    <input type="date" id="end_date" name="end_date" required  class=" text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3">
                 </div>
                 <div class="w-full">
                     <label for="end_time" class="py-1 block text-gray-700 dark:text-gray-300">Hora de Fin</label>
-                    <input type="time" id="end_time" name="end_time" required  class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600
-                    text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3">
+                    <input type="time" id="end_time" name="end_time" required  class=" text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3">
                 </div>
                 <!-- Botón -->
                 <div>
