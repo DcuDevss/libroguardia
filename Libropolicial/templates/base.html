@@ -120,22 +120,49 @@
       [x-cloak] {
         display: none !important;
       }
-
+      /*  */
+      .carajo {
+        border: 1px solid #555 !important;
+      }
+      html.dark .carajo {
+        border: 2px solid #555 !important;
+      }
       /* tabla comisarias */
       .tede:hover {
         background: rgba(0, 0, 0, 0.1) !important;
-        /* Cambia el color y la opacidad según desees */
         transition: background 0.3s ease;
-        /* Agrega una transición suave */
       }
 
       .dark .tede:hover {
         background-color: rgba(255, 255, 255, 0.1) !important;
         transition: background 0.3s ease;
       }
-
-      /* formulario subir partes pdf 'INPUTS' */
-      
+      .tede td {
+        border-right: 0.5px solid rgba(0, 0, 0, 0.15);
+      }
+      /* Ajuste para modo oscuro */
+      html.dark .tede td {
+        border-right: 0.5px solid rgba(255, 255, 255, 0.15); /* Borde gris claro para modo oscuro */
+        border-bottom: 0.5px solid rgba(255, 255, 255, 0.15); /* Borde gris claro para modo oscuro */
+      }
+      /* PAGINACION */
+      .paginacion-numeros:hover{
+        background: rgba(0, 0, 0, 0.1) !important;
+        transition: background 0.3s ease;
+      }
+      html.dark .paginacion-numeros:hover{
+        background-color: rgba(255, 255, 255, 0.1) !important;
+        transition: background 0.3s ease;
+      }
+      /* DESBORDE DE TEXTO DE MODAL-DESCRIPCION */
+      .descripcion-container * {
+        margin-right: 0 !important;
+      }
+      /* COLOR TEXT MODAL DESCRIPCION */
+      html.dark .descripcion-container * {
+        color: rgba(245, 245, 245, 0.96) !important;
+        background-color: inherit !important;
+      }
       /* responsivo menu y footer */
       @media (max-width: 840px) {
         .menu-header {
