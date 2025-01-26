@@ -49,8 +49,8 @@ class CustomLoginView(LoginView):
             'comisaria_terceraRG': 'comisariaterceraRG_list',
             'comisaria_cuartaRG': 'comisariacuartaRG_list',
             'comisaria_quintaRG': 'comisariaquintaRG_list',
-            #'comisaria_tolhuin': 'comisaria_tolhuin_list',
-            #'divisioncomunicaciones': 'divisioncomunicaciones_list'
+            #'comisaria_tolhuin': 'comisaria_tolhuin_list',xaca
+            #'divisioncomunicaciones': 'divisioncomunicaciones_list'ahsg
         }
         for group, url in user_group_redirects.items():
             if self.request.user.groups.filter(name=group).exists():
