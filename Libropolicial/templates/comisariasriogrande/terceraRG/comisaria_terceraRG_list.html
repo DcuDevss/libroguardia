@@ -3,6 +3,8 @@
 {% block title %}Lista de Codigos en Comisaría Tercera Rio Grande{% endblock %}
 
 {% block content %}
+
+{% load custom_tags %}
 <!-- <link rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.dataTables.css" /> -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <!-- <script src="https://cdn.datatables.net/2.1.3/js/dataTables.js"></script> -->
@@ -129,6 +131,11 @@
     html.dark .modal-desc p, html.dark .modal-desc span{
         color: rgba(255, 255, 255, 0.911);
     }
+    .highlight {
+        background-color: yellow;
+        color: black;
+        font-weight: bold;
+    }
     /* table.dataTable > tbody > tr.selected > * {
         box-shadow: inset 0 0 0 9999px rgb(4, 4, 107) !important; 
         color: white !important; 
@@ -248,16 +255,16 @@
                     <th class="px-4 py-4 text-center">Acciones</th>
                 </tr>
             </thead>
-
+ <!-- se agrego el resaltaado 20/01/25 -->
             <tbody>
                 {% for record in page_obj %}
                 <tr class="tede border">
-                    <td class="py-1 px-2 font-bold text-center">{{ record.cuartoRG.cuartoRG }}</td>
-                    <td class="py-1 px-2 text-center">{{ record.fecha_hora|date:"d/m/Y H:i:s" }}</td>
-                    <td class="td-codigo py-1 px-2 text-center">{{ record.codigoRG|default_if_none:'' }}</td>
-                    <td class="td-qth py-1 px-2 text-center">{{ record.lugar_codigo|default_if_none:'' }}</td>
+                    <td class="py-1 px-2 font-bold text-center">{{ record.cuartoRG.cuartoRG|highlight:query|safe }}</td>
+                    <td class="py-1 px-2 text-center">{{ record.fecha_hora|date:"d/m/Y H:i:s"|highlight:query|safe }}</td>
+                    <td class="td-codigo py-1 px-2 text-center">{{ record.codigoRG|default_if_none:''|highlight:query|safe }}</td>
+                    <td class="td-qth py-1 px-2 text-center">{{ record.lugar_codigo|default_if_none:''|highlight:query|safe }}</td>
                     <td class="py-1 px-2 text-center">                   
-                        <button @click="descripcion = '{{ record.descripcion|escapejs }}'; showModal = true" 
+                        <button @click="descripcion = '{{ record.descripcion|highlight:query|escapejs }}'; showModal = true" 
                             class="bg-blue-600 text-white px-3 py-2 rounded" 
                             style="font-size: 9px; font-weight: 600;"
                             onmouseover="this.style.backgroundColor='#3B82F6';"
@@ -268,20 +275,16 @@
                     <td class="py-1 px-2 text-center {% if record.estado %}blink-red{% endif %}">
                         {{ record.estado|yesno:"Activo,Finalizado" }}
                     </td>
-                    <td class="td-nombres py-1 px-2 text-center">{{ record.created_by.get_full_name|default_if_none:'' }}</td>
-                    <td class="py-1 px-2 text-center">{{ record.created_at|date:"d/m/Y H:i:s" }}</td>
-                    <td class="td-nombres py-1 px-2 text-center">{{ record.updated_by.get_full_name|default:'' }}</td>
-                    <td class="py-1 px-2 text-center">{{ record.updated_at|date:"d/m/Y H:i:s" }}</td>
-
+                    <td class="td-nombres py-1 px-2 text-center">{{ record.created_by.get_full_name|default_if_none:''|highlight:query|safe }}</td>
+                    <td class="py-1 px-2 text-center">{{ record.created_at|date:"d/m/Y H:i:s"|highlight:query|safe }}</td>
+                    <td class="td-nombres py-1 px-2 text-center">{{ record.updated_by.get_full_name|default:''|highlight:query|safe }}</td>
+                    <td class="py-1 px-2 text-center">{{ record.updated_at|date:"d/m/Y H:i:s"|highlight:query|safe }}</td>
+                     <!-- fin 20/01/25 -->
                     <td class="td-acciones px-2 text-center">
-
-                        
-
                         <a href="{% url 'comisaria_terceraRG_detail' record.pk %}" 
                             class="bg-blue-600 text-white  px-4 w-full rounded  block text-center my-1">
                             FULL
                         </a>
-
                         {% if not request.user.get_full_name in record.firmas %}
                         {% if is_oficialesservicios or is_jefessuperiores or is_encargadosguardias %}
                         <button @click="recordIdToSign = {{ record.pk }}; showConfirmModal = true" class="bg-teal-500 text-black  px-4 w-full rounded  block text-center my-1 hover:bg-teal-600">FIRMAR</button>

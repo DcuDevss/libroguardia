@@ -1924,8 +1924,6 @@ def eliminar_comisaria_cuarta(request, pk):
 
 
 #---------------------comisaria quinta para ver ---------------------
-
-
 class ComisariaQuintaListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     # Vista basada en clases para listar los registros de la Comisaría Quinta.
     # Incluye restricciones de acceso y paginación.
@@ -1987,6 +1985,8 @@ class ComisariaQuintaListView(LoginRequiredMixin, UserPassesTestMixin, ListView)
         
         context = super().get_context_data(**kwargs)  # Obtiene el contexto predeterminado.
         user = self.request.user  # Obtiene el usuario actual.
+        query = self.request.GET.get('q', '').strip()
+        page_obj = context['page_obj']
 
         # Añade información sobre los permisos del usuario, según sus grupos.
         context['is_jefessuperiores'] = user.groups.filter(name='jefessuperiores').exists()  
@@ -2020,6 +2020,7 @@ class ComisariaQuintaListView(LoginRequiredMixin, UserPassesTestMixin, ListView)
         context['query'] = self.request.GET.get('q', '')  # Añade la consulta de búsqueda al contexto.
         context['items_per_page'] = paginate_by  # Añade el número de elementos por página al contexto.
         context['page_range'] = range(range_start, range_end)  # Añade el rango dinámico de páginas al contexto.
+        
 
         return context  # Devuelve el contexto completo.
 

@@ -91,7 +91,7 @@
         background-color: #3b82f6; /* Equivalente a blue-500 */
     }
    /* Estilo general para inputs de fecha y hora */
-   input[type="date"], input[type="time"] {
+    input[type="date"], input[type="time"] {
         background-color: var(--bg-color, white); /* Fondo dinámico según tema */
         color: var(--text-color, black); /* Texto dinámico según tema */
         border: 1px solid var(--border-color, #ccc);
@@ -99,25 +99,24 @@
         padding: 10px;
         font-size: 16px;
         appearance: none; /* Deshabilita el estilo nativo */
-        -webkit-appearance: none; /* Para navegadores basados en Webkit */
+        -webkit-appearance: none; /* Para navegadores basados en WebKit */
         position: relative;
     }
 
-    /* Ajustar iconos para campos nativos */
+    /* Personaliza el ícono */
     input[type="date"]::-webkit-calendar-picker-indicator,
     input[type="time"]::-webkit-calendar-picker-indicator {
-        filter: var(--icon-filter, none);
-        opacity: 2; /* Asegurar que el ícono sea visible */
-        background-color: transparent; 
+        filter: var(--icon-filter, none); /* Dinámico según tema */
         cursor: pointer;
     }
+    
 
     /* Modo claro */
     body {
         --bg-color: white;
         --text-color: black;
         --border-color: #ccc;
-        --icon-filter: none;
+        --icon-filter: none; /* Negro por defecto (sin filtros) */
     }
 
     /* Modo oscuro */
@@ -125,17 +124,18 @@
         --bg-color: #1e293b; /* Fondo oscuro */
         --text-color: #cbd5e1; /* Texto claro */
         --border-color: #475569; /* Borde claro */
-        --icon-filter: invert(1); /* Invertir iconos para que sean claros */
-
-       
+        --icon-filter: invert(1); /* Blanco en modo oscuro */
     }
+
+    /* Asegura que el ícono no se enfoque */
     input[type="date"]::-webkit-calendar-picker-indicator:focus,
     input[type="time"]::-webkit-calendar-picker-indicator:focus {
-        outline: none; }
+        outline: none;
+    }
 </style>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center dark">
-    <div style="width: 400px; margin-top: 50px; margin-left: auto; margin-right: auto;" 
-         class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+    <div style=" width: 400px; margin-top: 50px; margin-left: auto; margin-right: auto;" 
+         class="bg-white dark:bg-gray-700 p-6 rounded-lg shadow-lg">
         <h1 class="text-lg font-bold mb-4 text-center text-gray-700 dark:text-gray-300">Generar PDF por Rango de Fecha y Hora</h1>
         <form method="get" action="{% url 'generate_pdf_custom_range_view' %}" target="_blank"> 
             <div class="bloques grid grid-cols-1 gap-y-4">
@@ -143,27 +143,23 @@
                 <div class="w-full">
                     <label for="start_date" class="py-1 block text-gray-700 dark:text-gray-300">Fecha de Inicio</label>
                     <input type="date" id="start_date" name="start_date" required 
-                        class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600
-                        text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3">
+                        class=" text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3">
                 </div>
                 <div class="w-full">
                     <label for="start_time" class="py-1 block text-gray-700 dark:text-gray-300">Hora de Inicio</label>
                     <input type="time" id="start_time" name="start_time" required 
-                        class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600
-                        text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3">
+                        class="text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3">
                 </div>
                 <!-- FECHA Y HORA DE FIN -->
                 <div class="w-full">
                     <label for="end_date" class="py-1 block text-gray-700 dark:text-gray-300">Fecha de Fin</label>
                     <input type="date" id="end_date" name="end_date" required 
-                        class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600
-                        text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3">
+                        class="text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3">
                 </div>
                 <div class="w-full">
                     <label for="end_time" class="py-1 block text-gray-700 dark:text-gray-300">Hora de Fin</label>
                     <input type="time" id="end_time" name="end_time" required 
-                        class="bg-gray-50 dark:bg-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600
-                        text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3">
+                        class=" text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3">
                 </div>
                 <div class="">
                     <button type="submit" 

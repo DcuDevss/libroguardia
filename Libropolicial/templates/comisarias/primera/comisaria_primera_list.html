@@ -3,6 +3,8 @@
 {% block title %}Lista de Codigos en Comisaría Primera{% endblock %}
 
 {% block content %}
+
+{% load custom_tags %}
 <!-- <link rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.dataTables.css" /> -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <!-- <script src="https://cdn.datatables.net/2.1.3/js/dataTables.js"></script> -->
@@ -75,6 +77,9 @@
     .carajo {
         border: 1px solid #555 !important;
     }
+    html.dark .carajo {
+        border: 2px solid #555 !important;
+    }
     /*  */
     /* .dark .dataTables_wrapper tbody tr:hover {
         background-color: #3b82f6;
@@ -95,6 +100,7 @@
     /* Ajuste para modo oscuro */
     html.dark .tede td {
         border-right: 0.5px solid rgba(255, 255, 255, 0.15); /* Borde gris claro para modo oscuro */
+        border-bottom: 0.5px solid rgba(255, 255, 255, 0.15); /* Borde gris claro para modo oscuro */
     }
     .td-codigo p{
         margin: auto;
@@ -128,6 +134,11 @@
     }
     html.dark .modal-desc p, html.dark .modal-desc span{
         color: rgba(255, 255, 255, 0.911);
+    }
+    .highlight {
+        background-color: yellow;
+        color: black;
+        font-weight: bold;
     }
     /* table.dataTable > tbody > tr.selected > * {
         box-shadow: inset 0 0 0 9999px rgb(4, 4, 107) !important; 
@@ -247,16 +258,16 @@
                     <th class="px-4 py-4 text-center">Acciones</th>
                 </tr>
             </thead>
-
+ <!-- se agrego el resaltaado 20/01/25 -->
             <tbody>
                 {% for record in page_obj %}
                 <tr class="tede border">
-                    <td class="py-1 px-2 font-bold text-center">{{ record.cuarto.cuarto }}</td>
-                    <td class="py-1 px-2 text-center">{{ record.fecha_hora|date:"d/m/Y H:i:s" }}</td>
-                    <td class="td-codigo py-1 px-2 text-center">{{ record.codigo|default_if_none:'' }}</td>
-                    <td class="td-qth py-1 px-2 text-center">{{ record.lugar_codigo|default_if_none:'' }}</td>
+                    <td class="py-1 px-2 font-bold text-center">{{ record.cuarto.cuarto|highlight:query|safe }}</td>
+                    <td class="py-1 px-2 text-center">{{ record.fecha_hora|date:"d/m/Y H:i:s"|highlight:query|safe }}</td>
+                    <td class="td-codigo py-1 px-2 text-center">{{ record.codigo|default_if_none:''|highlight:query|safe }}</td>
+                    <td class="td-qth py-1 px-2 text-center">{{ record.lugar_codigo|default_if_none:''|highlight:query|safe }}</td>
                     <td class="py-1 px-2 text-center">                   
-                        <button @click="descripcion = '{{ record.descripcion|escapejs }}'; showModal = true" 
+                        <button @click="descripcion = '{{ record.descripcion|highlight:query|escapejs }}'; showModal = true" 
                             class="bg-blue-600 text-white px-3 py-2 rounded" 
                             style="font-size: 9px; font-weight: 600;"
                             onmouseover="this.style.backgroundColor='#3B82F6';"
@@ -267,12 +278,12 @@
                     <td class="py-1 px-2 text-center {% if record.estado %}blink-red{% endif %}">
                         {{ record.estado|yesno:"Activo,Finalizado" }}
                     </td>
-                    <td class="td-nombres py-1 px-2 text-center">{{ record.created_by.get_full_name|default_if_none:'' }}</td>
-                    <td class="py-1 px-2 text-center">{{ record.created_at|date:"d/m/Y H:i:s" }}</td>
-                    <td class="td-nombres py-1 px-2 text-center">{{ record.updated_by.get_full_name|default:'' }}</td>
-                    <td class="py-1 px-2 text-center">{{ record.updated_at|date:"d/m/Y H:i:s" }}</td>
+                    <td class="td-nombres py-1 px-2 text-center">{{ record.created_by.get_full_name|default_if_none:''|highlight:query|safe }}</td>
+                    <td class="py-1 px-2 text-center">{{ record.created_at|date:"d/m/Y H:i:s"|highlight:query|safe }}</td>
+                    <td class="td-nombres py-1 px-2 text-center">{{ record.updated_by.get_full_name|default:''|highlight:query|safe }}</td>
+                    <td class="py-1 px-2 text-center">{{ record.updated_at|date:"d/m/Y H:i:s"|highlight:query|safe }}</td>
                     <td class="td-acciones px-2 text-center">
-
+ <!-- fin 20/01/25 -->
                         <a href="{% url 'comisaria_primera_detail' record.pk %}" 
                             class="bg-blue-600 text-white  px-4 w-full rounded  block text-center my-1">
                             FULL
@@ -317,19 +328,19 @@
         <span>Mostrando registros del {{ page_obj.start_index }} al {{ page_obj.end_index }} de un total de {{ page_obj.paginator.count }}</span>
         <div>
             {% if page_obj.has_previous %}
-            <a href="?page=1&items_per_page={{ items_per_page }}" class="px-2 py-1 border rounded">Primero</a>
-            <a href="?page={{ page_obj.previous_page_number }}&items_per_page={{ items_per_page }}" class="px-2 py-1 border rounded">Anterior</a>
+            <a href="?page=1&items_per_page={{ items_per_page }}" class="paginacion-numeros px-2 py-1 border rounded">Primero</a>
+            <a href="?page={{ page_obj.previous_page_number }}&items_per_page={{ items_per_page }}" class="paginacion-numeros px-2 py-1 border rounded">Anterior</a>
             {% endif %}
             {% for num in page_range %}
             {% if num == page_obj.number %}
-            <span class="px-2 py-1 border rounded bg-blue-500 text-white">{{ num }}</span>
+            <span class="paginacion-numeros px-2 py-1 border rounded bg-blue-500 text-white">{{ num }}</span>
             {% else %}
-            <a href="?page={{ num }}&items_per_page={{ items_per_page }}" class="px-2 py-1 border rounded">{{ num }}</a>
+            <a href="?page={{ num }}&items_per_page={{ items_per_page }}" class="paginacion-numeros px-2 py-1 border rounded">{{ num }}</a>
             {% endif %}
             {% endfor %}
             {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}&items_per_page={{ items_per_page }}" class="px-2 py-1 border rounded">Siguiente</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}&items_per_page={{ items_per_page }}" class="px-2 py-1 border rounded">Último</a>
+            <a href="?page={{ page_obj.next_page_number }}&items_per_page={{ items_per_page }}" class="paginacion-numeros px-2 py-1 border rounded">Siguiente</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}&items_per_page={{ items_per_page }}" class="paginacion-numeros px-2 py-1 border rounded">Último</a>
             {% endif %}
         </div>
     </div>
