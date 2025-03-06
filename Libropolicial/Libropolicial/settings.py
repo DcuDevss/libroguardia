@@ -124,7 +124,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',  # Utiliza el backend MySQL
         'NAME': 'libro',  # Nombre de la base de datos
         'USER': 'root',  # Usuario de la base de datos
-        'PASSWORD': '',  # Contraseña de la base de datos
+        'PASSWORD': 'Todo2021',  # Contraseña de la base de datos
         'HOST': 'localhost',  # Host de la base de datos
         'PORT': '3306',  # Puerto de la base de datos
     }
