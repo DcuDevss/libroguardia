@@ -28,6 +28,21 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.contrib.auth.views import PasswordResetConfirmView
+from django.contrib.auth.views import LoginView
+from django.utils.timezone import now
+from django.urls import reverse_lazy
+import user_agents  # Instalar con pip install user-agents
+from django.http import JsonResponse
+from compartido.models import Personal
+from django.shortcuts import redirect
+from django.contrib.auth import logout
+from user_agents import parse
+from django.contrib.sessions.models import Session
+from user_agents import parse  # Asegúrate de que `user-agents` esté instalado: pip install user-agents
+from django.utils.timezone import now
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+from django.utils.timezone import now
 
 def no_permission(request):
     return render(request, 'no_permission.html', {})
@@ -35,17 +50,22 @@ def no_permission(request):
 class HomeView(TemplateView):
     template_name = 'home.html'
 
+
+
 class CustomLoginView(LoginView):
     template_name = 'login.html'
     authentication_form = CustomLoginForm
     
 
     def get_success_url(self):
+        """
+        Redirige al usuario según su grupo asignado.
+        """
         user_group_redirects = {
             'comisariaprimera': 'comisaria_primera_list',
             'comisariasegunda': 'comisaria_segunda_list',
             'comisaria_primeraRG': 'comisariaprimeraRG_list',
-            'comisaria_segundaRG': 'comisariasegundaRG_list',
+            'comisaria_segundaRG': 'comisaria_segundaRG_list',
             'comisaria_terceraRG': 'comisariaterceraRG_list',
             'comisaria_cuartaRG': 'comisariacuartaRG_list',
             'comisaria_quintaRG': 'comisariaquintaRG_list',
@@ -57,17 +77,73 @@ class CustomLoginView(LoginView):
                 return reverse_lazy(url)
         return reverse_lazy('no_permission')
 
+    def form_valid(self, form):
+        """
+        Maneja la lógica al inicio de sesión exitoso:
+        - Cierra sesiones previas del usuario.
+        - Actualiza la IP, dispositivo y hora de conexión.
+        - Marca al usuario como "en línea".
+        """
+        user = form.get_user()
+        profile = getattr(user, 'personal_profile', None)
+
+        if profile:
+            # Cerrar sesiones activas del usuario
+            active_sessions = Session.objects.filter(session_key=profile.session_key)
+            for session in active_sessions:
+                session.delete()
+
+            # Registrar nueva sesión
+            profile.session_key = self.request.session.session_key
+
+            # Registrar última IP
+            x_forwarded_for = self.request.META.get('HTTP_X_FORWARDED_FOR')
+            ip = x_forwarded_for.split(',')[0] if x_forwarded_for else self.request.META.get('REMOTE_ADDR')
+            profile.last_ip = ip
+
+            # Registrar dispositivo
+            user_agent = parse(self.request.META.get('HTTP_USER_AGENT', ''))
+            browser = user_agent.browser.family or "Navegador desconocido"
+            os = user_agent.os.family or "Sistema operativo desconocido"
+            device = user_agent.device.family if user_agent.device.family != "Other" else "Dispositivo desconocido"
+            profile.last_device = f"{browser} en {os} ({device})"
+
+            # Registrar última hora de conexión
+            profile.last_login_time = now()
+
+            # Marcar al usuario como "en línea"
+            profile.is_online = True
+
+            # Guardar cambios en el perfil
+            profile.save()
+
+        # Continúa con el inicio de sesión normal
+        return super().form_valid(form)
 
 @login_required
 def perfil_usuario(request):
-    # Obtener o crear el perfil personalizado del usuario autenticado
     personal_profile, created = Personal.objects.get_or_create(user=request.user)
 
-    if created:
-        # Si se creó un nuevo perfil, puedes inicializar campos predeterminados aquí si es necesario
-        messages.info(request, "Se ha creado automáticamente un perfil para tu usuario.")
-    
-    return render(request, 'perfil_usuario.html', {'user': request.user, 'personal_profile': personal_profile})
+    last_device_raw = personal_profile.last_device
+    if last_device_raw:
+        try:
+            user_agent = parse(last_device_raw)
+            browser = user_agent.browser.family or "Navegador desconocido"
+            os = user_agent.os.family or "Sistema operativo desconocido"
+            device = user_agent.device.family if user_agent.device.family != "Other" else "Dispositivo desconocido"
+            last_device = f"{browser} en {os} ({device})"
+        except Exception:
+            last_device = "Formato de dispositivo no reconocido"
+    else:
+        last_device = "No registrado"
+
+    context = {
+        'user': request.user,
+        'personal_profile': personal_profile,
+        'last_device': last_device,
+    }
+
+    return render(request, 'perfil_usuario.html', context)
 
 
 @login_required
@@ -125,6 +201,53 @@ def actualizar_perfil(request):
         messages.error(request, "Error al procesar la solicitud.")
         return redirect('perfil_usuario')
     
+
+def obtener_usuarios_conectados(request):
+    """
+    Devuelve una lista de usuarios conectados clasificados por grupo.
+    """
+    usuarios = Personal.objects.filter(is_online=True).select_related('user')
+    usuarios_por_grupo = {}
+
+    for usuario in usuarios:
+        grupos = usuario.user.groups.values_list('name', flat=True)  # Obtén los nombres de los grupos del usuario
+        for grupo in grupos:
+            if grupo not in usuarios_por_grupo:
+                usuarios_por_grupo[grupo] = []
+            usuarios_por_grupo[grupo].append({
+                "username": usuario.user.username,
+                "nombre_completo": usuario.user.get_full_name() or usuario.user.username
+            })
+
+    return JsonResponse({"usuarios_por_grupo": usuarios_por_grupo})
+
+
+def custom_logout(request):
+    """
+    Cierra la sesión del usuario y actualiza el estado `is_online` y `last_login_time` en su perfil.
+    """
+    if request.user.is_authenticated:
+        try:
+            # Obtén el perfil asociado al usuario
+            user_profile = getattr(request.user, 'personal_profile', None)
+
+            if user_profile:
+                # Actualiza el estado del perfil
+                user_profile.is_online = False
+                user_profile.last_login_time = now()  # Registrar la última hora antes de cerrar sesión
+                user_profile.session_key = None  # Elimina cualquier clave de sesión activa
+                user_profile.save()
+        except AttributeError:
+            # Maneja el caso en el que el perfil no existe
+            pass
+
+    # Cierra la sesión del usuario
+    logout(request)
+
+    # Redirige al usuario a la página de inicio de sesión
+    return redirect('login')
+
+   
 @csrf_exempt
 @login_required
 def cambiar_contrasena(request):
