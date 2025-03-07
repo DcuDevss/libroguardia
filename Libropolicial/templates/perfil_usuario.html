@@ -72,34 +72,49 @@
                 </div>
                 <h1 class="mb-1">
                     Bienvenido, <span class="fw-bold">{{ user.username }}</span>
+                    
                 </h1>
+               
+                
                 <p class="text-muted">Miembro desde {{ user.date_joined|date:"d-m-Y" }}</p>
             </div>
         
             <div class="profile-details">
                 <h4 class="text-primary">Información Personal</h4>
                 <p>
-                    <strong>Nombre completo:</strong> {{ user.get_full_name|default:"No
-                    especificado" }}
+                    <strong>Nombre completo:</strong> {{ user.get_full_name|default:"No especificado" }}
                 </p>
                 <p>
-                    <strong>DNI:</strong> {{ user.personal_profile.dni|default:"No
-                    especificado" }}
+                    <strong>DNI:</strong> {{ user.personal_profile.dni|default:"No especificado" }}
                 </p>
                 <p>
-                    <strong>Legajo:</strong> {{ user.personal_profile.legajo|default:"No
-                    especificado" }}
+                    <strong>DNI:</strong> {{ user.personal_profile.dni|default:"No especificado" }}
+                </p>
+                <p><strong>Legajo:</strong> {{ personal_profile.legajo|default_if_none:"No especificado" }}</p>
+                <p>
+                    <strong>Teléfono:</strong> {{ user.personal_profile.telefono|default:"No especificado" }}
                 </p>
                 <p>
-                    <strong>Teléfono:</strong> {{ user.personal_profile.telefono|default:"No
-                    especificado" }}
-                </p>
-                <p>
-                    <strong>Domicilio:</strong> {{ user.personal_profile.domicilio|default:"No
-                    especificado" }}
+                    <strong>Domicilio:</strong> {{ user.personal_profile.domicilio|default:"No especificado" }}
                 </p>
                 <p><strong>Correo electrónico:</strong> {{ user.email }}</p>
             </div>
+            <!-- Última Actividad -->
+            <div class="profile-details mb-4">
+                <h4 class="text-primary mb-3">Última Actividad</h4>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>Última conexión:</strong> 
+                        <span>{{ user.personal_profile.last_login_time|date:"d-m-Y H:i" }}</span>
+                    </li>
+                    <li class="list-group-item"><strong>Última IP:</strong> 
+                        <span>{{ user.personal_profile.last_ip|default:"No registrada" }}</span>
+                    </li>
+                    <li class="list-group-item"><strong>Último dispositivo:</strong> 
+                        <span>{{ last_device }}</span>
+                    </li>
+                </ul>
+            </div>
+
         
             <div class="actions mt-4 d-flex justify-content-between">
                 <button type="button" class="btn btn-primary w-50 me-2" data-bs-toggle="modal"
@@ -111,8 +126,10 @@
                     Cambiar Contraseña
                 </button>
             </div>
+            
         </div>
     </div>
+    
     
     <footer style="background-color: black; color: white; text-align: center; padding: 0.5rem;  margin-left: auto; margin-right: auto; width: 100%;">
         <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-left: auto; margin-right: auto;">
