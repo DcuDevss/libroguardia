@@ -51,7 +51,7 @@ class HomeView(TemplateView):
     template_name = 'home.html'
 
 
-
+#ult actual. 8/01/25
 class CustomLoginView(LoginView):
     template_name = 'login.html'
     authentication_form = CustomLoginForm
@@ -118,6 +118,8 @@ class CustomLoginView(LoginView):
         # Continúa con el inicio de sesión normal
         return super().form_valid(form)
 
+
+#ult actual. 8/01/25
 @login_required
 def perfil_usuario(request):
     personal_profile, created = Personal.objects.get_or_create(user=request.user)
@@ -143,7 +145,7 @@ def perfil_usuario(request):
 
     return render(request, 'perfil_usuario.html', context)
 
-
+#ult actual. 8/01/25
 @login_required
 def actualizar_perfil(request):
     try:
@@ -199,7 +201,7 @@ def actualizar_perfil(request):
         messages.error(request, "Error al procesar la solicitud.")
         return redirect('perfil_usuario')
     
-
+#ult actual. 8/01/25
 def obtener_usuarios_conectados(request):
     """
     Devuelve una lista de usuarios conectados clasificados por grupo.
@@ -219,7 +221,7 @@ def obtener_usuarios_conectados(request):
 
     return JsonResponse({"usuarios_por_grupo": usuarios_por_grupo})
 
-
+#ult actual. 8/01/25
 def custom_logout(request):
     """
     Cierra la sesión del usuario y actualiza el estado `is_online` y `last_login_time` en su perfil.
@@ -245,7 +247,8 @@ def custom_logout(request):
     # Redirige al usuario a la página de inicio de sesión
     return redirect('login')
 
-   
+
+#ult actual. 8/01/25
 @csrf_exempt
 @login_required
 def cambiar_contrasena(request):
