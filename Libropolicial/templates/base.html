@@ -303,7 +303,7 @@
         </div>
 
         <!--Partes-->
-        {% if can_access_comisarias %}
+        {% if request.user.is_superuser %}
         <!-- Dropdown para Partes PDF -->
         <div x-data="{ open: false }" x-cloak class="relative">
           <button
